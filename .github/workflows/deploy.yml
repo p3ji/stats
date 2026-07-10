@@ -1,6 +1,7 @@
-# Deploys the static dashboard/ directory to GitHub Pages on every push to main.
-# Plain HTML/JS — no build step (dashboard/index.html loads app.js and DuckDB-Wasm
-# directly via relative paths, so it can be served from any subpath).
+# Deploys the static site (repo root) to GitHub Pages on every push to main.
+# Plain HTML/JS — no build step. index.html lives at repo root (not a subfolder)
+# so it also works if Pages is ever switched to "Deploy from a branch" mode,
+# which only supports the repo root or /docs as a source.
 name: Deploy to GitHub Pages
 
 on:
@@ -28,6 +29,6 @@ jobs:
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dashboard
+          path: .
       - uses: actions/deploy-pages@v4
         id: deployment

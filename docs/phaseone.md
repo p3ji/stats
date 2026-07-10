@@ -2,6 +2,21 @@
 
 > **Rev 2 (2026-07-09).** Key changes from Rev 1: added census reality-check and a future census-integration phase; incorporated the `statcan_mcp` prototype as prior art; widened the schema for lineage and comparability; hardened the MCP query tool; fixed deployment details (cron is UTC, commit permissions, data sanity gates).
 
+## Status (2026-07-10): Phases 1–4 built and deployed
+
+**Live:** https://p3ji.github.io/statcan_codr/
+
+- **Phase 1** — [`pipeline/indicators.yaml`](../pipeline/indicators.yaml): 13 of 17 (city, indicator) cells confirmed against live APIs (StatCan WDS, FRED, ABS SDMX, Statistics Finland PxWeb). Remaining `todo`: Austin participation_rate (no MSA-level source exists in FRED/LAUS), Adelaide and Helsinki tech_sector_employment_share (no regional industry breakdown found), Helsinki shelter_cpi (Finland's CPI appears national-only), and all four cities' postsecondary_attainment_rate (deliberately deferred to Phase 6 — census-sourced).
+- **Phase 2** — [`pipeline/extract.py`](../pipeline/extract.py): fetchers for all four sources, `derived` (numerator/denominator) support, validation gate, writes `public/data/global_cities.parquet` (~21 KB, 2267 rows). Bypasses `mcp-statcan`'s broken bulk-fetch tools by calling WDS/FRED/ABS/PxWeb directly with `requests`.
+- **Phase 3** — not built. Skipped for this pass to prioritize shipping the dashboard; the manifest and extractor are reusable for it later.
+- **Phase 4** — [`index.html`](../index.html) / [`app.js`](../app.js) / [`style.css`](../style.css) at the repo root (not a `dashboard/` subfolder — see below): DuckDB-Wasm + Chart.js, index-baseline and divergence-delta views, indicator/peer-city dropdowns, graceful "not yet available" messaging for unresolved cells, per-city `geo_note` caveats shown inline, plus a dedicated Methodology section explaining the indexing technique (base-100 rebasing, per-comparison base date, last-observation-carried-forward alignment, and what indexing does/doesn't fix). Verified locally in-browser before deploying.
+- **Phase 5** — GitHub Pages via [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml). **Layout note:** the site lives at repo root, not `dashboard/`, because GitHub Pages' "Deploy from a branch" source only supports the repo root or `/docs` — keeping `index.html` at root means the site works under either Pages source mode (Actions-based or branch-based), not just the one this plan originally assumed. No scheduled re-extraction job yet — running `extract.py` and committing the refreshed Parquet is still manual.
+
+**Known rough edges to fix before calling this done:**
+- Index-baseline chart anchors both series to their **shared** overlap start date (fixed during testing — an earlier version anchored each series to its own first-ever point, which produced a meaningless comparison when one series started decades before the other).
+- Mobile layout has no horizontal overflow but chart tick labels are dense on narrow screens — not tuned further.
+- No scheduled sync (Phase 5.2's weekly GitHub Action) — data goes stale until someone reruns `python pipeline/extract.py` and pushes.
+
 ## Prior art: the `statcan_mcp` prototype
 
 `C:\Users\pushp\Documents\Projects\statcan_mcp` already proved out most of the architecture on real census data (2021 Census table 98-10-0403, education × occupation × field of study):
@@ -92,7 +107,7 @@ Long/tidy format, with lineage columns so every value is traceable to its source
 | `retrieved_at` | 2026-07-09T14:00Z | |
 
 ### Step 2.3: Validate, then Compile to Local Parquet
-Before writing, run sanity checks: non-empty per (city, indicator), values within plausible ranges, `ref_date` monotonic, no regression in row count vs. the previous file. **Fail loudly rather than write a bad file** — the deploy pipeline (Phase 5) depends on this gate. Then export via `duckdb` to `dashboard/public/data/global_cities.parquet`.
+Before writing, run sanity checks: non-empty per (city, indicator), values within plausible ranges, `ref_date` monotonic, no regression in row count vs. the previous file. **Fail loudly rather than write a bad file** — the deploy pipeline (Phase 5) depends on this gate. Then export via `duckdb` to `public/data/global_cities.parquet` (repo root — see Phase 4's layout note).
 
 *(Size expectation: 4 cities × ~6 indicators × ~10 years monthly ≈ a few thousand rows — well under 1 MB, not ~20 MB. Trivial to bundle and version.)*
 
@@ -112,7 +127,7 @@ from pathlib import Path
 import duckdb
 from mcp.server.fastmcp import FastMCP
 
-DATA = Path(__file__).resolve().parent.parent / "dashboard" / "public" / "data" / "global_cities.parquet"
+DATA = Path(__file__).resolve().parent.parent / "public" / "data" / "global_cities.parquet"
 MAX_ROWS = 200
 
 mcp = FastMCP("Ottawa Global Benchmarks")
@@ -159,7 +174,7 @@ Register the server in `.mcp.json` (and Claude Desktop if desired). Test:
 **Goal:** A zero-latency, reactive dashboard on the exact same Parquet file.
 
 ### Step 4.1: Install DuckDB-Wasm
-Scaffold a frontend app in `dashboard/` and bundle `@duckdb/duckdb-wasm`. **Start from the prototype's `dashboard.js`** — its DuckDB-Wasm bootstrap and Parquet-mounting code already work; strip the NOC/CIP-specific logic.
+Scaffold a frontend app at the **repo root** (not a subfolder — GitHub Pages' branch-deploy mode only serves `/` or `/docs`) and bundle `@duckdb/duckdb-wasm`. **Start from the prototype's `dashboard.js`** — its DuckDB-Wasm bootstrap and Parquet-mounting code already work; strip the NOC/CIP-specific logic.
 
 *Honest trade-off:* the dataset is small enough that plain JSON + JS would be lighter (DuckDB-Wasm adds a multi-MB WASM download). We keep DuckDB-Wasm anyway for SQL parity with the MCP layer, because the prototype already validated it, and because the dataset grows sharply once census tables arrive in 2027.
 
@@ -178,7 +193,7 @@ Client-side SQL over the mounted Parquet, with instant-toggle charts:
 **Goal:** Live on the web with automated updates at zero cost.
 
 ### Step 5.1: Deploy to Vercel
-Push `dashboard/` to GitHub and deploy to Vercel; the Parquet ships as a static asset in `public/`. *(GitHub Pages works equally well since the site is fully static — Vercel kept for preview deployments.)*
+Push to GitHub and deploy — this project uses GitHub Pages (see Phase 4's layout note on why `index.html` lives at repo root); the Parquet ships as a static asset in `public/`. *(Vercel would work equally well if ever needed for preview deployments — no code changes required, just point it at the repo.)*
 
 ### Step 5.2: Create a GitHub Action Sync Pipeline
 Weekly Action (data is monthly, so weekly is already generous):

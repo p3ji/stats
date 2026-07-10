@@ -2,7 +2,7 @@
 
 Reads pipeline/indicators.yaml, pulls every `status: confirmed` (city, indicator)
 cell from its live source, harmonizes into one long/tidy table, validates, and
-writes dashboard/public/data/global_cities.parquet.
+writes public/data/global_cities.parquet (site root, for GitHub Pages).
 
 Run: python pipeline/extract.py
 """
@@ -19,7 +19,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST_PATH = ROOT / "pipeline" / "indicators.yaml"
-OUTPUT_PATH = ROOT / "dashboard" / "public" / "data" / "global_cities.parquet"
+OUTPUT_PATH = ROOT / "public" / "data" / "global_cities.parquet"
 
 STATCAN_WDS_URL = "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorsAndLatestNPeriods"
 FRED_CSV_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv"

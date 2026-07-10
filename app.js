@@ -99,7 +99,7 @@ function renderCharts(indicator, peer, ottawaRows, peerRows) {
 
   const ottawaIdx = rebaseToIndex(ottawaRows, sharedAnchorDate);
   const peerIdx = rebaseToIndex(peerRows, sharedAnchorDate);
-  const baseNote = `Both series indexed to 100 at their first shared date, ${formatDateUTC(sharedAnchorDate)} — pre-overlap history is excluded so the comparison window is apples-to-apples.`;
+  const baseNote = `Base date for this comparison: ${formatDateUTC(sharedAnchorDate)} (first date both cities have data). See <a href="#methodology">Methodology</a> for how the base date is chosen and what indexing does and doesn't fix.`;
 
   const ctx1 = document.getElementById('indexChart');
   if (indexChart) indexChart.destroy();
@@ -138,8 +138,8 @@ function renderCharts(indicator, peer, ottawaRows, peerRows) {
   });
 
   document.getElementById('caveatPanel').innerHTML = `
-    <h3>Reading this chart</h3>
-    <p>${baseNote} Absolute levels are not directly comparable across countries (definitions, geography, and units differ) — that's why both charts show indexed trends, not raw values.</p>
+    <h3>Data notes for this comparison</h3>
+    <p>${baseNote}</p>
   `;
 }
 

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ottawa Global Benchmark Engine</title>
+<meta name="description" content="Ottawa vs. Austin, Adelaide, and Helsinki — labour, housing, and tech-sector benchmarks from Statistics Canada, FRED, ABS, and Statistics Finland.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script type="module">
+  import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.28.0/+esm";
+  window.duckdb = duckdb;
+</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-logo">OG</div>
+      <div>
+        <h1 class="header-title">Ottawa Global Benchmark Engine</h1>
+        <p class="header-subtitle">Ottawa vs. peer cities — labour, housing &amp; tech-sector indicators</p>
+      </div>
+    </div>
+    <div class="data-badge" id="dataStatusBadge">
+      <span class="badge-dot loading"></span>
+      <span id="dataStatusText">Loading database…</span>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <section class="controls-panel card">
+    <div class="control-group">
+      <label class="control-label">Indicator</label>
+      <select id="indicatorSelect" class="control-select"></select>
+    </div>
+    <div class="control-group">
+      <label class="control-label">Compare Ottawa to</label>
+      <select id="peerSelect" class="control-select">
+        <option value="austin">Austin, USA</option>
+        <option value="adelaide">Adelaide, Australia</option>
+        <option value="helsinki">Helsinki, Finland</option>
+      </select>
+    </div>
+  </section>
+
+  <section id="unavailableNotice" class="notice card" style="display:none;"></section>
+
+  <div class="charts-grid" id="chartsGrid">
+    <section class="chart-card card">
+      <div class="chart-header">
+        <h2 class="chart-title">Rebased Index (base = 100)</h2>
+        <p class="chart-desc">Relative growth since the shared start date — see <a href="#methodology">Methodology</a>.</p>
+      </div>
+      <div class="chart-body"><canvas id="indexChart"></canvas></div>
+    </section>
+
+    <section class="chart-card card">
+      <div class="chart-header">
+        <h2 class="chart-title">Divergence Delta</h2>
+        <p class="chart-desc">Index-point spread between the two rebased series — see <a href="#methodology">Methodology</a>.</p>
+      </div>
+      <div class="chart-body"><canvas id="deltaChart"></canvas></div>
+    </section>
+  </div>
+
+  <section class="card caveat-panel" id="caveatPanel"></section>
+
+  <section class="card methodology-panel" id="methodology">
+    <h2 class="chart-title">Methodology</h2>
+
+    <h3>What "indexed" means here</h3>
+    <p>Every series is shown as an <strong>index number with a base value of 100</strong> — the same technique behind the Consumer Price Index, GDP deflators, and house-price indices. Each city's raw values are divided by its own value at a chosen base date and multiplied by 100. This shows <em>relative movement over time</em>, not absolute levels — which matters here because absolute levels aren't directly comparable across countries (different definitions, different geographies — see the data notes above).</p>
+
+    <h3>Choosing the base period</h3>
+    <p>Official indices fix a base period to one calendar date that never changes (e.g. CPI 2002=100). This dashboard can't do that, because each city's data starts at a different date — Ottawa's labour-force series begins in 2011, Austin's FRED series goes back to 1990. Instead, the base period is chosen <strong>per comparison</strong>, as the first date where <em>both</em> selected cities have data. History before that shared start is excluded from the chart — plotting Austin's 1990s data next to nonexistent Ottawa data would misinform, not inform. One consequence: Ottawa's index values are not identical across different peer comparisons, because the base date shifts depending on which peer's data availability constrains the overlap. That's a deliberate tradeoff, not an inconsistency.</p>
+
+    <h3>Divergence Delta</h3>
+    <p>This chart is the arithmetic difference between the two rebased series — Ottawa's index value minus the peer's, at each date — an <strong>index-point spread</strong>, the same technique used for relative-performance and yield-spread charts. A positive bar means Ottawa's indicator has grown faster in relative terms since the base date; it says nothing about which city has the higher absolute level.</p>
+
+    <h3>Aligning mismatched frequencies</h3>
+    <p>Sources don't all publish at the same cadence — Ottawa's labour data is monthly, Adelaide's CPI is quarterly, Ottawa's tech-sector share is annual. Where the peer series is sparser than Ottawa's, the Divergence Delta uses Ottawa's most recent index value at or before the peer's observation date — <strong>last observation carried forward</strong>, a standard technique for aligning mismatched-frequency series. This can understate short-term divergence but avoids fabricating data Ottawa doesn't have yet.</p>
+
+    <h3>What indexing does <em>not</em> fix</h3>
+    <p>Rebasing to 100 only removes differences in absolute level and units — it cannot correct for differences in what's actually being measured. Canadian LFS unemployment and US CPS unemployment are defined differently; Ottawa's NAICS-54 tech-sector share and Austin's CES-based professional/scientific/technical share aren't an identical concept; some "peer" series are honest substitutes rather than true equivalents (e.g. Austin's shelter_cpi is a house-price index, not a cost-of-living index, because BLS doesn't publish city-level CPI for Austin). Read the data notes above for the selected indicator before drawing conclusions from magnitude — indexing fixes comparability of scale, not of definition.</p>
+
+    <h3>Why not year-over-year % change?</h3>
+    <p>Plotting year-over-year percent change instead would avoid the base-period-choice problem entirely, and is an equally standard technique. It's not used here because it obscures the <em>cumulative</em> divergence since a common starting point — the more useful question for benchmarking two cities against each other over a decade-plus horizon. Both are legitimate; this dashboard optimizes for the cumulative-divergence view.</p>
+
+    <p class="methodology-source">Full series-level detail — exact vector/series IDs, source APIs, and per-indicator comparability notes — lives in <code>pipeline/indicators.yaml</code> in the repository.</p>
+  </section>
+
+  <footer class="dashboard-footer">
+    <p id="lastUpdated"></p>
+    <p>Data: Statistics Canada WDS · FRED (St. Louis Fed) · Australian Bureau of Statistics · Statistics Finland — see <code>pipeline/indicators.yaml</code> for exact series and caveats.</p>
+    <p>⚠️ Levels are not directly comparable across countries — this dashboard defaults to indexed/trend views for that reason. See <a href="#methodology">Methodology</a>.</p>
+  </footer>
+
+</main>
+
+<script src="app.js" defer></script>
+</body>
+</html>
