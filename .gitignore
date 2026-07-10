@@ -1,0 +1,10 @@
+.cursor/
+__pycache__/
+*.pyc
+.env
+.env.local
+.env.production
+.env.development
+.env.staging
+.vscode/
+.idea/

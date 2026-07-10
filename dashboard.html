@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Field of Study × Occupation Explorer | Statistics Canada 2021 Census</title>
+  <meta name="description" content="Explore the relationship between field of study and occupation in Canada using 2021 Census data from Statistics Canada.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- d3-sankey must load after d3 -->
+  <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+  <!-- Load DuckDB-Wasm as ES Module and expose globally -->
+  <script type="module">
+    import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.28.0/+esm";
+    window.duckdb = duckdb;
+  </script>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <!-- Global D3 tooltip -->
+  <div class="d3-tooltip" id="d3Tooltip"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="header-logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="url(#logoGrad)"/>
+            <path d="M8 22L14 12l4 6 3-4 5 8H8z" fill="white" opacity="0.9"/>
+            <defs>
+              <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#6366f1"/>
+                <stop offset="1" stop-color="#8b5cf6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <h1 class="header-title">Field of Study × Occupation Explorer</h1>
+          <p class="header-subtitle">Statistics Canada · 2021 Census of Population</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="data-badge" id="dataStatusBadge">
+          <div class="badge-dot loading"></div>
+          <span id="dataStatusText">Connecting to StatCan…</span>
+        </div>
+        <a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810040301" target="_blank" class="source-link">
+          Table 98-10-0403-01 ↗
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Inline Debug Console for Diagnostics -->
+  <div id="debugLog" style="background: #1e1e2e; color: #f38ba8; border: 1px solid #f38ba8; padding: 12px; margin: 16px auto; max-width: 1550px; border-radius: 6px; font-family: monospace; font-size: 12px; display: none; overflow-x: auto; white-space: pre-wrap; z-index: 9999;">
+    <strong>Diagnostic Logs / Errors:</strong><br>
+  </div>
+  <script>
+    (function() {
+      const log = document.getElementById('debugLog');
+      window.addEventListener('error', function(e) {
+        if (log) {
+          log.style.display = 'block';
+          log.innerHTML += 'Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno + '\n';
+        }
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        if (log) {
+          log.style.display = 'block';
+          log.innerHTML += 'Unhandled Rejection: ' + (e.reason && (e.reason.message || e.reason.stack || e.reason)) + '\n';
+        }
+      });
+      const originalConsoleError = console.error;
+      console.error = function() {
+        if (log) {
+          log.style.display = 'block';
+          log.innerHTML += 'Console Error: ' + Array.from(arguments).map(a => {
+            if (a instanceof Error) return a.message + '\n' + a.stack;
+            return typeof a === 'object' ? JSON.stringify(a) : a;
+          }).join(' ') + '\n';
+        }
+        originalConsoleError.apply(console, arguments);
+      };
+    })();
+  </script>
+
+  <!-- Main Layout -->
+  <main class="main">
+
+    <!-- Warning Banner for Fallback Mode -->
+    <div id="fallbackWarning" class="fallback-warning" style="display: none;">
+      <span class="warning-icon">⚠️</span>
+      <div class="warning-content">
+        <strong>Offline Fallback Mode Active:</strong> The local database (DuckDB-Wasm) could not be initialized. This happens when the dashboard is opened directly as a file (<code>file://</code>) rather than served over HTTP. To enable granular 4-digit Field of Study and 5-digit Occupation filters, please access the page via <a href="http://localhost:8080/dashboard.html">http://localhost:8080/dashboard.html</a>.
+      </div>
+    </div>
+
+    <!-- Controls Panel -->
+    <section class="controls-panel glass-card">
+      <div class="controls-row">
+        <div class="control-group">
+          <label class="control-label">Field of Study</label>
+          <select id="fosFilter" class="control-select">
+            <option value="all">All Fields</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Occupation Group</label>
+          <select id="nocFilter" class="control-select">
+            <option value="all">All Occupations</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Education Level</label>
+          <select id="eduFilter" class="control-select">
+            <option value="all">All Levels</option>
+            <option value="bachelor">Bachelor's degree</option>
+            <option value="master">Master's degree</option>
+            <option value="phd">Doctorate degree</option>
+            <option value="college">College/CEGEP</option>
+            <option value="trade">Apprenticeship/Trade</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Gender</label>
+          <select id="genderFilter" class="control-select">
+            <option value="1">Total - Gender</option>
+            <option value="2">Men+</option>
+            <option value="3">Women+</option>
+          </select>
+        </div>
+        <button class="btn-refresh" id="refreshBtn" onclick="loadData()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 .49-3.51"></path>
+          </svg>
+          Refresh Data
+        </button>
+      </div>
+    </section>
+
+    <!-- Summary Stats Row -->
+    <section class="stats-row">
+      <div class="stat-card glass-card" id="statTotal">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1, #8b5cf6)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value" id="totalWorkers">—</div>
+          <div class="stat-label">Total Workers</div>
+        </div>
+      </div>
+      <div class="stat-card glass-card" id="statFOS">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #0ea5e9, #6366f1)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value" id="totalFOS">—</div>
+          <div class="stat-label">Fields of Study</div>
+        </div>
+      </div>
+      <div class="stat-card glass-card" id="statOcc">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #0ea5e9)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value" id="totalOcc">—</div>
+          <div class="stat-label">Occupation Groups</div>
+        </div>
+      </div>
+      <div class="stat-card glass-card" id="statMatch">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #ef4444)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value" id="fieldMatch">—</div>
+          <div class="stat-label">Top Field-Occ Match</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Charts Grid -->
+    <div class="charts-grid">
+
+      <!-- Sankey Diagram - Full Width -->
+      <section class="chart-card glass-card chart-full">
+        <div class="chart-header">
+          <div>
+            <h2 class="chart-title">Education Pathways: Field of Study → Occupation</h2>
+            <p class="chart-desc">Flow from major fields of study to broad occupation groups (NOC major groups)</p>
+          </div>
+          <div class="chart-legend-sankey" id="sankeyLegend"></div>
+        </div>
+        <div class="chart-body" id="sankeyContainer">
+          <div class="chart-placeholder">
+            <div class="spinner"></div>
+            <p>Loading pathway data…</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Heatmap -->
+      <section class="chart-card glass-card chart-half">
+        <div class="chart-header">
+          <div>
+            <h2 class="chart-title">Concentration Heat Map</h2>
+            <p class="chart-desc">% of field graduates in each occupation sector</p>
+          </div>
+        </div>
+        <div class="chart-body">
+          <canvas id="heatmapChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Top Occupations by Selected Field -->
+      <section class="chart-card glass-card chart-half">
+        <div class="chart-header">
+          <div>
+            <h2 class="chart-title">Top Occupations by Field</h2>
+            <p class="chart-desc">Select a field of study to see where graduates work</p>
+          </div>
+        </div>
+        <div class="chart-body">
+          <canvas id="topOccChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Fields for Selected Occupation -->
+      <section class="chart-card glass-card chart-half">
+        <div class="chart-header">
+          <div>
+            <h2 class="chart-title">Top Fields by Occupation</h2>
+            <p class="chart-desc">Select an occupation group to see educational backgrounds</p>
+          </div>
+        </div>
+        <div class="chart-body">
+          <canvas id="topFOSChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Match Rate Distribution -->
+      <section class="chart-card glass-card chart-half">
+        <div class="chart-header">
+          <div>
+            <h2 class="chart-title">Field-Occupation Alignment</h2>
+            <p class="chart-desc">How closely do fields align with specific occupation categories?</p>
+          </div>
+        </div>
+        <div class="chart-body">
+          <canvas id="alignmentChart"></canvas>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Data Table -->
+    <section class="chart-card glass-card chart-full table-section">
+      <div class="chart-header">
+        <div>
+          <h2 class="chart-title">Detailed Cross-Tabulation</h2>
+          <p class="chart-desc">2021 Census — Occupation by Field of Study (Table 98-10-0403-01)</p>
+        </div>
+        <input type="text" class="table-search" id="tableSearch" placeholder="Search field or occupation…" oninput="filterTable(this.value)">
+      </div>
+      <div class="table-wrapper">
+        <table class="data-table" id="dataTable">
+          <thead>
+            <tr>
+              <th onclick="sortTable(0)" class="sortable">Field of Study <span class="sort-icon">↕</span></th>
+              <th onclick="sortTable(1)" class="sortable">Occupation Group <span class="sort-icon">↕</span></th>
+              <th onclick="sortTable(2)" class="sortable">NOC Code <span class="sort-icon">↕</span></th>
+              <th onclick="sortTable(3)" class="sortable">Count <span class="sort-icon">↕</span></th>
+              <th onclick="sortTable(4)" class="sortable">% of Field <span class="sort-icon">↕</span></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="5" class="loading-row"><div class="spinner small"></div> Loading data…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+      <p>Data: Statistics Canada, 2021 Census of Population, Table 98-10-0403-01 · Accessed via <a href="https://github.com/Aryan-Jhaveri/mcp-statcan" target="_blank">mcp-statcan</a></p>
+      <p>⚠️ Always verify important figures at <a href="https://www.statcan.gc.ca/" target="_blank">statcan.gc.ca</a></p>
+      <p><a href="https://p3ji.github.io/portfolio/" target="_blank" rel="noopener">More by Peter Jiao ↗</a></p>
+    </footer>
+
+  </main>
+
+  <script src="dashboard.js?v=4"></script>
+</body>
+</html>
