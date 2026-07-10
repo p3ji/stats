@@ -1,101 +1,198 @@
 # Ottawa Global Benchmark Engine: Implementation Plan
 
+> **Rev 2 (2026-07-09).** Key changes from Rev 1: added census reality-check and a future census-integration phase; incorporated the `statcan_mcp` prototype as prior art; widened the schema for lineage and comparability; hardened the MCP query tool; fixed deployment details (cron is UTC, commit permissions, data sanity gates).
+
+## Prior art: the `statcan_mcp` prototype
+
+`C:\Users\pushp\Documents\Projects\statcan_mcp` already proved out most of the architecture on real census data (2021 Census table 98-10-0403, education × occupation × field of study):
+
+*   **`etl_to_parquet.py`** — streams a multi-GB census bulk ZIP as chunked CSV → filters → snappy Parquet. This chunked-ZIP-streaming pattern is essential for census tables (full CSVs are enormous) and should be ported into `pipeline/` as a reusable fetcher, not rewritten.
+*   **`dashboard.js` + `dashboard.html`** — DuckDB-Wasm querying a local Parquet, with NOC/CIP classification groupings. Validates the entire Phase 4 approach; reuse its DuckDB-Wasm bootstrap code.
+*   **`.cursor/mcp.json`** — the working MCP config: `statcan-mcp-server` v0.7.15 (= [Aryan-Jhaveri/mcp-statcan](https://github.com/Aryan-Jhaveri/mcp-statcan), pip-installed at `C:\Users\pushp\AppData\Roaming\Python\Python314\Scripts\statcan-mcp-server.exe`, stdio transport).
+
+What the prototype **didn't** cover — and this plan adds: multi-source international data, a harmonized long/tidy schema, a custom analytical MCP layer, and automated deploy.
+
+## Reality check: the 2026 Census timeline
+
+The motivation for this project is the upcoming census data, but note the release schedule — nothing ships before **Nov 18, 2026** (geographic/reference products), and the substantive tables land through 2027:
+
+| Date | Release |
+| :--- | :--- |
+| Feb 10, 2027 | Population and dwelling counts |
+| May 5, 2027 | Age, gender, type of dwelling |
+| Jul 14, 2027 | Families, households, **income** |
+| Sep 8, 2027 | Language, **housing** |
+| Dec 1, 2027 | **Labour**, commuting, **education** |
+
+So this MVP deliberately runs on **monthly/quarterly indicators** (LFS, CPI, housing price indexes) to build and battle-test the full pipeline now. The schema and pipeline are designed so census indicators (5-yearly, point-in-time) drop in later with no restructuring — see Phase 6.
+
+---
+
 ## Phase 1: Conversational Target Discovery
-**Goal:** Map out the exact datasets and fields needed to build identical socio-economic profiles for Ottawa and its peer group.
+**Goal:** Produce a machine-readable manifest (`pipeline/indicators.yaml`) mapping every (city, indicator) pair to an exact source series ID.
 
 ### Step 1.1: Connect the Live StatCan MCP
-Add `pranaviate/statscan-mcp` to your local Claude Desktop configuration file (`claude_desktop_config.json`).
+Use the already-installed **`statcan-mcp-server`** ([Aryan-Jhaveri/mcp-statcan](https://github.com/Aryan-Jhaveri/mcp-statcan)) — the same server the prototype ran. Register it in **this repo's `.mcp.json`** so it's testable inside Claude Code (copy the config from the prototype's `.cursor/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "mcp-statcan": {
+      "command": "C:\\Users\\pushp\\AppData\\Roaming\\Python\\Python314\\Scripts\\statcan-mcp-server.exe",
+      "args": ["--transport", "stdio"]
+    }
+  }
+}
+```
+
+While using it for discovery (Step 1.2), keep notes on where it falls short — those gaps are the design input for the `statcan_codr` library and custom MCP layer this repo exists to build. *(Fallback if it disappoints: [`pipeworx-io/mcp-statscan`](https://github.com/pipeworx-io/mcp-statscan), keyless and WDS-direct.)*
+
+**Confirmed gap (found during Ottawa discovery, 2026-07-10):** `get_bulk_vector_data_by_range` and `get_changed_series_data_from_vector` both throw HTTP errors (404/406) against valid vectors on the real WDS API. `get_series_info` / `get_series_info_from_vector` work fine and were used to round-trip-verify all resolved vector IDs instead. Phase 2's `extract.py` needs bulk historical pulls — either work around this in the custom fetcher (call the WDS bulk endpoint directly rather than through this MCP) or budget time to fix upstream.
 
 ### Step 1.2: Identify Ottawa Vectors
-Use Claude to crawl the live WDS registry and isolate the exact vector string coordinates or Vector IDs for the Ottawa-Gatineau (CMA) geography across three core domains:
-*   **Labor Force:** Participation rate, unemployment rate, and high-tech sector employment shares (NAICS 54).
-*   **Real Estate & Cost of Living:** Shelter CPI or benchmark housing prices.
-*   **Demographics:** Post-secondary education attainment rates.
+Use the MCP to crawl the WDS registry and isolate exact Vector IDs for **Ottawa–Gatineau (CMA)** across three domains:
+*   **Labour Force:** participation rate, unemployment rate, and professional/scientific/technical services employment share (NAICS 54). *(LFS 3-month moving averages at CMA level.)* **Confirmed 2026-07-10:** unemployment/participation are live monthly vectors (Table 14-10-0459), but the old monthly CMA×industry cubes are archived — NAICS-54 share is now only available as an annual derived figure (Table 14-10-0468, numerator ÷ denominator), a real frequency downgrade vs. the other two indicators. Flag this on the dashboard rather than silently resampling.
+*   **Real Estate & Cost of Living:** Shelter CPI (Ottawa–Gatineau, Ontario part) and/or New Housing Price Index by CMA. *(Note: MLS benchmark prices are CREA, not StatCan.)*
+*   **Demographics:** post-secondary attainment rate. **Census-sourced** — the 2021 value is the latest until Dec 2027. Store it as a static point-in-time observation, not a monthly series.
 
 ### Step 1.3: Document International Mappings
-Research equivalent open data endpoints for your target international peers. Map out:
-*   **Austin, USA:** FRED API (Federal Reserve Economic Data) for Austin-Round Rock MSA indicators.
-*   **Adelaide, Australia:** Australian Bureau of Statistics (ABS) data sheets or API.
-*   **Helsinki, Finland:** Eurostat or Statistics Finland open databases.
+Research the equivalent series for each peer and record the exact series/dataflow IDs in the manifest:
+*   **Austin, USA:** FRED API, Austin–Round Rock MSA series. *(Requires a free API key — store as env var / GitHub secret, never commit.)*
+*   **Adelaide, Australia:** ABS Data API (SDMX, no key) — Greater Adelaide (GCCSA) labour force series.
+*   **Helsinki, Finland:** Statistics Finland PxWeb API or Eurostat metro-region datasets (both keyless).
+
+### Step 1.4: Record Comparability Caveats (new)
+Cross-country levels are **not** directly comparable: unemployment definitions differ (e.g., Canadian LFS vs. US CPS concepts — Canadian rates run ~1 pp higher on definition alone), and CMA ≠ MSA ≠ GCCSA ≠ metro region. For each indicator, record in the manifest: geography definition, concept notes, and whether **level comparison** is defensible or only **trend/index comparison** is. The dashboard (Phase 4) leans on indexed views for exactly this reason.
+
+**Done when:** `pipeline/indicators.yaml` exists with a resolvable series ID + geography note for every (city, indicator) pair.
 
 ---
 
 ## Phase 2: Building the Unified Local Pipeline
-**Goal:** Write a lightweight Python script that hits the respective global APIs, extracts the rows relevant to our four target cities, and groups them into a standardized format.
+**Goal:** A lightweight Python script that pulls all sources, harmonizes them, and writes one Parquet file.
 
-### Step 2.1: Implement the Extractor Script (`/pipeline/extract.py`)
-Use `requests` to pull Ottawa data via StatCan WDS, Austin data via the FRED API, and Adelaide/Helsinki data via their respective open APIs or static file downloads.
+### Step 2.1: Implement the Extractor Script (`pipeline/extract.py`)
+One fetcher per source (`statcan_wds`, `fred`, `abs_sdmx`, `pxweb`), each driven by `indicators.yaml` — no hardcoded series IDs in code. Use `requests`; keep each fetcher ~50 lines.
+
+*Side benefit:* the `statcan_wds` fetcher is the seed of the `statcan_codr` library this repo exists for. Write it as a clean, importable module, not a script-local function.
 
 ### Step 2.2: Establish a Standardized Schema
-Standardize coordinates and metadata definitions from different countries into a single, clean table structure. Your rows will not use raw StatCan coordinate codes. Instead, format them cleanly for database queries:
+Long/tidy format, with lineage columns so every value is traceable to its source:
 
-| City | Indicator | Ref_Date | Value | Unit |
-| :--- | :--- | :--- | :--- | :--- |
-| Ottawa | Unemployment Rate | 2026-06-01 | 6.2 | Percent |
-| Austin | Unemployment Rate | 2026-06-01 | 3.8 | Percent |
-| Adelaide | Unemployment Rate | 2026-06-01 | 4.9 | Percent |
+| Column | Example | Notes |
+| :--- | :--- | :--- |
+| `city` | Ottawa | |
+| `indicator` | unemployment_rate | controlled vocabulary from the manifest |
+| `ref_date` | 2026-06-01 | first of period |
+| `value` | 6.2 | |
+| `unit` | percent | |
+| `source` | statcan_wds | |
+| `source_series_id` | v1234567 | vector ID / FRED ID / SDMX key |
+| `geo_note` | CMA: Ottawa–Gatineau | comparability flag from Step 1.4 |
+| `retrieved_at` | 2026-07-09T14:00Z | |
 
-### Step 2.3: Compile to Local Parquet
-Use Python's `duckdb` module to export this unified dataframe into a highly compressed local file: `/dashboard/public/data/global_cities.parquet`.
+### Step 2.3: Validate, then Compile to Local Parquet
+Before writing, run sanity checks: non-empty per (city, indicator), values within plausible ranges, `ref_date` monotonic, no regression in row count vs. the previous file. **Fail loudly rather than write a bad file** — the deploy pipeline (Phase 5) depends on this gate. Then export via `duckdb` to `dashboard/public/data/global_cities.parquet`.
+
+*(Size expectation: 4 cities × ~6 indicators × ~10 years monthly ≈ a few thousand rows — well under 1 MB, not ~20 MB. Trivial to bundle and version.)*
 
 ---
 
 ## Phase 3: Setting Up Your Local Analytical SQL-MCP Server
-**Goal:** Build your own custom MCP server to converse directly with this targeted city dataset.
+**Goal:** A custom MCP server for conversing with the benchmark dataset — and the first real MCP authored in this repo.
 
 ### Step 3.1: Initialize FastMCP
-Create a local Python script: `/mcp-server/server.py`.
+Create `mcp-server/server.py`.
 
-### Step 3.2: Create the Ultimate Query Tool
-Instead of writing 15 separate metadata tools, give your server a single, highly flexible tool that exposes your local file to an LLM via standard SQL:
+### Step 3.2: Create the Query Tool (hardened)
+One flexible SQL tool, plus a tiny discovery tool so the LLM never guesses column values. Fixes vs. Rev 1: accept a **full SELECT** (not an interpolated WHERE fragment), resolve the Parquet path relative to `__file__` (Claude launches MCP servers from an arbitrary cwd), open read-only, and cap output rows.
 
 ```python
+from pathlib import Path
 import duckdb
 from mcp.server.fastmcp import FastMCP
 
+DATA = Path(__file__).resolve().parent.parent / "dashboard" / "public" / "data" / "global_cities.parquet"
+MAX_ROWS = 200
+
 mcp = FastMCP("Ottawa Global Benchmarks")
 
-@mcp.tool()
-def query_city_benchmarks(sql_query: str) -> str:
-    """Executes a SQL query against the global cities dataset. 
-    Available columns: City, Indicator, Ref_Date, Value, Unit.
-    Example sql_query: "City = 'Ottawa' AND Indicator = 'Unemployment Rate'"
-    """
+def _connect() -> duckdb.DuckDBPyConnection:
     con = duckdb.connect()
-    # Direct query over the local compressed file
-    result = con.execute(f"SELECT * FROM './dashboard/public/data/global_cities.parquet' WHERE {sql_query}").df()
-    return result.to_markdown()
+    con.execute(f"CREATE VIEW benchmarks AS SELECT * FROM read_parquet('{DATA.as_posix()}')")
+    return con
+
+@mcp.tool()
+def list_indicators() -> str:
+    """Lists available cities, indicators, units, and date ranges in the benchmarks table."""
+    return _connect().execute(
+        "SELECT city, indicator, unit, min(ref_date) AS from_date, max(ref_date) AS to_date, "
+        "count(*) AS n FROM benchmarks GROUP BY ALL ORDER BY city, indicator"
+    ).df().to_markdown(index=False)
+
+@mcp.tool()
+def query_city_benchmarks(sql: str) -> str:
+    """Runs a read-only SQL SELECT against the `benchmarks` table.
+    Columns: city, indicator, ref_date, value, unit, source, source_series_id, geo_note, retrieved_at.
+    Example: SELECT ref_date, value FROM benchmarks
+             WHERE city = 'Ottawa' AND indicator = 'unemployment_rate' ORDER BY ref_date
+    """
+    if not sql.lstrip().lower().startswith("select"):
+        return "Error: only SELECT statements are allowed."
+    df = _connect().execute(sql).df()
+    truncated = len(df) > MAX_ROWS
+    out = df.head(MAX_ROWS).to_markdown(index=False)
+    return out + (f"\n\n*(truncated to {MAX_ROWS} of {len(df)} rows)*" if truncated else "")
 ```
 
+*(Requires `tabulate` for `to_markdown` — add it to dependencies. This is local data queried by you, so the `SELECT`-prefix guard is about tool clarity, not security.)*
+
 ### Step 3.3: Link and Chat
-Add this local server to Claude Desktop. You can now test your analysis layer directly via chat: 
-> *"Claude, calculate the year-over-year gap in housing costs between Ottawa and Austin using my SQL tool."*
+Register the server in `.mcp.json` (and Claude Desktop if desired). Test:
+> *"Calculate the year-over-year gap in shelter-cost growth between Ottawa and Austin using the SQL tool."*
+
+**Done when:** the model can answer that question with correct numbers, calling `list_indicators` first without being told to.
 
 ---
 
 ## Phase 4: Frontend Development & Client-Side Processing
-**Goal:** Build a zero-latency, reactive visual dashboard on top of the exact same dataset.
+**Goal:** A zero-latency, reactive dashboard on the exact same Parquet file.
 
 ### Step 4.1: Install DuckDB-Wasm
-Scaffold a frontend web app inside `/dashboard` and bundle `@duckdb/duckdb-wasm`.
+Scaffold a frontend app in `dashboard/` and bundle `@duckdb/duckdb-wasm`. **Start from the prototype's `dashboard.js`** — its DuckDB-Wasm bootstrap and Parquet-mounting code already work; strip the NOC/CIP-specific logic.
+
+*Honest trade-off:* the dataset is small enough that plain JSON + JS would be lighter (DuckDB-Wasm adds a multi-MB WASM download). We keep DuckDB-Wasm anyway for SQL parity with the MCP layer, because the prototype already validated it, and because the dataset grows sharply once census tables arrive in 2027.
 
 ### Step 4.2: Build the Dropdown Slicers
-Create simple UI selectors: Primary City (Default: Ottawa) vs. Comparison City (Dropdown: Austin, Adelaide, Helsinki).
+Primary city (default: Ottawa) vs. comparison city (Austin, Adelaide, Helsinki).
 
 ### Step 4.3: Native Analytical Transformations
-Write native client-side SQL calculations that pull from the `global_cities.parquet` file mounted in the user's browser. Implement instant toggle charts for:
-*   **Index Baseline:** Set a specific start date to 100 to show growth velocities side-by-side.
-*   **Divergence Delta:** A bar chart displaying the variance gap between Ottawa and the chosen peer over time.
+Client-side SQL over the mounted Parquet, with instant-toggle charts:
+*   **Index Baseline:** rebase a chosen start date to 100 — growth velocities side-by-side. *(This is the default view: index comparisons dodge the cross-country definition problem from Step 1.4.)*
+*   **Divergence Delta:** bar chart of the Ottawa-vs-peer gap over time.
+*   Surface `geo_note` as a caveat footnote on every chart that compares raw levels.
 
 ---
 
 ## Phase 5: $0 Deployment and Automation
-**Goal:** Ship the application to the live web with fully automated updates at zero cost.
+**Goal:** Live on the web with automated updates at zero cost.
 
 ### Step 5.1: Deploy to Vercel
-Push the `/dashboard` code to GitHub and deploy to Vercel. Because the Parquet file is tiny (~20 MB) and bundled directly in your repository's `/public` folder, it deploys as a static asset.
+Push `dashboard/` to GitHub and deploy to Vercel; the Parquet ships as a static asset in `public/`. *(GitHub Pages works equally well since the site is fully static — Vercel kept for preview deployments.)*
 
 ### Step 5.2: Create a GitHub Action Sync Pipeline
-Write a GitHub Action that runs every Monday morning at 9:00 AM EST.
-The runner executes your Python pipeline script to grab fresh data for Ottawa and Austin, compiles the brand new `global_cities.parquet` file, auto-commits it back to your GitHub repository, and pushes it.
-Vercel detects the push and silently swaps out the old data file on production without any web downtime.
+Weekly Action (data is monthly, so weekly is already generous):
+*   **Cron is UTC:** Monday 9:00 AM Ottawa time = `0 13 * * 1` (EDT) / `0 14 * * 1` (EST) — pick one and note the drift, or just run `0 14 * * 1` year-round. Scheduled runs can be delayed ~minutes; irrelevant here.
+*   Workflow needs `permissions: contents: write` to auto-commit, and the FRED key as a repo secret.
+*   Run `pipeline/extract.py`; the Phase 2.3 validation gate must pass, **and skip the commit entirely if the Parquet is byte-identical** (no noise commits).
+*   On push, Vercel redeploys and swaps the data file with zero downtime.
+
+---
+
+## Phase 6 (Future): 2026 Census Integration
+**Goal:** The payoff — fold census releases into the same pipeline as they land.
+
+*   **Feb 2027** (population/dwelling counts) is the first integration test: add a `statcan_census` fetcher, emit rows with `frequency = quinquennial` into the same schema.
+*   Census data ships two ways, neither of which is classic WDS vectors: the **Census Profile web data service** (per-geography lookups) and **bulk ZIP downloads** (full tables like 98-10-0403). The prototype's `etl_to_parquet.py` already solved the bulk path — chunked CSV streaming straight from the ZIP — port it as the `statcan_census` fetcher's engine.
+*   Peer-city census equivalents: US ACS (Census Bureau API), ABS Census (2026 for Australia too — same year!), Statistics Finland.
+*   The big releases for this project's domains: **income** (Jul 2027), **housing** (Sep 2027), **labour + education** (Dec 2027).

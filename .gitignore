@@ -8,3 +8,4 @@ __pycache__/
 .env.staging
 .vscode/
 .idea/
+.claude/settings.local.json

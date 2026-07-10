@@ -1,0 +1,261 @@
+# Ottawa Global Benchmark Engine — indicator manifest (Phase 1 deliverable)
+#
+# One entry per (city, indicator). `source_series_id` must be a resolvable
+# vector/series/table+key that pipeline/extract.py fetchers consume directly —
+# no series IDs hardcoded in fetcher code.
+#
+# comparability: "level" = raw values are meaningfully comparable across cities.
+#                "trend"  = definitions/geography differ enough that only
+#                           indexed/rebased comparisons are defensible.
+# STATUS legend: confirmed = verified against the live API/registry this session.
+#                todo      = genuinely unresolved as of 2026-07-10 (extract.py should
+#                            skip these cells with a warning, not fail the whole run).
+#                Remaining todo: postsecondary_attainment_rate (all cities — Phase 6,
+#                census-sourced, deliberately out of scope for this MVP), Adelaide
+#                tech_sector_employment_share, Helsinki tech_sector_employment_share
+#                and shelter_cpi, Austin participation_rate (no MSA-level source exists).
+#
+# `derived: true` + `derived_from` = this indicator isn't a single vector — extract.py
+# must compute it from multiple source series (e.g. a share = numerator/denominator).
+
+indicators:
+
+  # ── Labour Force ──────────────────────────────────────────────
+  - id: unemployment_rate
+    unit: percent
+    comparability: trend
+    comparability_note: >
+      Canadian LFS and US CPS unemployment concepts differ (~1pp on definition
+      alone per BLS/StatCan concordance studies). Do not compare raw levels
+      across countries — index each series instead.
+    cities:
+      ottawa:
+        status: confirmed
+        source: statcan_wds
+        source_series_id: v1643278942
+        geo_note: >
+          Ottawa–Gatineau, Ontario/Quebec (combined CMA) — Table 14-10-0459
+          ("Labour force characteristics by census metropolitan area,
+          three-month moving average, seasonally adjusted"), coordinate
+          19.5.1.1 (Unemployment rate; Estimate; Seasonally adjusted).
+          Current/active table, 2011–present, monthly. UOM: percent.
+      austin:
+        status: confirmed
+        source: fred
+        source_series_id: AUST448URN
+        geo_note: "Austin-Round Rock, TX (MSA); not seasonally adjusted. SA variant: AUST448UR"
+      adelaide:
+        status: confirmed
+        source: abs_sdmx
+        source_series_id: "ABS,LF,1.0.0/M13.3.1599.20.4.M"
+        geo_note: >
+          South Australia (state), not Greater Adelaide GCCSA — ABS dataflow
+          "LF" only carries REGION at state level (CL_STATE) monthly. True
+          GCCSA/SA4-level estimates exist only as quarterly "smoothed"
+          experimental series in a separate table. Using state-level monthly
+          as the MVP proxy per the Step 1.4 trade-off call; revisit for v2.
+          Key: MEASURE=M13 (Unemployment rate), SEX=3 (Persons), AGE=1599
+          (15-99, i.e. total), TSEST=20 (Seasonally Adjusted), REGION=4 (South
+          Australia), FREQ=M. UOM: percent.
+      helsinki:
+        status: confirmed
+        source: pxweb
+        source_series_id: "StatFin/tyti/137i.px?region=SA1&content=tyti-Tyottomyysaste"
+        geo_note: >
+          PxWeb StatFin table 137i ("Population aged 15-74 by labour force
+          status, sex and major region", quarterly, 2012Q1–present) — region
+          SA1 "Helsinki-Uusimaa" major region, which contains Helsinki, not
+          the city alone. This IS the LFS-comparable definition
+          (activity/unemployment rate, %). Switched from the annual table
+          13al (only 17 points, 2009–2025) to this quarterly one for a denser
+          series — still far sparser than the other three cities' monthly
+          data. Alternative at true municipal granularity (KU091 = Helsinki)
+          is StatFin/tyonv/12tf.px, but that's a registered-jobseeker rate,
+          NOT LFS-comparable — do not mix the two without a clear geo_note.
+
+  - id: participation_rate
+    unit: percent
+    comparability: trend
+    cities:
+      ottawa:
+        status: confirmed
+        source: statcan_wds
+        source_series_id: v1643278950
+        geo_note: >
+          Ottawa–Gatineau, Ontario/Quebec (combined CMA) — Table 14-10-0459,
+          coordinate 19.6.1.1 (Participation rate; Estimate; Seasonally
+          adjusted). Same table as unemployment_rate. UOM: percent.
+      austin:
+        status: todo
+        source: fred
+        source_series_id: null
+        discovery_note: >
+          Confirmed 2026-07-10: no MSA-level participation-rate series exists
+          on FRED. BLS's Local Area Unemployment Statistics (the source for
+          all Austin MSA labour series) publishes labor force, employment,
+          unemployment, and unemployment rate — but participation rate needs
+          a working-age-population denominator LAUS doesn't carry at MSA
+          granularity monthly. Only state-level participation rates exist
+          (e.g. LBSSA48 for Texas). Real fix is an annual ACS-based estimate
+          (same census-adjacent pattern as postsecondary_attainment_rate) —
+          not a monthly series like the other Austin indicators.
+      adelaide:
+        status: confirmed
+        source: abs_sdmx
+        source_series_id: "ABS,LF,1.0.0/M12.3.1599.20.4.M"
+        geo_note: "South Australia proxy, same caveat as unemployment_rate. MEASURE=M12 (Participation rate)."
+      helsinki:
+        status: confirmed
+        source: pxweb
+        source_series_id: "StatFin/tyti/137i.px?region=SA1&content=tyti-tyovoimaosuus"
+        geo_note: "SA1 Helsinki-Uusimaa proxy, same table as unemployment_rate."
+
+  - id: tech_sector_employment_share
+    unit: percent
+    comparability: trend
+    comparability_note: >
+      NAICS 54 (Professional/Scientific/Technical) is a Canadian/US concordance
+      (NAICS is shared). ANZSIC (Australia) and TOL 2008 (Finland) industry
+      codes need explicit mapping — do not assume 1:1 category equivalence.
+    cities:
+      ottawa:
+        status: confirmed
+        source: statcan_wds
+        source_series_id: null
+        frequency: annual
+        derived: true
+        derived_from:
+          numerator_series_id: v1642753078   # Professional, scientific and technical services (NAICS 54), Estimate
+          denominator_series_id: v1642753067  # Total employed, Estimate
+        geo_note: >
+          NAICS 54, Ottawa–Gatineau, Ontario/Quebec (combined CMA) — Table
+          14-10-0468 ("Employment characteristics by census metropolitan
+          area, annual"), coordinates 12.12.1 (numerator) and 12.1.1
+          (denominator). UOM: persons in thousands — extract.py must divide
+          numerator/denominator to get the percent share.
+        discovery_note: >
+          No active monthly/CMA×industry LFS cube exists anymore: the old
+          monthly series (14-10-0097, -0379, -0388, -0384) were archived and
+          replaced by 14-10-0468, which is annual only (2011–2025). This is a
+          real frequency downgrade vs. the other Ottawa indicators (monthly)
+          — flag it on the dashboard, don't silently resample.
+      austin:
+        status: confirmed
+        source: fred
+        source_series_id: null
+        derived: true
+        derived_from:
+          numerator_series_id: SMU48124206054000001   # All Employees: Prof/Sci/Tech Services (NAICS 54), monthly, NSA
+          denominator_series_id: AUST448NA             # All Employees: Total Nonfarm, monthly, SA
+        geo_note: >
+          Austin-Round Rock, TX (MSA), establishment survey (CES) — % of
+          total nonfarm PAYROLL employment, not % of total employed persons
+          (LFS/CPS concept), and numerator is NSA while denominator is SA.
+          Close enough for a share ratio but not a perfect match to Ottawa's
+          LFS-based definition — flag on the dashboard. UOM: thousands of
+          employees for both series; extract.py divides.
+      adelaide:
+        status: todo
+        source: abs_sdmx
+        source_series_id: null
+        discovery_note: >
+          ABS's monthly "LF" dataflow has no industry dimension. Industry ×
+          state employment exists in ABS Labour Force Detailed (quarterly,
+          catalogue 6291) or the Australian Industry dataflow (business-level,
+          not employment-by-worker) — neither confirmed against the live API
+          this session. Needs a follow-up SDMX dataflow search.
+      helsinki:
+        status: todo
+        source: pxweb
+        source_series_id: null
+        discovery_note: >
+          Confirmed 2026-07-10: StatFin/tyti table 137l (industry × quarter,
+          TOL 2008) has NO regional dimension — national Finland only
+          (variables are just Industry, Quarter, Information). No StatFin
+          table found yet with both industry breakdown AND sub-national
+          (even Uusimaa-level) geography. May need Helsinki's own open-data
+          portal (stat.hel.fi) rather than national StatFin.
+
+  # ── Real Estate & Cost of Living ──────────────────────────────
+  - id: shelter_cpi
+    unit: index
+    comparability: trend
+    cities:
+      ottawa:
+        status: confirmed
+        source: statcan_wds
+        source_series_id: v41692883
+        geo_note: >
+          CPI, Shelter component, Ottawa–Gatineau, Ontario part — Table
+          18-10-0004 ("Consumer Price Index, monthly, not seasonally
+          adjusted"), coordinate 15.79 (Shelter). StatCan footnote confirms
+          this geography member "represents Ottawa only" (not the combined
+          bi-provincial CMA — CPI has no combined Ottawa-Gatineau region;
+          Gatineau, Quebec is priced separately). UOM: index, 2002=100.
+      austin:
+        status: confirmed
+        source: fred
+        source_series_id: ATNHPIUS12420Q
+        geo_note: >
+          SUBSTITUTE SERIES, not CPI shelter: BLS does not publish an
+          Austin-MSA-specific CPI (only ~23 largest CBSAs get city-level CPI;
+          Austin isn't one — confirmed by checking, an earlier guessed series
+          ID turned out to be Dallas's). Using FHFA All-Transactions House
+          Price Index for Austin-Round Rock-Georgetown MSA instead —
+          quarterly, home-price index (not a cost-of-living/rental index).
+          Comparability is TREND-ONLY and weaker than the other three cities'
+          shelter_cpi entries; label clearly on the dashboard.
+      adelaide:
+        status: confirmed
+        source: abs_sdmx
+        source_series_id: "ABS,CPI,2.0.0/1.10001.10.4.Q"
+        geo_note: >
+          SUBSTITUTE SERIES: the Housing sub-group (tried INDEX=20003) is not
+          published at individual-capital-city granularity in this dataflow —
+          only the All Groups CPI (INDEX=10001) returns data for REGION=4
+          (Adelaide). Using All Groups CPI as the proxy; it moves with
+          shelter costs but isn't shelter-specific. Key: MEASURE=1 (Index
+          numbers), TSEST=10 (Original), FREQ=Q. UOM: index.
+      helsinki:
+        status: todo
+        source: pxweb
+        source_series_id: null
+        discovery_note: >
+          Spot-checked 2026-07-10: StatFin's CPI folder (khi) tables are
+          national-index series (Consumer Price Index, Cost-of-living index)
+          with no obvious per-city variant in the table titles — Finland's
+          CPI, like Statistics Finland's other price series, appears to be a
+          national-only measure. Not exhaustively confirmed (didn't check
+          every table's variable list) — worth one more look, but budget
+          expectations accordingly; may end up in the same boat as tech share
+          (needs Helsinki's own open-data portal, not national StatFin).
+
+  # ── Demographics (census-sourced — static, not a monthly series) ─
+  - id: postsecondary_attainment_rate
+    unit: percent
+    frequency: quinquennial
+    comparability: trend
+    comparability_note: >
+      Educational-attainment classification differs by country (ISCED vs.
+      national schemes) — this is a Phase 6 census-integration indicator.
+      2021 Census value is a static point-in-time observation until the
+      2026 Census education release (Dec 1, 2027).
+    cities:
+      ottawa:
+        status: todo
+        source: statcan_census
+        source_series_id: null
+        geo_note: "2021 Census, Ottawa–Gatineau CMA — bulk table via prototype's etl_to_parquet.py pattern"
+      austin:
+        status: todo
+        source: acs
+        source_series_id: null
+        discovery_note: "US Census Bureau ACS 5-year estimates, Austin-Round Rock MSA, table S1501."
+      adelaide:
+        status: todo
+        source: abs_census
+        source_series_id: null
+      helsinki:
+        status: todo
+        source: statfin_census
+        source_series_id: null

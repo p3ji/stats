@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mcp-statcan": {
+      "command": "C:\\Users\\pushp\\AppData\\Roaming\\Python\\Python314\\Scripts\\statcan-mcp-server.exe",
+      "args": ["--transport", "stdio"]
+    }
+  }
+}

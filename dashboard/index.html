@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ottawa Global Benchmark Engine</title>
+<meta name="description" content="Ottawa vs. Austin, Adelaide, and Helsinki — labour, housing, and tech-sector benchmarks from Statistics Canada, FRED, ABS, and Statistics Finland.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script type="module">
+  import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.28.0/+esm";
+  window.duckdb = duckdb;
+</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-logo">OG</div>
+      <div>
+        <h1 class="header-title">Ottawa Global Benchmark Engine</h1>
+        <p class="header-subtitle">Ottawa vs. peer cities — labour, housing &amp; tech-sector indicators</p>
+      </div>
+    </div>
+    <div class="data-badge" id="dataStatusBadge">
+      <span class="badge-dot loading"></span>
+      <span id="dataStatusText">Loading database…</span>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <section class="controls-panel card">
+    <div class="control-group">
+      <label class="control-label">Indicator</label>
+      <select id="indicatorSelect" class="control-select"></select>
+    </div>
+    <div class="control-group">
+      <label class="control-label">Compare Ottawa to</label>
+      <select id="peerSelect" class="control-select">
+        <option value="austin">Austin, USA</option>
+        <option value="adelaide">Adelaide, Australia</option>
+        <option value="helsinki">Helsinki, Finland</option>
+      </select>
+    </div>
+  </section>
+
+  <section id="unavailableNotice" class="notice card" style="display:none;"></section>
+
+  <div class="charts-grid" id="chartsGrid">
+    <section class="chart-card card">
+      <div class="chart-header">
+        <h2 class="chart-title">Index Baseline (first common date = 100)</h2>
+        <p class="chart-desc">Growth velocity side-by-side — cancels out cross-country level differences.</p>
+      </div>
+      <div class="chart-body"><canvas id="indexChart"></canvas></div>
+    </section>
+
+    <section class="chart-card card">
+      <div class="chart-header">
+        <h2 class="chart-title">Divergence Delta</h2>
+        <p class="chart-desc">Ottawa's indexed value minus the peer's, at each shared date.</p>
+      </div>
+      <div class="chart-body"><canvas id="deltaChart"></canvas></div>
+    </section>
+  </div>
+
+  <section class="card caveat-panel" id="caveatPanel"></section>
+
+  <footer class="dashboard-footer">
+    <p id="lastUpdated"></p>
+    <p>Data: Statistics Canada WDS · FRED (St. Louis Fed) · Australian Bureau of Statistics · Statistics Finland — see <code>pipeline/indicators.yaml</code> for exact series and caveats.</p>
+    <p>⚠️ Levels are not directly comparable across countries — this dashboard defaults to indexed/trend views for that reason.</p>
+  </footer>
+
+</main>
+
+<script src="app.js" defer></script>
+</body>
+</html>
