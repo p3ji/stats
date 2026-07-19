@@ -43,9 +43,14 @@ concludes.** (`build_mirror.py` enforces the skip.)
 table markup, one headline sentence with the key figure, schema.org/Dataset JSON-LD
 (`sameAs`/`isBasedOn` → canonical table; `creator` = Statistics Canada; Open Licence),
 prominent "Source: Statistics Canada, Table …" attribution, explicit not-affiliated notice.
-Discovery: `sitemap.xml` at site root + footer link from the dashboard index. No other
-promotion (no submissions to aggregators, no backlink building) — treatment is
-crawlability + markup only.
+Discovery: `sitemap.xml` at site root + footer link from the dashboard index, plus
+(as of 2026-07-19) manual sitemap submission to **Bing Webmaster Tools** for
+`https://p3ji.github.io/stats/` — site verified via HTML meta tag
+(`msvalidate.01`, added to `index.html`), sitemap submitted at
+`https://p3ji.github.io/stats/sitemap.xml`. This is a deliberate crawl-discovery
+nudge and is part of the treatment (not a passive-discovery-only design); no
+other promotion (no aggregator submissions, no backlink building, no Google
+Search Console at this time) — record here if that changes.
 
 **Treatment URL change (2026-07-19):** the site was renamed from
 `p3ji.github.io/statcan_codr/` to `p3ji.github.io/stats/` (repo `statcan_codr` → `stats`,
@@ -120,6 +125,12 @@ Secondary: does the mirror page itself get indexed (site: queries) and crawled
 ## Threats / caveats
 
 - New domain-path with zero authority; 12 weeks may undercount Google-side effects.
+- **Asymmetric discovery push**: Bing Webmaster Tools got a verified, submitted sitemap
+  (2026-07-19); Google Search Console has not (as of this writing). Since Bing Copilot
+  Search is the primary re-audit surface and shares Bing's index, this asymmetry likely
+  *helps* the Bing-side outcome relative to a pure "just crawl it naturally" design —
+  note this when interpreting Bing results, and submit to Google Search Console too if a
+  same-treatment comparison across engines becomes a goal.
 - The dashboard site itself is low-traffic; discovery depends on sitemap + crawl, which
   is the mechanism under test (crawlability, not popularity).
 - Bing Copilot Search answers are nondeterministic; single-shot per re-audit (same as
