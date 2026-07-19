@@ -39,13 +39,21 @@ concludes.** (`build_mirror.py` enforces the skip.)
 ## Treatment
 
 `visibility/mirror/build_mirror.py` renders one static page per treatment table into
-`tables/` (deployed at `https://p3ji.github.io/statcan_codr/tables/`): values in plain HTML
+`tables/` (deployed at `https://p3ji.github.io/stats/tables/`): values in plain HTML
 table markup, one headline sentence with the key figure, schema.org/Dataset JSON-LD
 (`sameAs`/`isBasedOn` → canonical table; `creator` = Statistics Canada; Open Licence),
 prominent "Source: Statistics Canada, Table …" attribution, explicit not-affiliated notice.
 Discovery: `sitemap.xml` at site root + footer link from the dashboard index. No other
 promotion (no submissions to aggregators, no backlink building) — treatment is
 crawlability + markup only.
+
+**Treatment URL change (2026-07-19):** the site was renamed from
+`p3ji.github.io/statcan_codr/` to `p3ji.github.io/stats/` (repo `statcan_codr` → `stats`,
+public brand "Open Stats Lab") to remove any impression of Statistics Canada affiliation.
+This happened **the same day as deployment, before any indexing** (the T+2w indexing check
+hadn't run), so the treatment pages have only ever been discoverable at the `/stats/` URL —
+the rename does not confound the experiment. The final canonical treatment URLs are
+`https://p3ji.github.io/stats/tables/<slug>.html`.
 
 ## Baseline (captured before deploy)
 
@@ -95,7 +103,7 @@ Secondary: does the mirror page itself get indexed (site: queries) and crawled
 - Same 11 queries, same phrasing, same engines (Bing Copilot Search primary; DDG organic
   re-run via `run_audit_ddg.py`; Duck.ai if consented), fresh sessions, screenshots saved
   with the same naming scheme (`<engine>_<ID>_<date>.png`).
-- **T+2 weeks** (~2026-08-02): indexing check only (site:p3ji.github.io/statcan_codr/tables).
+- **T+2 weeks** (~2026-08-02): indexing check only (site:p3ji.github.io/stats/tables).
 - **T+6 weeks** (~2026-08-30): full re-audit round 1.
 - **T+12 weeks** (~2026-10-11): full re-audit round 2 (crawl/index cycles are slow;
   round 2 is the primary endpoint).

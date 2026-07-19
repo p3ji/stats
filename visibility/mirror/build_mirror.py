@@ -24,7 +24,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 META_CACHE = ROOT / "visibility" / "cache" / "mirror_meta"
 OUT_DIR = ROOT / "tables"
-BASE_URL = "https://p3ji.github.io/statcan_codr/"
+BASE_URL = "https://p3ji.github.io/stats/"
 
 WDS = "https://www150.statcan.gc.ca/t1/wds/rest"
 BATCH = 50
@@ -392,7 +392,7 @@ For the full table, all breakdowns, and the latest data, use the
 <p>Retrieved from the Statistics Canada Web Data Service on {built}.
 Values are reproduced as published, without transformation.</p>
 <p><a href="index.html">All mirrored tables</a> ·
-<a href="https://github.com/p3ji/statcan_codr">About this project</a> —
+<a href="https://github.com/p3ji/stats">About this project</a> —
 part of a study of how search and AI answer engines use official statistics.</p>
 </footer>
 </body>
@@ -423,11 +423,11 @@ Static mirrors of selected <a href="https://www150.statcan.gc.ca/t1/en/type/data
 Canada data tables</a>, reproduced under the
 <a href="https://www.statcan.gc.ca/en/reference/licence">Statistics Canada Open Licence</a>.
 Not affiliated with or endorsed by Statistics Canada. Published as part of a
-<a href="https://github.com/p3ji/statcan_codr">study</a> of whether making official
+<a href="https://github.com/p3ji/stats">study</a> of whether making official
 table values crawlable changes how search and AI answer engines cite them.
 </div>
 <ul>{items}</ul>
-<footer><p>Built {built}. <a href="../">statcan_codr home</a> · <a href="../benchmark/">city benchmark dashboard</a></p></footer>
+<footer><p>Built {built}. <a href="../">Open Stats Lab home</a> · <a href="../benchmark/">city benchmark dashboard</a></p></footer>
 </body>
 </html>
 """
