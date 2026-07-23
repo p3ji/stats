@@ -25,15 +25,14 @@ Screenshot only gaps — see [[visibility-audit-screenshots]] rationale.
 - Keep `arm` = `tbd` (arms are assigned AFTER the full baseline, per the pre-reg selection rule).
 - In `screenshot`: `GAP:<name>` for gaps, `GAP-WEAK:` for cross-org (PHAC/CIHI), `n/a (...)` for clean.
 
-## DONE
+## DONE (updated 2026-07-23)
+- Chrome extension (claude-in-chrome) now available -> screenshots work (in-app browser timed out). save_to_disk does NOT reach the repo filesystem; screenshots are inline-only. Evidence policy: capture ALL situation-(b) cases (StatCan number ABSENT: value_match different_metric/no_number), representative only for (a) displacement.
+- **Health / Bing: 25/25 COMPLETE.** 2 clean (HEA-006 obesity, HEA-020 physical activity - both recent-Daily direct cites); 7 clean situation-(b) [screenshots captured inline this session]: HEA-001,002,016,017,019,024,025; 6 cross-org GAP-WEAK (PHAC/CCS own: HEA-008,009,012,013,015,023); ~10 (a) displacement; 1 mixed (HEA-018).
 - Pilot (5, both engines): HEA-006, HEA-012, HEA-016, IMM-001, POP-001.
-- Health / Bing: 10 of 25 — coded IDs: 001, 003, 005, 006, 012, 016, 017, 019, 022 (+006/012/016 from pilot).
-  Result so far: 9 gaps, 1 clean (HEA-006 obesity, StatCan CHMS direct). Every other health query =
-  intermediary (Statista/Wikipedia/madeinca/Global News/OurCare/Fraser/Health Canada) owns the number.
 
 ## TODO (in order, commit after each subject×engine batch)
-1. Health / Bing — remaining 15: HEA 002,004,007,008,009,011,013,014,015,018,020,021,023,024,025.
-2. Health / Duck.ai — remaining 20 (have 006,012,016 pilot... actually pilot did 006,012,016; need the other 22).
+1. [DONE] Health / Bing — all 25 complete.
+2. Health / Duck.ai — remaining 22 (pilot did 006,012,016). Expect far fewer gaps (Duck.ai cites StatCan directly).
 3. Immigration / Bing (24 left) + Duck.ai (24 left) — IMM-001 pilot done both.
 4. Population / Bing (24 left) + Duck.ai (24 left) — POP-001 pilot done both.
 5. Compile: gap pool (Bing column drives selection) → assign treatment/control arms
