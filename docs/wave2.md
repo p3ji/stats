@@ -5,6 +5,30 @@
 (treatment mechanism, coding schema, engines, re-audit cadence) is inherited from wave 1;
 only the deltas are recorded here.
 
+## Pilot finding (2026-07-22, n=5) — the gap is surface-specific
+
+A 5-query pilot (HEA-006, HEA-012, HEA-016, IMM-001, POP-001) run through both engines the
+same day showed a sharp per-engine split:
+
+- **Bing inline AI answer: 4/5 gaps.** Even where StatCan publishes the figure, Bing's
+  answer served it via SEO farms / aggregators — `madeinca.ca` (immigrants), Wikipedia/
+  Worldometer (population, no AI box at all), the OurCare/CMA survey (family doctor).
+- **Duck.ai (chatbot + web search): 0/5 gaps.** It cited StatCan *directly* on 4/5,
+  naming the exact table on POP-001 (`17-10-0009-01`), the exact census count on IMM-001,
+  and the 82.8% regular-provider rate on HEA-016.
+- **Both engines miss identically on HEA-012 (opioid deaths)** — but that's PHAC's
+  surveillance, not a StatCan product, i.e. a cross-org case, not underutilization.
+
+Implication for the experiment: the visibility gap is largely a **Bing/SERP-AI surface**
+phenomenon; the retrieval-augmented chatbot already uses StatCan well. So (a) the wave-2
+**gap pool / treatment candidates are essentially the Bing-side gaps**, and (b) Duck.ai is
+better read as an *already-good comparison surface* — the place to watch for treatment
+**displacement** (mirror cited instead of StatCan), not for new citations. `value_match`
+and `citation_class` are therefore coded **per engine**, and gap-selection keys off the
+Bing column. Caveat: n=5, one day, Duck.ai on its default "Fast" model tier (wave 1 used
+GPT-5.4-nano — model not held identical; note when comparing across waves). The full
+75-query audit tests whether this holds.
+
 ## Motivation
 
 Wave 1 tested 9 tables across 3 subjects (Labour, Digital economy, Society). It works as a
