@@ -63,12 +63,14 @@ rule):
   value-match schema (`citation_class`, `cited_sources`, `answer_value`, `statcan_value`,
   `statcan_vintage_cited`, `best_available_vintage`, `value_match`, `note`) →
   `visibility/results/baseline_<engine>_wave2_<date>.csv`. No screenshot at this stage.
-- **Pass 2 — evidence (gap cases only).** Capture a full screenshot + accessibility-tree
-  **only** for queries where treatment could plausibly change the outcome: coded
-  answerable (`fully`/`partially`) **and** baseline `citation_class` ∈ {`none`, `indirect`}
-  **or** `value_match` ∈ {`no_number`, `match_stale`, `mismatch_risk`}. Stored under
-  `visibility/results/baseline_evidence/` with the existing `<engine>_<ID>_<date>.png`/`.yml`
-  scheme. **Rationale:** where StatCan's figure is already cited *and* used *and* current
+- **Pass 2 — evidence (gap cases only).** Capture evidence **only** for queries where
+  treatment could plausibly change the outcome: coded answerable (`fully`/`partially`)
+  **and** baseline `citation_class` ∈ {`none`, `indirect`} **or** `value_match` ∈
+  {`no_number`, `match_stale`, `mismatch_risk`}. **Primary evidence is the captured answer
+  text + accessibility tree** (`<engine>_<ID>_<date>.yml`/`.txt` under
+  `visibility/results/baseline_evidence/`) — durable, diffable, and reliably capturable;
+  the full-page PNG is an optional extra for presentation (the in-app screenshot tool times
+  out on heavy SERPs, so PNGs are best-effort, grabbed for the strongest examples). **Rationale:** where StatCan's figure is already cited *and* used *and* current
   (`direct` + `match_current`), mirroring the table cannot move the outcome, so there is no
   "after" for a "before" screenshot to pair with — capturing it wastes effort and adds no
   evidentiary value. The gap cases are exactly the mirror-treatment candidates, so evidence
