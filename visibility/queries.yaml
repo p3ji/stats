@@ -195,3 +195,38 @@ subjects:
     - {id: POP-023, query: "which province are people moving to in canada", source: curated, intent: disaggregated, answerable: fully, candidate_table: "17100045", note: "interprovincial migration quarterly, current"}
     - {id: POP-024, query: "how many people immigrate to canada vs leave", source: curated, intent: comparison, answerable: fully, candidate_table: "17100008", note: "immigrant and emigrant components in one table"}
     - {id: POP-025, query: "what percentage of canadians live in cities", source: curated, intent: point, answerable: fully, candidate_table: "98100008", note: "population centres vs rural, census 2021"}
+
+  # Added 2026-07-22 (wave 2): Health subject. Autocomplete phrasings collected
+  # 2026-07-22 via suggestqueries.google.com (client=firefox, gl=ca), same method
+  # as prior subjects. Coding is title-based vs the cached cube list plus
+  # getCubeMetadata spot-checks on 13100930, 13100373, 13100969, 13100383,
+  # 13100962, 13100394. Single coder, PILOT-GRADE. Health is a staleness-heavy
+  # subject: many CCHS/vital-stats tables lag 2-11 years, and several headline
+  # indicators (opioid deaths, smoking prevalence, diabetes surveillance) are
+  # owned or fronted by PHAC/CIHI rather than a current StatCan cube.
+  health:
+    - {id: HEA-001, query: "mental health in canada statistics", source: autocomplete, intent: point, answerable: fully, candidate_table: "13100930", note: "Mental health indicators by population group, 2022 (also 13100465)"}
+    - {id: HEA-002, query: "mental health in canadian youth", source: autocomplete, intent: disaggregated, probe: shallow_disaggregation, answerable: partially, candidate_table: "13100930", note: "age-group dim exists but youth-specific mental health (CHSCY 2019/2023) lives in microdata + articles"}
+    - {id: HEA-003, query: "life expectancy in canada", source: autocomplete, intent: point, answerable: fully, candidate_table: "13100114", note: "complete life table, 3-yr estimates, current to 2022 (2-3 yr vital-stats lag)"}
+    - {id: HEA-004, query: "life expectancy in canada vs usa", source: autocomplete, intent: comparison, answerable: partially, candidate_table: "13100114", note: "Canada side only; comparison needs NCHS/CDC data"}
+    - {id: HEA-005, query: "life expectancy in canada by province", source: autocomplete, intent: disaggregated, answerable: fully, candidate_table: "13100114", note: "geography dim to province/territory/health region"}
+    - {id: HEA-006, query: "obesity rate canada", source: autocomplete, intent: point, answerable: fully, candidate_table: "13100373", note: "measured BMI overweight/obesity, current to 2024"}
+    - {id: HEA-007, query: "obesity rate canada by province", source: autocomplete, intent: disaggregated, answerable: fully, candidate_table: "13100373", note: "geography dim present"}
+    - {id: HEA-008, query: "cancer rates canada", source: autocomplete, intent: point, answerable: partially, candidate_table: "13100840", note: "incidence trends to 2021; site-level incidence tables (13100109/112) stall at 2013; CCS/PHAC front current headline stats"}
+    - {id: HEA-009, query: "cancer statistics canada 2025", source: autocomplete, intent: trend, answerable: partially, candidate_table: "13100839", note: "mortality trends to 2021; the widely-cited annual projections are Canadian Cancer Society, not a StatCan cube"}
+    - {id: HEA-010, query: "smoking rates canada", source: autocomplete, intent: point, probe: unpublished_indicator, answerable: partially, candidate_table: "", note: "no current standing smoking-prevalence cube in cache; CTNS/CCHS current smoking published via Daily/articles; older tables end 1994-2011"}
+    - {id: HEA-011, query: "smoking rates canada by province", source: autocomplete, intent: disaggregated, answerable: partially, candidate_table: "", note: "same gap; provincial smoking prevalence in article layer only"}
+    - {id: HEA-012, query: "opioid deaths canada", source: autocomplete, intent: trend, answerable: partially, candidate_table: "13100156", note: "vital-stats external-cause deaths (incl. drug poisoning) to 2024, but the headline opioid-surveillance numbers are PHAC Health Infobase (Special Advisory Committee), not StatCan"}
+    - {id: HEA-013, query: "opioid deaths canada by province", source: autocomplete, intent: disaggregated, answerable: partially, candidate_table: "", note: "provincial opioid-toxicity deaths are PHAC Infobase; StatCan cause-of-death lags and isn't opioid-specific"}
+    - {id: HEA-014, query: "cannabis use canada statistics", source: autocomplete, intent: point, answerable: partially, candidate_table: "13100383", note: "self-reported past-3-month cannabis use ends 2020; National Cannabis Survey discontinued; newer NCS-style estimates in articles"}
+    - {id: HEA-015, query: "diabetes prevalence canada", source: curated, intent: point, answerable: partially, candidate_table: "13100873", note: "CHMS measured diabetes combined cycles to 2016; the authoritative annual prevalence is PHAC CCDSS admin-data surveillance"}
+    - {id: HEA-016, query: "how many canadians have a family doctor", source: autocomplete, intent: point, answerable: fully, candidate_table: "13100962", note: "Survey on Health Care Access and Experiences, primary/specialist care indicators, 2024 — verify regular-provider item among indicators"}
+    - {id: HEA-017, query: "how many canadians don't have a family doctor", source: autocomplete, intent: point, answerable: fully, candidate_table: "13100962", note: "same SHCAE 2024 table; unmet-attachment framing"}
+    - {id: HEA-018, query: "wait times canada healthcare", source: autocomplete, intent: point, answerable: partially, candidate_table: "13100962", note: "SHCAE 2024 covers access/experience; the classic median-wait-time tables (13100480-483) end 2013; Fraser Institute 'Waiting Your Turn' dominates the answer space"}
+    - {id: HEA-019, query: "unmet health care needs canada", source: autocomplete, intent: point, answerable: fully, candidate_table: "13100836", note: "unmet health care needs by gender and age group, 2024"}
+    - {id: HEA-020, query: "physical activity canada statistics", source: autocomplete, intent: point, answerable: fully, candidate_table: "13100969", note: "adherence to activity/sedentary/sleep recommendations, self-report + accelerometer, 2024"}
+    - {id: HEA-021, query: "how many canadians vape", source: curated, intent: point, probe: unpublished_indicator, answerable: microdata_only, candidate_table: "", note: "zero cubes title-match 'vaping'/'e-cigarette'/'nicotine'; CTNS vaping prevalence published in articles only"}
+    - {id: HEA-022, query: "leading causes of death in canada", source: curated, intent: point, answerable: fully, candidate_table: "13100394", note: "leading causes of death by age group, current to 2024 (also 13100933 age-standardized)"}
+    - {id: HEA-023, query: "covid deaths canada total", source: autocomplete, intent: trend, answerable: partially, candidate_table: "13100810", note: "COVID-era excess-mortality tables (13100784/792) now inactive/2023; COVID deaths fold into cause-of-death 13100156; PHAC owns the live dashboard"}
+    - {id: HEA-024, query: "self rated mental health canada", source: autocomplete, intent: point, answerable: fully, candidate_table: "13100465", note: "Mental health indicators incl. perceived mental health, to 2022"}
+    - {id: HEA-025, query: "does income affect health in canada", source: curated, intent: integration, probe: no_integration, answerable: partially, candidate_table: "13100971", note: "health-adjusted life expectancy by income quintile (2023) is a rare published crossing; broader income-health integration is article/microdata only"}

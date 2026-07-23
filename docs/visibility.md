@@ -97,6 +97,13 @@ engine × intent). Not yet built.
 - [ ] Extend chatbot audit (more models/surfaces, full 100, correctness coding)
 - [ ] Common Crawl presence check for t1/tbl1 URLs
 - [ ] Dashboard
+- [~] **Wave 2** (2026-07-22): widen subject coverage for more captured examples.
+      Query bank extended to Health (25 new, HEA-001…025) alongside the already-coded
+      Immigration (25) and Population (25) — 75-query wave-2 audit set. Pre-registration
+      in `docs/wave2.md` (separate cohort from wave 1; selection rule fixed, tables
+      chosen after baseline). Next: run the 75-query baseline audit (Bing Copilot +
+      Duck.ai, screenshots + value-match coding) → derive gap pool → assign arms →
+      build mirrors.
 
 Tooling: `visibility/fetch_cubes.py` (cube list → `visibility/cache/`, gitignored),
 `visibility/search_cubes.py` (title keyword search). WDS gotcha: in
