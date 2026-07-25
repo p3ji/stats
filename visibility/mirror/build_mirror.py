@@ -465,7 +465,7 @@ table values crawlable changes how search and AI answer engines cite them.
 
 
 def render_sitemap(pages: list[dict], built_date: str) -> str:
-    urls = [BASE_URL, f"{BASE_URL}benchmark/", f"{BASE_URL}tables/"] + \
+    urls = [BASE_URL, f"{BASE_URL}report/", f"{BASE_URL}benchmark/", f"{BASE_URL}tables/"] + \
         [f"{BASE_URL}tables/{p['slug']}.html" for p in pages]
     entries = "".join(
         f"<url><loc>{u}</loc><lastmod>{built_date}</lastmod></url>" for u in urls)
