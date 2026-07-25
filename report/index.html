@@ -214,8 +214,8 @@
 <header class="top">
   <div class="wrap">
     <div class="eyebrow-row">
-      <span class="pill live">Wave 2 in progress</span>
-      <span class="pill">Last updated July 23, 2026</span>
+      <span class="pill live">Live experiment &middot; awaiting re-audit</span>
+      <span class="pill">Last updated July 25, 2026</span>
     </div>
     <h1>Is Statistics Canada's data actually being used?</h1>
     <p class="tagline">An independent, ongoing test of whether AI search tools and chatbots use Canada's official statistics when they answer everyday questions&nbsp;&mdash; or quietly route around them in favour of blogs, private surveys, and other websites.</p>
@@ -352,10 +352,10 @@
   </section>
 
   <section id="wave2">
-    <span class="section-label">Wave 2 &middot; Health, immigration, population &mdash; in progress</span>
+    <span class="section-label">Wave 2 &middot; Health, immigration &amp; population</span>
     <h2>Widening the test</h2>
     <div class="prose">
-      <p>Wave 2 repeats the same three-step check across new subjects, starting with Health. So far, all 25 health questions have been checked against Bing's AI answers (a chatbot pass and two more subjects are still to come &mdash; this section will grow as that work finishes).</p>
+      <p>Wave 2 repeats the same three-step check across new subjects. All 25 Health questions and all 25 Immigration questions have now been checked against Bing's AI answers, with Population sampled alongside; Duck.ai (which cites StatCan far more reliably) serves as the comparison surface. As of July&nbsp;25,&nbsp;2026, crawlable mirrors of the clearest Health cases are live &mdash; so, exactly as in Wave&nbsp;1, the &ldquo;after&rdquo; measurement now waits on the scheduled re-audits. Both waves are live experiments at the same stage: treatment pages published, results pending.</p>
     </div>
 
     <div class="scorecard">
@@ -365,17 +365,17 @@
           <div class="seg" style="flex:2; background:#2e9e6b" title="Cited StatCan correctly">2</div>
           <div class="seg" style="flex:10; background:#d9932b" title="Displacement">10</div>
           <div class="seg" style="flex:7; background:#c0552a" title="Skipped StatCan">7</div>
-          <div class="seg" style="flex:6; background:#7a8590" title="Rightfully another agency's data">6</div>
+          <div class="seg" style="flex:6; background:#7a8590" title="Not StatCan's topic — another agency is the official source">6</div>
         </div>
       </div>
       <div class="sc-legend">
         <span><i style="background:#2e9e6b"></i>Cited StatCan correctly (current)</span>
         <span><i style="background:#d9932b"></i>Used StatCan's number, credited someone else</span>
         <span><i style="background:#c0552a"></i>Skipped StatCan &mdash; scenario (b)</span>
-        <span><i style="background:#7a8590"></i>Rightfully another agency's data (opioids, cancer)</span>
+        <span><i style="background:#7a8590"></i>Not StatCan's to answer &mdash; another agency is the official source (opioid deaths &rarr; Public Health Agency; cancer projections &rarr; Canadian Cancer Society)</span>
       </div>
     </div>
-    <p class="prose" style="margin-top:16px; color:var(--ink-soft); font-size:0.92rem;">Same story as Wave 1, at larger scale: on Health questions, Bing cited StatCan correctly just <strong>2 times in 25</strong>. Most often it used StatCan's own number but credited an SEO site instead (displacement); on 7 questions it skipped StatCan's figure entirely (scenario&nbsp;b); and on 6 it reached for another agency that genuinely owns the topic (the opioid death toll is Public Health's, cancer projections are the Cancer Society's). An early sample of Immigration and Population shows the same displacement pattern &mdash; those counts will fill in as the subjects complete.</p>
+    <p class="prose" style="margin-top:16px; color:var(--ink-soft); font-size:0.92rem;">Same story as Wave 1, at larger scale: on Health questions, Bing cited StatCan correctly just <strong>2 times in 25</strong>. Most often it used StatCan's own number but credited an SEO site instead (displacement); on 7 questions it skipped StatCan's figure entirely (scenario&nbsp;b); and on 6 it reached for another agency that genuinely owns the topic (the opioid death toll is Public Health's, cancer projections are the Cancer Society's). Those last 6 are <em>not</em> counted against the AI &mdash; StatCan has no competing figure there, so citing the right agency is correct, not a miss. The Immigration and Population samples show the same displacement pattern as Health.</p>
 
         <h3 style="margin-top:34px;">The clearest cases &mdash; with proof of what the AI actually said</h3>
     <p class="prose" style="color:var(--ink-soft); font-size:0.92rem;">These are the strictest kind of gap: not &ldquo;someone else got credit for StatCan's number,&rdquo; but cases where the AI served a <em>different or vaguer</em> answer entirely, while StatCan's own figure sat unused. Each card shows a real screenshot of the AI's answer, then the number StatCan publishes &mdash; with a link to verify. Screenshots captured July&nbsp;23,&nbsp;2026.</p>
@@ -511,7 +511,8 @@
     <h2>How this report grows</h2>
     <p class="prose" style="color:var(--ink-soft);">This page is a living document. As each new batch of questions is tested, it gets added below and the numbers above update.</p>
     <ul class="changelog">
-      <li><time>Jul 23, 2026</time><span>First publication. Wave 1 baseline complete (11 questions, both engines) with 3 illustrative screenshots. Wave 2 Health subject complete on Bing (25 questions); Duck.ai pass and the Immigration &amp; Population subjects still to come.</span></li>
+      <li><time>Jul 25, 2026</time><span>Wave 2 treatment mirrors deployed (5 tables: mental health, family doctor, income &amp; health, population, immigrants), each crediting Statistics Canada in its markup and citation. Immigration baseline finished on Bing. Both waves are now at the same stage &mdash; treatment live, awaiting the scheduled re-audits. Wording clarified: the &ldquo;another agency&rdquo; category means StatCan isn't the source for that topic, not that it was skipped.</span></li>
+      <li><time>Jul 23, 2026</time><span>First publication. Wave 1 baseline complete (11 questions, both engines) with 3 illustrative screenshots. Wave 2 Health subject complete on Bing (25 questions).</span></li>
     </ul>
   </section>
 
