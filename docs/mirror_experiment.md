@@ -125,6 +125,10 @@ Secondary: does the mirror page itself get indexed (site: queries) and crawled
 - Same 11 queries, same phrasing, same engines (Bing Copilot Search primary; DDG organic
   re-run via `run_audit_ddg.py`; Duck.ai if consented), fresh sessions, screenshots saved
   with the same naming scheme (`<engine>_<ID>_<date>.png`).
+- **3 runs per query on Bing, modal coding** (amendment A2); Duck.ai 1 run. Code blind to
+  arm (A3). Re-fetch StatCan reference values and rebuild the mirrors first (A8).
+- Wave-2 clock (deployed 2026-07-25): index check ~**2026-08-08**, round 1 ~**2026-09-05**,
+  primary endpoint ~**2026-10-17**.
 - **T+2 weeks** (~2026-08-02): indexing check only (site:p3ji.github.io/stats/tables).
 - **T+6 weeks** (~2026-08-30): full re-audit round 1.
 - **T+12 weeks** (~2026-10-11): full re-audit round 2 (crawl/index cycles are slow;
@@ -138,6 +142,121 @@ Secondary: does the mirror page itself get indexed (site: queries) and crawled
   report as its own outcome, evidence for "StatCan should do this on its own domain."
 - n=9 tables: this is a demonstration experiment — report counts and concrete
   before/after screenshot pairs, not significance tests.
+
+## Methodology audit and amendments (2026-07-25)
+
+Full design audit run **before any post-treatment measurement exists** (treatment deployed
+2026-07-25; first re-audit not due until ~2026-08-08). Nothing here is a post-hoc change to
+a rule after seeing results — no results exist yet. Amendments A1–A9 are binding from now.
+
+### A1. Primary outcome and endpoint (was under-specified — multiplicity risk)
+
+Three outcomes × 2 engines × 2 waves × 3 timepoints ≈ 36 chances for a spurious "win."
+Fixed now:
+
+- **Primary outcome:** change in `citation_class` to `direct` (statcan.gc.ca cited as a
+  source), **Bing Copilot only**, **treatment vs control**, **at T+12 weeks**.
+- **Secondary:** vintage shift, `value_match` distribution, Duck.ai, the T+6wk round.
+- Everything else is exploratory and must be labelled as such when reported.
+
+Rationale for Bing-only primary: Duck.ai already cites StatCan on ~90% of queries — a
+**ceiling effect**, no room to improve. Duck.ai's job is to detect *displacement* (mirror
+cited instead of StatCan), not to test the citation hypothesis.
+
+### A2. Single-shot measurement is the biggest threat — add replicates (URGENT)
+
+Baseline is **exactly one run per query** (verified: 1 row per ID). Bing Copilot answers are
+nondeterministic, and **16 of 60** wave-2 rows had *no AI answer box at all* — a volatile
+surface. With n=1 run at baseline and n=1 at re-audit, a query flipping category is
+**indistinguishable from run-to-run noise**, which would make the headline result
+uninterpretable.
+
+- **From now on: 3 runs per query per timepoint** (Bing/primary), fresh session each,
+  coded independently; the **modal** coding is the query's value. Duck.ai stays 1 run
+  (secondary).
+- **URGENT / time-limited:** capture **2 additional baseline replicates now**, before the
+  mirrors are indexed (index check ~Aug 8). The pages are live but not yet crawled, so
+  extra runs today are still *pre-treatment*. This (a) firms up the baseline via majority
+  vote and (b) yields a **noise floor** — how often a query changes category with no
+  intervention at all. Without that number we cannot say whether any post-treatment change
+  is real. **This window closes once the pages are indexed.**
+
+### A3. Code blind to arm
+
+Coding `citation_class`/`value_match` involves judgment, and the coder knows which tables
+are treatment — a live bias risk in the direction of the hypothesis. From the next round:
+strip arm/table labels from captured answer text, shuffle, code, then re-join on query ID.
+
+### A4. Indexing is a gating manipulation check, not a secondary outcome
+
+If the treatment pages are never indexed, the study cannot test crawlability at all — it
+tests whether a new GitHub Pages subpath gets crawled. Pre-committed reading:
+
+- **Pages indexed + no citation change** → evidence *against* the crawlability mechanism.
+- **Pages not indexed** → **null by non-exposure**, an inconclusive test of the mechanism.
+  Must be reported that way, never as "crawlability doesn't work."
+
+### A5. Pre-specified handling of "no AI answer box"
+
+Common (16/60) and volatile. Rules fixed now: no box = `no_number`, and it counts as
+**StatCan not cited** for the primary outcome. A box appearing/disappearing between rounds
+is **not** itself a treatment effect — it is a surface change, reported separately. With A2
+replicates, a query is "no box" only if the majority of its runs show none.
+
+### A6. Unit of analysis is the table, not the query
+
+Randomization is clustered at the table level and queries within a table are not
+independent (2–3 queries can ride on one table). Analyse at the **table** level.
+Effective n: **9 tables (5T/4C) wave 1, 8 tables (5T/3C) wave 2**. This is a
+demonstration experiment: report counts, per-table detail, and concrete before/after
+pairs. **No p-values, no significance claims** — the design cannot support them.
+
+### A7. Wave-2 Population is descriptive only
+
+Wave-2 strata are Health 3T/2C, Immigration 1T/1C, **Population 1T/0C**. Population has
+**no control**, so any change there is inseparable from secular drift — report it as an
+illustration, never as evidence. Immigration at 1T/1C is nearly as weak. Realistically
+**wave 2 is a Health experiment** with two anecdotal side subjects; say so when reporting.
+
+### A8. Refresh reference values and rebuild mirrors before each re-audit
+
+`value_match`/vintage compare the served number against StatCan's current value, which
+moves as StatCan publishes. Before each re-audit: re-fetch official values (record fetch
+date) and re-run `build_mirror.py`. Otherwise "stale" becomes ambiguous, and the mirrors —
+public pages that name Statistics Canada as the official source — would themselves drift
+into serving outdated figures.
+
+### A9. Score only questions StatCan can actually answer
+
+Queries where StatCan publishes no comparable figure (cross-org: PHAC opioid deaths,
+Cancer Society projections) **fail the entry test and are excluded from denominators
+before scoring**, not carried as a category. They cannot measure whether an engine uses
+StatCan data. Applied to the wave-2 Health scorecard 2026-07-25 (25 tested → **19 scored**).
+Cross-org counts are still reported separately as the "vacuum-filling" finding.
+
+### Design features that are sound (checked, no change needed)
+
+- **Selection-on-baseline is handled.** Tables enter the pool *because* they showed a gap
+  (an extreme value), so regression to the mean predicts improvement even with no
+  treatment — but treatment and control are drawn from the **same** pool, so RTM hits both
+  arms and the difference-in-differences absorbs it. This is precisely why the control arm
+  must stay un-mirrored.
+- **Secular drift** (engines change between July and October) is absorbed by the same DiD.
+- **Displacement** (mirror cited *instead of* StatCan) was pre-registered as its own
+  outcome rather than counted as success, and the 2026-07-25 attribution-strengthened
+  template actively pushes credit to StatCan.
+
+### Known residual limitations (accept and disclose, not fixable)
+
+- **Underpowered by construction** (9 + 8 tables). Can demonstrate and illustrate; cannot
+  estimate an effect size.
+- **Single coder, pilot-grade**, even with A3 blinding — no second-rater reliability check.
+- **Wave-1 discovery environment changed mid-flight**: wave-2 pages were added to the same
+  site/sitemap on 2026-07-25, after wave-1 baseline. This affects wave-1 *treatment*
+  exposure only (controls are not on the site) and pushes toward more crawling, not toward
+  spurious citations — but wave-1 treatment is not held perfectly constant. Logged here.
+- **Not generalizable to "crawlable and left to be found"** — sitemaps were actively
+  submitted to both consoles (see below).
 
 ## Threats / caveats
 

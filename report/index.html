@@ -506,11 +506,41 @@
 
   </section>
 
+  <section id="rigour">
+    <span class="section-label">Method &middot; audited July 25, 2026</span>
+    <h2>How we're trying not to fool ourselves</h2>
+    <div class="prose">
+      <p>It is easy to run a test like this and see whatever you hoped to see. Before any &ldquo;after&rdquo; measurements were taken, the whole design was audited for the kinds of mistakes that would quietly wreck the conclusion. Here is what protects the result &mdash; and, just as important, what it still can't tell you.</p>
+
+      <h3 style="margin-top:26px;">What protects the result</h3>
+      <ul style="line-height:1.7; color:var(--ink-soft); font-size:0.94rem;">
+        <li><strong>A control group.</strong> Some tables get a crawlable page; a matched set deliberately gets nothing. If AI answers improve everywhere, that's the industry changing, not us. Only a gap that opens <em>between</em> the two groups counts as an effect.</li>
+        <li><strong>The comparison is fair in both directions.</strong> Tables were picked <em>because</em> they looked bad at the start &mdash; and things that start unusually bad tend to drift better on their own. Because the control tables were chosen the same way, that drift shows up in both groups and cancels out.</li>
+        <li><strong>The questions were fixed in advance.</strong> The wording, the engines, the dates, and what counts as success were all written down before treatment, so nothing can be quietly redefined later to manufacture a win.</li>
+        <li><strong>One headline test, not thirty.</strong> With enough measurements, something always looks impressive by luck. A single primary question was named up front: <em>does Bing start citing Statistics Canada on the treated tables but not the untreated ones, by mid-October?</em> Everything else is explicitly secondary.</li>
+        <li><strong>Only fair questions are scored.</strong> Questions StatCan doesn't cover are removed before scoring, not counted as failures (see the note in Wave&nbsp;2).</li>
+        <li><strong>Answers get graded without knowing which group they're in</strong>, so a hopeful coder can't nudge borderline calls.</li>
+      </ul>
+
+      <h3 style="margin-top:26px;">What it can't tell you</h3>
+      <ul style="line-height:1.7; color:var(--ink-soft); font-size:0.94rem;">
+        <li><strong>It's small.</strong> Seventeen tables in total. This can demonstrate that something happens and show you real examples; it cannot measure how big the effect is, and there will be no statistics claiming otherwise.</li>
+        <li><strong>AI answers are unstable.</strong> Ask the same question twice and you can get different answers &mdash; roughly a quarter of the time, Bing produced no AI answer at all. So each question is now asked several times per round and the typical answer is used. Extra &ldquo;before&rdquo; rounds are being collected while the pages are still uncrawled, purely to measure how much these answers wobble on their own. Without knowing that, we couldn't tell a real change from noise.</li>
+        <li><strong>The pages might never be read.</strong> If search engines never index them, the experiment says nothing about whether crawlability matters &mdash; only that a small new site went unnoticed. That outcome will be reported as inconclusive, not as proof the idea failed.</li>
+        <li><strong>Two of the Wave 2 subjects are illustrations only.</strong> Population has no control group and Immigration has just one table per side, so only the Health results carry real weight.</li>
+        <li><strong>One person is doing the grading</strong>, with no second reviewer.</li>
+      </ul>
+
+      <p style="margin-top:22px;">The full audit, including the corrections it triggered, is in the <a href="https://github.com/p3ji/stats/blob/main/docs/mirror_experiment.md">public pre-registration</a>. A worked example of why this matters: the Wave&nbsp;2 scorecard originally counted 6 questions StatCan doesn't even publish data on as part of its total &mdash; making the AI look worse than it was. That was caught in this audit and fixed before any &ldquo;after&rdquo; results existed.</p>
+    </div>
+  </section>
+
   <section id="changelog">
     <span class="section-label">Changelog</span>
     <h2>How this report grows</h2>
     <p class="prose" style="color:var(--ink-soft);">This page is a living document. As each new batch of questions is tested, it gets added below and the numbers above update.</p>
     <ul class="changelog">
+      <li><time>Jul 25, 2026</time><span><strong>Full methodology audit</strong> (see &ldquo;How we're trying not to fool ourselves&rdquo;), run before any post-treatment results exist. Named a single primary test to avoid cherry-picking; each question will now be asked several times per round because AI answers vary run to run; answers will be graded without knowing which group they belong to; and if the pages never get indexed, that will be reported as inconclusive rather than as a failed idea. Extra &ldquo;before&rdquo; rounds are being collected while the pages are still uncrawled, to measure how much these answers wobble on their own.</span></li>
       <li><time>Jul 25, 2026</time><span><strong>Scoring correction.</strong> The Wave 2 Health scorecard now reports out of the <strong>19 questions Statistics Canada can actually answer</strong>, not all 25 tested. The 6 questions StatCan doesn't cover (opioid deaths, cancer projections) are set aside before scoring instead of appearing as a category &mdash; they can't test whether the AI uses StatCan's data, so including them understated the rate. No underlying codings changed; all 25 remain in the published data.</span></li>
       <li><time>Jul 25, 2026</time><span>Wave 2 treatment mirrors deployed (5 tables: mental health, family doctor, income &amp; health, population, immigrants), each crediting Statistics Canada in its markup and citation. Immigration baseline finished on Bing. Both waves are now at the same stage &mdash; treatment live, awaiting the scheduled re-audits. Wording clarified: the &ldquo;another agency&rdquo; category means StatCan isn't the source for that topic, not that it was skipped.</span></li>
       <li><time>Jul 23, 2026</time><span>First publication. Wave 1 baseline complete (11 questions, both engines) with 3 illustrative screenshots. Wave 2 Health subject complete on Bing (25 questions).</span></li>
