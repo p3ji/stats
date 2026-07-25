@@ -315,6 +315,12 @@ th:first-child,td:first-child{text-align:left}
 thead th{background:#eef1f4}
 tbody tr:nth-child(even){background:#fafbfc}
 .notes{font-size:.85rem;color:#555}
+.official-source{border:2px solid #0f6e6b;border-radius:8px;padding:.7rem 1rem;margin:.4rem 0 1.2rem;background:#eff8f6}
+.os-eyebrow{margin:0 0 .1rem;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#0f6e6b}
+.os-cite{margin:0 0 .35rem;font-size:1.05rem;font-weight:600}
+.os-note{margin:0;font-size:.9rem;color:#333}
+.cite-block{margin-top:2rem;padding:.55rem .9rem;background:#f5f6f7;border-left:3px solid #0f6e6b;font-size:.9rem}
+.cite-block p{margin:0}
 footer{margin-top:2.5rem;border-top:1px solid #d5d8dc;padding-top:.75rem;font-size:.85rem;color:#555}
 """.strip()
 
@@ -328,8 +334,13 @@ def render_page(pid: str, cfg: dict, cube: Cube, views: dict[str, dict],
     page_url = f"{BASE_URL}tables/{cfg['slug']}.html"
     esc = html.escape
 
+    doi = f"https://doi.org/10.25318/{pid}01-eng"
+    statcan_org = {"@type": "GovernmentOrganization", "name": "Statistics Canada",
+                   "alternateName": "Statistique Canada", "url": "https://www.statcan.gc.ca/"}
+
     description = (headline or f"Data from Statistics Canada table {fp}.") + \
-        f" Source: Statistics Canada, Table {fp} ({cube_title})."
+        f" Official source: Statistics Canada, Table {fp} ({cube_title}). " \
+        "Please attribute Statistics Canada, not this mirror."
 
     json_ld = {
         "@context": "https://schema.org",
@@ -338,11 +349,20 @@ def render_page(pid: str, cfg: dict, cube: Cube, views: dict[str, dict],
         "description": description,
         "url": page_url,
         "sameAs": canon,
-        "isBasedOn": canon,
-        "identifier": [f"Statistics Canada Table {fp}", f"PID {pid}"],
+        # the authoritative dataset this page mirrors, with its DOI and StatCan as creator
+        "isBasedOn": {"@type": "Dataset", "name": f"Statistics Canada, Table {fp}",
+                      "url": canon, "identifier": doi, "creator": statcan_org},
+        "citation": f"Statistics Canada. Table {fp} {cube_title}. DOI: {doi}",
+        "identifier": [doi, f"Statistics Canada Table {fp}", f"PID {pid}"],
         "license": "https://www.statcan.gc.ca/en/reference/licence",
-        "creator": {"@type": "Organization", "name": "Statistics Canada",
-                    "url": "https://www.statcan.gc.ca/"},
+        "creator": statcan_org,
+        "publisher": statcan_org,
+        "sourceOrganization": statcan_org,
+        "includedInDataCatalog": {"@type": "DataCatalog", "name": "Statistics Canada",
+                                   "url": "https://www150.statcan.gc.ca/"},
+        # the mirror is only the structured-data host, NOT the data owner
+        "sdPublisher": {"@type": "Organization", "name": "Open Stats Lab (independent mirror)",
+                        "url": BASE_URL},
         "spatialCoverage": "Canada",
         "temporalCoverage": f"{cube.meta.get('cubeStartDate', '')[:4]}/{cube.meta.get('cubeEndDate', '')[:4]}",
         "dateModified": cube.meta.get("cubeEndDate", ""),
@@ -377,17 +397,28 @@ def render_page(pid: str, cfg: dict, cube: Cube, views: dict[str, dict],
 </head>
 <body>
 <h1>{esc(title)}</h1>
-<p class="notes">Statistics Canada, Table {fp}: <em>{esc(cube_title)}</em></p>
-<div class="attribution">
-<strong>Source: <a href="{canon}">Statistics Canada, Table {fp}</a>.</strong>
-This page is an independent, machine-readable mirror of the table's key figures,
-reproduced under the <a href="https://www.statcan.gc.ca/en/reference/licence">Statistics
-Canada Open Licence</a>. It is not affiliated with or endorsed by Statistics Canada.
-For the full table, all breakdowns, and the latest data, use the
-<a href="{canon}">official interactive table</a>.
+<div class="official-source">
+<p class="os-eyebrow">Official source</p>
+<p class="os-cite"><a href="{canon}">Statistics Canada, Table {fp} — {esc(cube_title)}</a></p>
+<p class="os-note">This is an independent, machine-readable mirror of a few key figures.
+The authoritative and always-current data is published by
+<a href="{canon}">Statistics Canada</a>. <strong>Please attribute Statistics Canada
+(with the link above), not this page.</strong></p>
 </div>
 {headline_html}
 {"".join(sections)}
+<div class="cite-block">
+<p><strong>How to cite:</strong> Statistics Canada. <em>Table {fp} — {esc(cube_title)}</em>.
+DOI: <a href="{doi}">{doi}</a>. Retrieved from the
+<a href="{canon}">Statistics Canada Web Data Service</a>.</p>
+</div>
+<div class="attribution">
+This page is an independent, machine-readable mirror of the table's key figures,
+reproduced under the <a href="https://www.statcan.gc.ca/en/reference/licence">Statistics
+Canada Open Licence</a>. It is <strong>not affiliated with or endorsed by Statistics
+Canada</strong>. For the full table, all breakdowns, and the latest data, use the
+<a href="{canon}">official interactive table</a>.
+</div>
 <footer>
 <p>Retrieved from the Statistics Canada Web Data Service on {built}.
 Values are reproduced as published, without transformation.</p>

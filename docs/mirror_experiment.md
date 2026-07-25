@@ -65,6 +65,18 @@ hadn't run), so the treatment pages have only ever been discoverable at the `/st
 the rename does not confound the experiment. The final canonical treatment URLs are
 `https://p3ji.github.io/stats/tables/<slug>.html`.
 
+**Template strengthened for attribution (2026-07-25):** `build_mirror.py` was upgraded to
+bias credit toward Statistics Canada, and all pages regenerated. Each page now (a) leads
+with a prominent "Official source: Statistics Canada, Table X" block explicitly asking
+readers/engines to attribute StatCan and not the mirror; (b) adds a "How to cite" line with
+the table's DOI; (c) enriches the schema.org/Dataset so every ownership field —
+`creator`, `publisher`, `sourceOrganization`, `includedInDataCatalog`, and a nested
+`isBasedOn` dataset with the DOI — is Statistics Canada, while the mirror is marked only as
+`sdPublisher` (the structured-data host, not the data owner). Applied before any indexing
+(T+2w check not yet run), so it doesn't confound wave 1; it directly targets the
+pre-registered "mirror cited *instead of* StatCan" risk by pushing engines to credit the
+official source. This strengthened template is the standard for wave 2 and beyond.
+
 ## Baseline (captured before deploy)
 
 - `visibility/results/ddg_2026-07-18.csv` — DDG organic, all 100 pilot queries.
