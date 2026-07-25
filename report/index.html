@@ -358,24 +358,24 @@
       <p>Wave 2 repeats the same three-step check across new subjects. All 25 Health questions and all 25 Immigration questions have now been checked against Bing's AI answers, with Population sampled alongside; Duck.ai (which cites StatCan far more reliably) serves as the comparison surface. As of July&nbsp;25,&nbsp;2026, crawlable mirrors of the clearest Health cases are live &mdash; so, exactly as in Wave&nbsp;1, the &ldquo;after&rdquo; measurement now waits on the scheduled re-audits. Both waves are live experiments at the same stage: treatment pages published, results pending.</p>
     </div>
 
+    <p class="prose" style="color:var(--ink-soft); font-size:0.92rem;"><strong>First, a fair-test rule.</strong> Of the 25 Health questions, <strong>6 were set aside before scoring</strong> because Statistics Canada simply doesn't publish an answer to them &mdash; opioid deaths belong to the Public Health Agency, cancer projections to the Canadian Cancer Society. There was nothing of StatCan's for the AI to skip, so scoring them would be unfair to the AI and would water down the result. That leaves <strong>19 questions where StatCan genuinely has the answer</strong> &mdash; the only ones that can test whether the AI uses it.</p>
+
     <div class="scorecard">
       <div class="sc-row">
-        <div class="sc-engine">Bing's AI answer box &mdash; Health <span class="n">25 questions</span></div>
+        <div class="sc-engine">Bing's AI answer box &mdash; Health <span class="n">19 answerable questions</span></div>
         <div class="bar">
           <div class="seg" style="flex:2; background:#2e9e6b" title="Cited StatCan correctly">2</div>
           <div class="seg" style="flex:10; background:#d9932b" title="Displacement">10</div>
           <div class="seg" style="flex:7; background:#c0552a" title="Skipped StatCan">7</div>
-          <div class="seg" style="flex:6; background:#7a8590" title="Not StatCan's topic — another agency is the official source">6</div>
         </div>
       </div>
       <div class="sc-legend">
         <span><i style="background:#2e9e6b"></i>Cited StatCan correctly (current)</span>
         <span><i style="background:#d9932b"></i>Used StatCan's number, credited someone else</span>
         <span><i style="background:#c0552a"></i>Skipped StatCan (a rival's number or none)</span>
-        <span><i style="background:#7a8590"></i>Not StatCan's to answer &mdash; another agency is the official source (opioid deaths &rarr; Public Health Agency; cancer projections &rarr; Canadian Cancer Society)</span>
       </div>
     </div>
-    <p class="prose" style="margin-top:16px; color:var(--ink-soft); font-size:0.92rem;">Same story as Wave 1, at larger scale: on Health questions, Bing cited StatCan correctly just <strong>2 times in 25</strong>. Most often it used StatCan's own number but credited an SEO site instead (displacement); on 7 questions it skipped StatCan's figure entirely (scenario&nbsp;b); and on 6 it reached for another agency that genuinely owns the topic (the opioid death toll is Public Health's, cancer projections are the Cancer Society's). Those last 6 are <em>not</em> counted against the AI &mdash; StatCan has no competing figure there, so citing the right agency is correct, not a miss. The Immigration and Population samples show the same displacement pattern as Health.</p>
+    <p class="prose" style="margin-top:16px; color:var(--ink-soft); font-size:0.92rem;">Same story as Wave 1, at larger scale: on the 19 Health questions StatCan can answer, Bing cited it correctly just <strong>2 times</strong>. Most often &mdash; 10 of 19 &mdash; it used StatCan's own number but credited an SEO site or private survey instead (displacement); on the remaining 7 it skipped StatCan's figure entirely, serving a rival's number or none at all. The Immigration and Population samples show the same displacement pattern as Health.</p>
 
         <h3 style="margin-top:34px;">The clearest cases &mdash; with proof of what the AI actually said</h3>
     <p class="prose" style="color:var(--ink-soft); font-size:0.92rem;">These are the strictest kind of gap: not &ldquo;someone else got credit for StatCan's number,&rdquo; but cases where the AI served a <em>different or vaguer</em> answer entirely, while StatCan's own figure sat unused. Each card shows a real screenshot of the AI's answer, then the number StatCan publishes &mdash; with a link to verify. Screenshots captured July&nbsp;23,&nbsp;2026.</p>
@@ -511,6 +511,7 @@
     <h2>How this report grows</h2>
     <p class="prose" style="color:var(--ink-soft);">This page is a living document. As each new batch of questions is tested, it gets added below and the numbers above update.</p>
     <ul class="changelog">
+      <li><time>Jul 25, 2026</time><span><strong>Scoring correction.</strong> The Wave 2 Health scorecard now reports out of the <strong>19 questions Statistics Canada can actually answer</strong>, not all 25 tested. The 6 questions StatCan doesn't cover (opioid deaths, cancer projections) are set aside before scoring instead of appearing as a category &mdash; they can't test whether the AI uses StatCan's data, so including them understated the rate. No underlying codings changed; all 25 remain in the published data.</span></li>
       <li><time>Jul 25, 2026</time><span>Wave 2 treatment mirrors deployed (5 tables: mental health, family doctor, income &amp; health, population, immigrants), each crediting Statistics Canada in its markup and citation. Immigration baseline finished on Bing. Both waves are now at the same stage &mdash; treatment live, awaiting the scheduled re-audits. Wording clarified: the &ldquo;another agency&rdquo; category means StatCan isn't the source for that topic, not that it was skipped.</span></li>
       <li><time>Jul 23, 2026</time><span>First publication. Wave 1 baseline complete (11 questions, both engines) with 3 illustrative screenshots. Wave 2 Health subject complete on Bing (25 questions).</span></li>
     </ul>
