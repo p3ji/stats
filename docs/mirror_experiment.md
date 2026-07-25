@@ -173,8 +173,9 @@ single draw, with no estimate of its variance**, which leaves "treat cautiously"
 judgment made *after* seeing results — precisely where bias enters.
 
 Baseline is **exactly one run per query** (verified: 1 row per ID). Separately, **16 of 60**
-wave-2 rows had *no AI answer box at all* — there the outcome variable doesn't merely vary,
-it intermittently fails to exist.
+wave-2 rows had *no AI answer box at all* — but see **A10**: that rate is largely a property
+of the **ordinary SERP surface** wave 2 used, not of "Bing," and must not be read as the
+engine failing to answer.
 
 Why the magnitude decides the conclusion: if 2 of 5 treatment tables flip to `direct` at
 T+12 and 0 of 4 controls do, that is a signal **if** unprompted flips are rare (~5%), and
@@ -210,10 +211,12 @@ tests whether a new GitHub Pages subpath gets crawled. Pre-committed reading:
 
 ### A5. Pre-specified handling of "no AI answer box"
 
-Common (16/60) and volatile. Rules fixed now: no box = `no_number`, and it counts as
-**StatCan not cited** for the primary outcome. A box appearing/disappearing between rounds
-is **not** itself a treatment effect — it is a surface change, reported separately. With A2
-replicates, a query is "no box" only if the majority of its runs show none.
+Common on the ordinary SERP (16/60 wave-2 rows) and rare on Copilot Search — so this is
+mostly a **surface** property (A10), not engine behaviour. Rules fixed now: no box =
+`no_number`, and it counts as **StatCan not cited** for the primary outcome. A box
+appearing/disappearing between rounds is **not** itself a treatment effect — it is a surface
+change, reported separately. With A2 replicates, a query is "no box" only if the majority of
+its runs show none.
 
 ### A6. Unit of analysis is the table, not the query
 
@@ -245,6 +248,37 @@ Cancer Society projections) **fail the entry test and are excluded from denomina
 before scoring**, not carried as a category. They cannot measure whether an engine uses
 StatCan data. Applied to the wave-2 Health scorecard 2026-07-25 (25 tested → **19 scored**).
 Cross-org counts are still reported separately as the "vacuum-filling" finding.
+
+### A10. The two waves measured different Bing surfaces — pin the surface (SERIOUS)
+
+Discovered 2026-07-25 while checking why "no AI answer box" was so common. **The waves did
+not query the same thing**, though both were labelled `bing_copilot`:
+
+| Wave | Surface actually used | Evidence |
+|---|---|---|
+| 1 (2026-07-19) | **Bing Copilot Search** (dedicated AI-answer surface) | saved a11y trees show a `"Back to Bing search"` heading + All/Images/Videos/Maps filter bar; operational note "answers take 60–150s, poll for *Searching for*" |
+| 2 (2026-07-22→24) | **Ordinary Bing SERP** inline AI module, `bing.com/search?q=` | harness recorded in `WAVE2_AUDIT_RESUME.md` |
+
+These surfaces answer different questions (what a searcher sees vs. what a deliberate
+Copilot user sees) and behave differently — Copilot Search nearly always returns an answer;
+the SERP module often doesn't render at all. Consequences and rules:
+
+1. **Re-audit each wave on the surface its own baseline used.** A wave-2 re-audit run on
+   Copilot Search would compare a SERP "before" to a Copilot "after" — the difference would
+   be surface, not treatment. This would silently destroy the DiD. **Binding.**
+2. **Record the exact URL/surface in every results file** from now on; never rely on the
+   `engine` label alone. Wave-2 rows are relabelled `bing_serp_ai`.
+3. **Do not pool or directly compare wave-1 and wave-2 rates.** Cross-wave statements
+   ("same story as wave 1") are unsafe and have been qualified in the public report.
+4. **Wave-2 internal comparisons are unaffected** — Health vs Immigration vs Population were
+   all run on the same surface, so the finding that clean scenario-(b) concentrates in Health
+   (and therefore the treatment-table selection) still stands.
+5. The 16/60 no-box rate characterises the **SERP**, not "Bing," and A5 is corrected
+   accordingly.
+
+Ideally both surfaces would be measured at every round. Given effort limits, the **primary
+outcome (A1) stays on each wave's own baseline surface**; adding the second surface is
+optional and, if done, is a new arm reported separately — never merged into the primary.
 
 ### Design features that are sound (checked, no change needed)
 

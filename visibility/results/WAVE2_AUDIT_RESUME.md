@@ -28,6 +28,13 @@ capture a11y/text evidence for GAP cases only (answerable + StatCan not cited/us
 Screenshot only gaps — see [[visibility-audit-screenshots]] rationale.
 
 ## Harness (validated, works)
+> **SURFACE WARNING (2026-07-25).** This wave used the **ordinary Bing SERP** inline AI
+> module. Wave 1 used **Bing Copilot Search** (a different surface — its a11y trees show
+> "Back to Bing search"). Both were mislabelled `bing_copilot`; wave-2 rows are now
+> `bing_serp_ai`. **Re-audit this wave on the SERP, not Copilot Search** — mixing them
+> would make the before/after difference a surface artifact. See amendment A10 in
+> `docs/mirror_experiment.md`. Do not pool wave-1 and wave-2 rates.
+
 - **Bing:** `https://www.bing.com/search?q=<query>` → `get_page_text` (~1500 chars). The
   inline AI answer + source rail is in the page text. 2 tool calls/query. NOTE: the
   `computer` screenshot action TIMES OUT on Bing SERPs — rely on text/a11y evidence.
