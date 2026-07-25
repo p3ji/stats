@@ -163,13 +163,25 @@ Rationale for Bing-only primary: Duck.ai already cites StatCan on ~90% of querie
 **ceiling effect**, no room to improve. Duck.ai's job is to detect *displacement* (mirror
 cited instead of StatCan), not to test the citation hypothesis.
 
-### A2. Single-shot measurement is the biggest threat — add replicates (URGENT)
+### A2. Quantify the noise floor — add replicates (URGENT)
 
-Baseline is **exactly one run per query** (verified: 1 row per ID). Bing Copilot answers are
-nondeterministic, and **16 of 60** wave-2 rows had *no AI answer box at all* — a volatile
-surface. With n=1 run at baseline and n=1 at re-audit, a query flipping category is
-**indistinguishable from run-to-run noise**, which would make the headline result
-uninterpretable.
+**This sharpens an existing caveat rather than raising a new one.** The original threats
+list already noted that Bing answers are nondeterministic and that the design is single-shot
+("treat individual flips cautiously, look at the pattern across 11 queries"). Nondeterminism
+is not itself the flaw — it is expected. The flaw is **measuring a variable draw with a
+single draw, with no estimate of its variance**, which leaves "treat cautiously" as a
+judgment made *after* seeing results — precisely where bias enters.
+
+Baseline is **exactly one run per query** (verified: 1 row per ID). Separately, **16 of 60**
+wave-2 rows had *no AI answer box at all* — there the outcome variable doesn't merely vary,
+it intermittently fails to exist.
+
+Why the magnitude decides the conclusion: if 2 of 5 treatment tables flip to `direct` at
+T+12 and 0 of 4 controls do, that is a signal **if** unprompted flips are rare (~5%), and
+**nothing** if a query flips category ~30% of the time on its own (≈1.5 flips expected among
+5 tables by chance). Identical data, opposite readings — and no internal feature of the data
+distinguishes them. Only a measured noise floor does, which converts "look at the pattern"
+into a threshold fixed in advance.
 
 - **From now on: 3 runs per query per timepoint** (Bing/primary), fresh session each,
   coded independently; the **modal** coding is the query's value. Duck.ai stays 1 run
