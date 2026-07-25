@@ -478,7 +478,12 @@ def render_sitemap(pages: list[dict], built_date: str) -> str:
 
 def main() -> int:
     manifest = yaml.safe_load((HERE / "manifest.yaml").read_text(encoding="utf-8"))
-    treatment = {pid for group in manifest["experiment"]["treatment"].values() for pid in group}
+    exp = manifest["experiment"]
+    treatment = {pid for group in exp["treatment"].values() for pid in group}
+    # later waves record their own treatment/control under experiment.<wave>
+    for key, val in exp.items():
+        if isinstance(val, dict) and "treatment" in val and isinstance(val["treatment"], list):
+            treatment.update(val["treatment"])
     code_sets = get_code_sets()
     now = datetime.now(timezone.utc)
     built = now.strftime("%Y-%m-%d")

@@ -102,6 +102,38 @@ rule):
 - **Reference values:** official current value per treatment table recorded at baseline
   (from WDS) so post-treatment vintage/accuracy shifts are measurable.
 
+## Assignment (executed 2026-07-25)
+
+Baseline done (Bing, 60 queries: Health 25, Immigration 25, Population 10 — the 15
+routine Population queries and the full Duck.ai pass were skipped as they don't change
+the gap pool; the census subjects are conclusively *displacement*, Duck.ai is the
+already-good comparison surface). Gap pool deduped to table and randomized table→arm by
+[`visibility/mirror/assign_wave2.py`](../visibility/mirror/assign_wave2.py),
+`random.Random(20260725)`, stratified by subject. Curated pool = the tables where StatCan
+publishes the *matching* metric (cross-org PHAC/IRCC/CCS cases and no-table cases excluded).
+
+| Arm | Table | Metric (short) | Matched queries |
+|---|---|---|---|
+| treatment | 13-10-0465 | Self-rated mental health / disorders | HEA-024, HEA-001 |
+| treatment | 13-10-0962 | Regular health care provider (family doctor) | HEA-016, HEA-017 |
+| treatment | 13-10-0971 | Health-adjusted life expectancy by income | HEA-025 |
+| treatment | 17-10-0009 | Quarterly population estimates | POP-001, POP-002 |
+| treatment | 98-10-0307 | Immigrant / foreign-born population (census) | IMM-001, IMM-013, IMM-014 |
+| control | 13-10-0836 | Unmet health care needs | HEA-019 |
+| control | 13-10-0930 | Mental disorders (MHACS) | HEA-002 |
+| control | 98-10-0324 | Visible minority population (census) | IMM-007, IMM-008, IMM-010 |
+
+Subject-stratified: Health 3T/2C, Immigration 1T/1C, Population 1T/0C (a singleton stratum
+can't hold out a control). Three of the five clean scenario-(b) Health tables landed in
+treatment; two are held out as controls, giving a within-failure-mode comparison. **Wave-2
+control tables (13-10-0836, 13-10-0930, 98-10-0324) must not be mirrored, linked, or
+promoted until the experiment concludes** — same rule as wave 1.
+
+Mirror pages deployed 2026-07-25 at `https://p3ji.github.io/stats/tables/` using the
+attribution-strengthened template (credits Statistics Canada, not the mirror):
+`mental-health-canada`, `family-doctor-canada`, `income-and-health-canada`,
+`population-of-canada`, `immigrants-in-canada`. Re-audit clock starts at this deploy.
+
 ## Outcomes & re-audit
 
 Unchanged from wave 1: difference-in-differences on citation, vintage, and value-match,

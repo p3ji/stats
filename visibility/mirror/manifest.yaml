@@ -29,6 +29,20 @@ experiment:
   treatment_queries: [SOC-004, LAB-002, LAB-003, SOC-001, SOC-002, SOC-024, DIG-014]
   control_queries: [LAB-014, SOC-010, SOC-016, SOC-005]
 
+  # ── Wave 2 (Health / Immigration / Population) ──────────────────────────
+  # Separate cohort from wave 1 (must not touch wave-1 tables). Gap pool from
+  # the Bing baseline (baseline_bing_wave2_2026-07-22.csv) deduped to table,
+  # randomized table->arm by visibility/mirror/assign_wave2.py, stratified by
+  # subject. Control tables MUST NOT be mirrored. Design: docs/wave2.md.
+  wave2:
+    seed: 20260725
+    assigned: "2026-07-25"
+    baseline_audit: visibility/results/baseline_bing_wave2_2026-07-22.csv
+    treatment: ["13100465", "13100962", "13100971", "17100009", "98100307"]
+    control: ["13100836", "13100930", "98100324"]
+    treatment_queries: [HEA-024, HEA-001, HEA-016, HEA-017, HEA-025, POP-001, POP-002, IMM-001, IMM-013, IMM-014]
+    control_queries: [HEA-019, HEA-002, IMM-007, IMM-008, IMM-010]
+
 # View spec fields:
 #   fixed  — {DimensionName: exact member name} held constant
 #   rows   — "time" (periods as rows) or {dim, members: [names] | "all"}
@@ -215,5 +229,162 @@ tables:
         rows:
           dim: "Business characteristics"
           members: ["North American Industry Classification System (NAICS), all industries", "Agriculture, forestry, fishing and hunting", "Mining, quarrying, and oil and gas extraction", "Construction", "Manufacturing", "Wholesale trade", "Retail trade", "Transportation and warehousing", "Information and cultural industries", "Finance and insurance", "Real estate and rental and leasing", "Professional, scientific and technical services", "Administrative and support, waste management and remediation services", "Health care and social assistance", "Arts, entertainment and recreation", "Accommodation and food services", "Other services (except public administration)"]
+        cols: value
+        latestN: 1
+
+  # ── Wave 2 treatment tables ────────────────────────────────────────────
+
+  "13100465":
+    slug: mental-health-canada
+    queries: [HEA-024, HEA-001]
+    flavour: clean_b
+    page_title: "Mental health in Canada: self-rated mental health and mental disorders"
+    headline:
+      view: perceived-mh
+      row: "Total, 15 years and over"
+      col: "Perceived mental health, fair or poor"
+      template: "In {period}, {value}% of Canadians aged 15 and over rated their own mental health as fair or poor."
+    views:
+      - id: perceived-mh
+        title: "Self-rated (perceived) mental health, by age group"
+        caption: "Share of people rating their own mental health as very good/excellent, good, or fair/poor, Canada, by age group. Mental Health and Access to Care Survey."
+        fixed:
+          Geography: "Canada"
+          Gender: "Total, gender of person"
+          Characteristics: "Percent"
+        rows: {dim: "Age group", members: all}
+        cols:
+          dim: Indicators
+          members: ["Perceived mental health, very good or excellent", "Perceived mental health, good", "Perceived mental health, fair or poor"]
+        latestN: 1
+      - id: disorders
+        title: "Selected mental or substance use disorders (past 12 months), by gender"
+        caption: "12-month prevalence of selected mental or substance use disorders among people aged 15+, Canada, by gender."
+        fixed:
+          Geography: "Canada"
+          "Age group": "Total, 15 years and over"
+          Characteristics: "Percent"
+        rows:
+          dim: Indicators
+          members: ["Any selected disorder (mental or substance), including social phobia,  12 months", "Any mood disorder, 12 months", "Major depressive episode, 12 months", "Any anxiety disorder, 12 months", "Generalized anxiety disorder, 12 months", "Any substance use disorder (alcohol or drug), 12 months", "Suicidal thoughts, 12 months"]
+        cols: {dim: Gender, members: ["Total, gender of person", "Men+", "Women+"]}
+        latestN: 1
+
+  "13100962":
+    slug: family-doctor-canada
+    queries: [HEA-016, HEA-017]
+    flavour: clean_b
+    page_title: "Access to a family doctor and primary care in Canada"
+    headline:
+      view: by-age
+      row: "Total, 18 years and over"
+      col: "Has a regular health care provider"
+      template: "In {period}, {value}% of Canadians aged 18 and over had a regular health care provider (a family doctor or nurse practitioner)."
+    views:
+      - id: by-age
+        title: "Primary-care access, by age group"
+        caption: "Share of people aged 18+ reporting each primary-care experience, Canada (excluding territories), by age group. Survey on Health Care Access and Experiences, 2024."
+        fixed:
+          Geography: "Canada (excluding territories)"
+          Gender: "Both genders"
+          Characteristics: "Percentage"
+        rows: {dim: "Age group", members: all}
+        cols:
+          dim: "Indicators "
+          members: ["Has a regular health care provider", "Consulted a health care provider for a non-urgent primary health care need in the past 12 months", "Experienced difficulties getting non-urgent primary health care in the past 12 months", "Had unmet health care needs in the past 12 months"]
+        latestN: 1
+      - id: by-province
+        title: "Access to a regular health care provider, by province"
+        caption: "Share of people aged 18+ with a regular health care provider and with unmet health care needs, by province."
+        fixed:
+          Gender: "Both genders"
+          "Age group": "Total, 18 years and over"
+          Characteristics: "Percentage"
+        rows: {dim: Geography, members: all}
+        cols:
+          dim: "Indicators "
+          members: ["Has a regular health care provider", "Had unmet health care needs in the past 12 months", "Experienced difficulties getting specialist care in the past 12 months"]
+        latestN: 1
+
+  "13100971":
+    slug: income-and-health-canada
+    queries: [HEA-025]
+    flavour: clean_b
+    page_title: "How income affects health in Canada: health-adjusted life expectancy by income quintile"
+    headline:
+      view: by-income
+      row: "Income group, quintile 1 (lowest)"
+      col: "Health-adjusted life expectancy"
+      template: "In {period}, Canadians in the lowest income quintile had a health-adjusted life expectancy of {value} years at birth."
+    views:
+      - id: by-income
+        title: "Health-adjusted and total life expectancy at birth, by income quintile"
+        caption: "Health-adjusted life expectancy (years lived in full health) and total life expectancy at birth, Canada, both sexes, by income quintile. The gap between quintile 1 and quintile 5 is the income–health gradient."
+        fixed:
+          Geography: "Canada"
+          "Age group": "At birth"
+          Sex: "Both sexes"
+        rows: {dim: "Income group", members: all}
+        cols:
+          dim: Characteristics
+          members: ["Health-adjusted life expectancy", "Life expectancy"]
+        latestN: 1
+      - id: by-income-sex
+        title: "Health-adjusted life expectancy at birth, by income quintile and sex"
+        caption: "Health-adjusted life expectancy at birth, Canada, by income quintile and sex."
+        fixed:
+          Geography: "Canada"
+          "Age group": "At birth"
+          Characteristics: "Health-adjusted life expectancy"
+        rows: {dim: "Income group", members: all}
+        cols: {dim: Sex, members: ["Both sexes", "Males", "Females"]}
+        latestN: 1
+
+  "17100009":
+    slug: population-of-canada
+    queries: [POP-001, POP-002]
+    flavour: displacement
+    page_title: "Population of Canada, by province and over time (quarterly estimates)"
+    headline:
+      view: by-province
+      row: "Canada"
+      col: value
+      template: "As of {period}, Statistics Canada estimated Canada's population at {value}."
+    views:
+      - id: by-province
+        title: "Latest population estimate, by province and territory"
+        caption: "Quarterly population estimate for Canada and each province and territory, most recent quarter."
+        rows: {dim: Geography, members: all}
+        cols: value
+        latestN: 1
+      - id: trend
+        title: "Canada's population over the last three years"
+        caption: "Quarterly population estimate for Canada, last 12 quarters."
+        rows: time
+        latestN: 12
+        cols: {dim: Geography, members: ["Canada"]}
+
+  "98100307":
+    slug: immigrants-in-canada
+    queries: [IMM-001, IMM-013, IMM-014]
+    flavour: displacement
+    page_title: "How many immigrants live in Canada (2021 Census)"
+    headline:
+      view: status
+      row: "Immigrants"
+      col: value
+      template: "In {period}, the census counted {value} immigrants (foreign-born residents) living in Canada."
+    views:
+      - id: status
+        title: "Population by immigrant status and period of immigration, Canada"
+        caption: "Counts of non-immigrants, immigrants (by period of arrival), and non-permanent residents, Canada, 2021 Census. Total population is the first row; immigrants divided by total gives the foreign-born share."
+        fixed:
+          Geography: "Canada"
+          "Age (8D)": "Total - Age"
+          "Gender (3)": "Total - Gender"
+          "Place of birth (290)": "Total"
+        rows:
+          dim: "Immigrant status and period of immigration (11)"
+          members: ["Total - Immigrant status and period of immigration", "Non-immigrants", "Immigrants", "Before 1980", "1980 to 1990", "1991 to 2000", "2001 to 2010", "2011 to 2021", "Non-permanent residents"]
         cols: value
         latestN: 1
