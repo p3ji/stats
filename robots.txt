@@ -1,0 +1,12 @@
+# Open Stats Lab — https://p3ji.github.io/stats/
+# Independent open-data experiments. Not affiliated with Statistics Canada.
+#
+# All content here is public and intended to be crawled. The /tables/ mirrors
+# exist specifically to test whether crawlable, machine-readable open data
+# changes how answer engines cite official statistics — see
+# docs/mirror_experiment.md in the repository.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://p3ji.github.io/stats/sitemap.xml
