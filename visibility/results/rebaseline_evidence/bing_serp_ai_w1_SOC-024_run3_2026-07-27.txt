@@ -1,0 +1,5 @@
+# query: who does more housework men or women canada
+# url: https://www.bing.com/search?q=who+does+more+housework+men+or+women+canada
+# captured: 2026-07-27 run 3
+
+RUN 3. populated, 2718 chars, direct StatCan, "in 2019, Canadian women performed 50% more unpaid domestic labor" -- identical to run 2, differs from run 1 (2017 GSS). Modal across 3 runs = the 2019 framing (2 of 3). Run 1's 2017 GSS is the minority variant.

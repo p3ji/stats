@@ -1,0 +1,5 @@
+# query: what percentage of canadians volunteer
+# url: https://www.bing.com/search?q=what+percentage+of+canadians+volunteer
+# captured: 2026-07-27 run 3
+
+RUN 3. empty. nAns=2, no populated block. THIRD consecutive empty. The SOC-001 vs SOC-002 contrast is now replicated 3/3: identical topic and identical underlying StatCan data, but one phrasing always answers (and credits Statistique Canada by name) while the other never does. Definitive evidence that AI-module fill is a property of the query string.

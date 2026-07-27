@@ -1,0 +1,5 @@
+# query: average salary in canada by province
+# url: https://www.bing.com/search?q=average+salary+in+canada+by+province
+# captured: 2026-07-27 run 3
+
+RUN 3. populated, 3047 chars, identical headline to runs 1 and 2. No direct StatCan attribution. Stable across all 3 runs.

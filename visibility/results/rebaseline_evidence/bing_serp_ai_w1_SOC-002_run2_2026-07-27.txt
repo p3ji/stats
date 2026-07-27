@@ -1,0 +1,5 @@
+# query: what percentage of canadians volunteer
+# url: https://www.bing.com/search?q=what+percentage+of+canadians+volunteer
+# captured: 2026-07-27 run 2
+
+RUN 2. empty. nAns=2, no populated block. Matches run 1. The SOC-001/SOC-002 contrast therefore holds across two independent runs: same topic and same underlying StatCan data, but "volunteering in canada statistics" answers and credits Statistique Canada while "what percentage of canadians volunteer" returns an empty container both times. This is the query-string finding, now replicated.

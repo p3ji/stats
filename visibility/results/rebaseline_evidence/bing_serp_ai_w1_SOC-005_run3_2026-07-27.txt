@@ -1,0 +1,6 @@
+# query: loneliness in canada statistics
+# url: https://www.bing.com/search?q=loneliness+in+canada+statistics
+# captured: 2026-07-27 run 3
+
+RUN 3. populated, 1306 chars, direct StatCan -- back to the run-1 headline: "According to Statistics Canada's 2021 survey, 13% of people aged 15 and older reported always or often feeling lonely."
+MODAL RESOLUTION: run 1 = 13%, run 2 = 40%, run 3 = 13%. Modal value 13% (2 of 3); run 2's 40% is the outlier. This is the single clearest demonstration of why A2 mandates 3 runs -- a one-shot capture landing on run 2 would have recorded a headline three times too large, with the citation class unchanged.

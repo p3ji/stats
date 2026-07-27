@@ -1,0 +1,5 @@
+# query: are charitable donations declining in canada
+# url: https://www.bing.com/search?q=are+charitable+donations+declining+in+canada
+# captured: 2026-07-27 run 2
+
+RUN 2. populated, 3724 chars. Same substance as run 1: Fraser Institute 2025 Generosity Index 21.9%(2013)->16.8%(2023); "Statistics Canada reports that the percentage of Canadians giving declined..." attributed to LinkedIn. StatCan named in text, not in the source rail. Stable vs run 1.

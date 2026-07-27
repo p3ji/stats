@@ -1,0 +1,5 @@
+# query: who does more housework men or women canada
+# url: https://www.bing.com/search?q=who+does+more+housework+men+or+women+canada
+# captured: 2026-07-27 run 2
+
+RUN 2. populated, 2718 chars, direct StatCan. VALUE DRIFT vs run 1: run 1 served the 2017 General Social Survey (laundry 61% women / 39% men, outdoor work 78% men); run 2 serves "According to Statistics Canada, in 2019, Canadian women performed an average of 50% more unpaid domestic labor". Same ai_module, same citation_class, DIFFERENT vintage and different statistic. Code citation stability and value stability separately.

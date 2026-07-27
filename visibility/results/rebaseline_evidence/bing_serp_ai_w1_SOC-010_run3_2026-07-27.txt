@@ -1,0 +1,5 @@
+# query: do canadians trust the government
+# url: https://www.bing.com/search?q=do+canadians+trust+the+government
+# captured: 2026-07-27 run 3
+
+RUN 3. absent. nAns=0, and a whole-page regex for statcan/statistique returns FALSE. Third consecutive absent. Stable.

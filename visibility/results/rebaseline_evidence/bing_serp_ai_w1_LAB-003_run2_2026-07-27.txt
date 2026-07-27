@@ -1,0 +1,5 @@
+# query: average salary in canada by province
+# url: https://www.bing.com/search?q=average+salary+in+canada+by+province
+# captured: 2026-07-27 run 2
+
+RUN 2. populated, 3047 chars -- byte-identical headline to run 1: "$57,000 to $72,000 depending on the province, with Alberta and Ontario leading". No direct StatCan attribution in the answer (scDirect=false). Stable vs run 1.

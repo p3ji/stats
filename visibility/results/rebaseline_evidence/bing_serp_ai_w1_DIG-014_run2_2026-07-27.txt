@@ -1,0 +1,5 @@
+# query: how many businesses in canada use artificial intelligence
+# url: https://www.bing.com/search?q=how+many+businesses+in+canada+use+artificial+intelligence
+# captured: 2026-07-27 run 2
+
+RUN 2. populated, 2476 chars, direct StatCan -- identical to run 1 including the 19.2% Q2 2026 headline and the 6.1%/12.2%/19.2% series. Most stable query in the set.

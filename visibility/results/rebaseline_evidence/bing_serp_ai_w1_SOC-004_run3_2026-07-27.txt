@@ -1,0 +1,5 @@
+# query: are charitable donations declining in canada
+# url: https://www.bing.com/search?q=are+charitable+donations+declining+in+canada
+# captured: 2026-07-27 run 3
+
+RUN 3. populated, 3724 chars, identical to run 2. Fraser Institute Generosity Index headline; "Statistics Canada" named in body, attribution to LinkedIn. Stable across all 3 runs.

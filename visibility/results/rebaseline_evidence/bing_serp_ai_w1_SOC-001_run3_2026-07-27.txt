@@ -1,0 +1,5 @@
+# query: volunteering in canada statistics
+# url: https://www.bing.com/search?q=volunteering+in+canada+statistics
+# captured: 2026-07-27 run 3
+
+RUN 3. populated, 3273 chars, direct StatCan attribution, identical 73% / 4.1 billion hours / $64 billion headline. Stable across all 3 runs.

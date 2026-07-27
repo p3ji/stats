@@ -1,0 +1,5 @@
+# query: how religious is canada
+# url: https://www.bing.com/search?q=how+religious+is+canada
+# captured: 2026-07-27 run 3
+
+RUN 3. populated, 2856 chars, Wikipedia carries the inline attribution for 2021 Census figures, no direct StatCan attribution. Identical to run 2. Displacement stable across all 3 runs.

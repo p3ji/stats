@@ -1,0 +1,5 @@
+# query: average salary in canada by age
+# url: https://www.bing.com/search?q=average+salary+in+canada+by+age
+# captured: 2026-07-27 run 2
+
+RUN 2. empty. nAns=3 (video carousel + feedback widget + empty container), no populated block after ~12s on a cache-busted load. Matches run 1.

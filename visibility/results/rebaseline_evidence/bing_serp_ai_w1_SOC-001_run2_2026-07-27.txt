@@ -1,0 +1,5 @@
+# query: volunteering in canada statistics
+# url: https://www.bing.com/search?q=volunteering+in+canada+statistics
+# captured: 2026-07-27 run 2
+
+RUN 2. populated, 3273 chars, direct StatCan attribution present. Identical headline to run 1: 73% of Canadians 15+, 4.1 billion hours, $64 billion. Stable vs run 1.

@@ -1,0 +1,5 @@
+# query: loneliness in canada statistics
+# url: https://www.bing.com/search?q=loneliness+in+canada+statistics
+# captured: 2026-07-27 run 2
+
+RUN 2. populated, 1457 chars, direct StatCan. LARGE VALUE DRIFT vs run 1: run 1 led with "13% of people aged 15 and older reported always or often feeling lonely" (Statistics Canada 2021); run 2 leads with "40% of Canadians experience some..." -- a different headline figure for the same question. Citation class stable, headline value not. This is the clearest single illustration of why A2 requires replicates.

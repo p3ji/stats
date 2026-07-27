@@ -1,0 +1,5 @@
+# query: how many canadians work in the public sector
+# url: https://www.bing.com/search?q=how+many+canadians+work+in+the+public+sector
+# captured: 2026-07-27 run 2
+
+RUN 2. populated, 842 chars, short quick-answer card -- identical to run 1: 4.55 million / 21.6%, attributed to canada.ca. No direct StatCan attribution. Stable vs run 1.

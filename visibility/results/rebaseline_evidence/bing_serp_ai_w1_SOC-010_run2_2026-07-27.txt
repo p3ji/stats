@@ -1,0 +1,5 @@
+# query: do canadians trust the government
+# url: https://www.bing.com/search?q=do+canadians+trust+the+government
+# captured: 2026-07-27 run 2
+
+RUN 2. absent. nAns=0 -- no AI container rendered at all, matching run 1. The only query in wave 1 that is consistently `absent` rather than `empty`.
