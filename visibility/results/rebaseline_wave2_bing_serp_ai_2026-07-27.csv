@@ -1,3 +1,5 @@
 run_date,engine,wave,run,id,subject,arm,query_asked,ai_module,answerable,citation_class,cited_sources,answer_value,statcan_value,statcan_vintage_cited,best_available_vintage,value_match,evidence,note
 2026-07-27,bing_serp_ai,2,1,HEA-024,health,tbd,self rated mental health canada,populated,,,,,,,,,bing_serp_ai_w2_HEA-024_run1_2026-07-27.txt,
 2026-07-27,bing_serp_ai,2,1,IMM-013,immigration_and_ethnocultural_diversity,tbd,what percentage of canada population is foreign born,empty,,,,,,,,,bing_serp_ai_w2_IMM-013_run1_2026-07-27.txt,
+2026-07-27,bing_serp_ai,2,1,HEA-001,health,tbd,mental health in canada statistics,populated,,,,,,,,,bing_serp_ai_w2_HEA-001_run1_2026-07-27.txt,
+2026-07-27,bing_serp_ai,2,1,HEA-016,health,tbd,how many canadians have a family doctor,populated,,,,,,,,,bing_serp_ai_w2_HEA-016_run1_2026-07-27.txt,

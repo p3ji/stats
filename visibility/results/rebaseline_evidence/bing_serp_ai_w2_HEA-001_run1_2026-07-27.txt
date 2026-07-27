@@ -1,0 +1,11 @@
+# query: mental health in canada statistics
+# url: https://www.bing.com/search?q=mental+health+in+canada+statistics
+# captured: 2026-07-27 run 1
+
+AI ANSWER PRESENT (3425 chars). Reproduces the wave-2 coding.
+
+"Approximately 20% of Canadians experience mental health problems annually, with significant disparities among Indigenous peoples, youth, and low-income populations. Annual prevalence: About 20% ... by age 40, roughly half of the population will have faced some level of mental health challenge" [madeinca]
+
+StatCan present in body text (organic results) but the answer's numbers come from madeinca / CAMH.
+
+RE-VERIFICATION: CONFIRMS wave-2 coding (indirect / different_metric, scenario (b)). StatCan's perceived-mental-health data neither cited nor used in the answer. Not a junk load -- a full answer rendered.

@@ -1,0 +1,13 @@
+# query: how many canadians have a family doctor
+# url: https://www.bing.com/search?q=how+many+canadians+have+a+family+doctor
+# captured: 2026-07-27 run 1
+
+AI ANSWER PRESENT (2329 chars). Reproduces the wave-2 coding, strongly.
+
+"Approximately 81% of Canadians have a regular family doctor or nurse practitioner, while about 5.9 million people lack regular access to primary care. According to the 2025 OurCare Survey conducted in partnership with the Canadian Medical Association, 81% of Canadians reported having a regular family doctor or nurse practitioner, up from 77% in 2022"
+
+CRITICAL: a regex for /statistics canada|statcan/i over the ENTIRE page body returned FALSE. StatCan does not appear anywhere on the SERP -- not in the answer, not in the organic rail.
+
+StatCan's own 2024 access-to-care survey (17100009) carries 81.0% -- the SAME headline number the OurCare/CMA survey is credited for. The public gets the right number and never learns the national statistical agency measured it.
+
+RE-VERIFICATION: CONFIRMS wave-2 coding. Cleanest scenario (b) in the set.
