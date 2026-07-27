@@ -150,7 +150,7 @@ Secondary: does the mirror page itself get indexed (site: queries) and crawled
 
 Full design audit run **before any post-treatment measurement exists** (treatment deployed
 2026-07-25; first re-audit not due until ~2026-08-08). Nothing here is a post-hoc change to
-a rule after seeing results — no results exist yet. Amendments A1–A11 are binding from now.
+a rule after seeing results — no results exist yet. Amendments A1–A12 are binding from now.
 
 ### A1. Primary outcome and endpoint (was under-specified — multiplicity risk)
 
@@ -174,6 +174,10 @@ list already noted that Bing answers are nondeterministic and that the design is
 is not itself the flaw — it is expected. The flaw is **measuring a variable draw with a
 single draw, with no estimate of its variance**, which leaves "treat cautiously" as a
 judgment made *after* seeing results — precisely where bias enters.
+
+> **RETIRED by A12 (2026-07-27).** The 16/60 figure below mixes genuine absence, unfilled
+> answer containers, and mismatched junk loads. It is illustrative only and must not be
+> used as a baseline quantity.
 
 Baseline is **exactly one run per query** (verified: 1 row per ID). Separately, **16 of 60**
 wave-2 rows had *no AI answer box at all* — but see **A10**: that rate is largely a property
@@ -214,7 +218,8 @@ tests whether a new GitHub Pages subpath gets crawled. Pre-committed reading:
 
 ### A5. Pre-specified handling of "no AI answer box"
 
-Common on the ordinary SERP (16/60 wave-2 rows) and rare on Copilot Search — so this is
+Common on the ordinary SERP (16/60 wave-2 rows — **retired as a quantity by A12**, which
+splits this into `populated`/`empty`/`absent`) and rare on Copilot Search — so this is
 mostly a **surface** property (A10), not engine behaviour. Rules fixed now: no box =
 `no_number`, and it counts as **StatCan not cited** for the primary outcome. A box
 appearing/disappearing between rounds is **not** itself a treatment effect — it is a surface
@@ -314,6 +319,82 @@ pre-treatment baseline and the surface choice can be re-made at no cost to the d
    the main reason to do it and partly mitigates the power limitation in A6. Per-wave
    estimates are still reported alongside the pooled one.
 5. Every results row records the surface explicitly (`bing_serp_ai`), per A10 point 2.
+
+### A12. Capture integrity on the Bing SERP (2026-07-27)
+
+**The capture procedure that produced the baselines can silently record the wrong page, and
+"no AI answer box" turns out to be three different states.** Found 2026-07-27 by direct DOM
+inspection of live Bing SERPs while re-verifying wave-2 codings under A11.
+
+**What was observed:**
+
+1. **Mismatched first loads.** The first page load after navigating to a new Bing search URL
+   frequently returns a page with the *correct* URL and *correct* `<title>` but results for a
+   **different query**. Observed cases:
+
+   | Query navigated to | Results actually served |
+   |---|---|
+   | `average salary in canada by age` | dictionary/calculator definitions of the word "average" |
+   | `self rated mental health canada` | SELF Magazine and the philosophical concept of self |
+   | `are charitable donations declining in canada` | Chinese-language results about Paris |
+
+   A reload with a changed URL parameter fixed it every time. These junk loads carry **no AI
+   answer box**, so they masquerade as genuine non-answers.
+2. **Caching masks the problem.** Reloading the *same* URL serves a cached page. The earlier
+   conclusion that a result was "verified stable across 2 consecutive loads" was **wrong** —
+   the stability was the cache, not the phenomenon. Cache-busting requires a **changed query
+   parameter**, not a plain reload.
+3. **The AI module has three states, not two.** What A5 and A10 coded as "no AI answer box"
+   conflates:
+
+   | `ai_module` | Meaning |
+   |---|---|
+   | `populated` | module rendered an answer |
+   | `empty` | container present in the DOM but never fills, even after ~25s and multiple cache-busted loads |
+   | `absent` | no container at all |
+
+   All three occur: wave-1 run 1 was **8 `populated`, 2 `empty`, 1 `absent`**.
+
+**Binding rules:**
+
+1. **Capture protocol:** navigate → reload with a **changed cache-busting parameter** → poll
+   the DOM for up to ~12s → **confirm the results are actually about the query** before
+   recording. `visibility/rebaseline.py` enforces this and refuses text sharing under half the
+   query's content words.
+2. **Record `ai_module` at capture time** as `populated` / `empty` / `absent`. Never infer it
+   later from stored text.
+3. **The wave-2 16/60 "no AI answer box" rate is retired as a quantity.** It mixes genuine
+   absence, unfilled containers, and mismatched junk loads, and is **not comparable** to any
+   re-audit coded with `ai_module`. It must not be used as a baseline quantity for the primary
+   outcome. (A2 and A5 cite that rate; treat it as illustrative only.)
+4. **HEA-024 is re-coded.** "self rated mental health canada" was coded in the wave-2 baseline
+   as *situation (b): no AI answer generated*. Re-verification returns a full **1770-character**
+   AI answer leading with **53.7%** from the **Canadian Community Health Survey** — attributed
+   to `www.canada.ca` (PHAC), with StatCan appearing only in the organic rail. The CCHS *is* a
+   Statistics Canada survey, so this is **scenario (a), displacement**, not scenario (b), and
+   an answer does exist. HEA-024 supports treatment table **13100962**.
+5. **The arm assignment stands — do not re-randomize.** Reasoning, recorded so it is not
+   re-litigated later:
+   - A junk load can only corrupt cases coded *"no answer"*, because it produces no answer at
+     all. It **cannot manufacture a cited answer**.
+   - Among the seven Health clean-scenario-(b) cases that fed treatment selection, **HEA-024
+     was the only one carrying a "no answer" coding**. The other six carry `indirect` codings
+     with **named competing sources** — positive evidence those pages rendered correctly.
+   - Two were spot-checked and both reproduced exactly: **HEA-001** (20% from madeinca/CAMH,
+     StatCan uncited) and **HEA-016** (81% from the OurCare/CMA survey, a whole-page regex for
+     StatCan returning FALSE while StatCan's own access survey carries the identical 81.0%
+     figure).
+   - Both treatment tables retain independent clean-(b) support.
+   - Re-randomizing **after** inspecting re-verification results would make the arms
+     conditional on observed data — exactly the post-hoc contamination this amendment series
+     exists to prevent.
+
+**A genuine finding, not just a methods fix.** Whether the AI module fills is a property of
+the **query string**, not of StatCan's coverage. "volunteering in canada statistics" returns a
+full answer citing Statistique Canada directly; "what percentage of canadians volunteer" —
+same topic, same underlying StatCan data, different phrasing — returns an **empty** container.
+Therefore the absence of an AI answer can **never** be read as evidence about whether
+StatCan's data was available or used.
 
 ### Design features that are sound (checked, no change needed)
 
