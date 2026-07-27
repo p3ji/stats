@@ -1,0 +1,8 @@
+# query: loneliness in canada statistics
+# url: https://www.bing.com/search?q=loneliness+in+canada+statistics
+# captured: 2026-07-27 run 1
+
+AI ANSWER PRESENT (1306 chars). DIRECT StatCan citation, named in the answer body.
+"13% -- Loneliness in Canada. According to Statistics Canada's 2021 survey, 13% of people aged 15 and older reported always or often feeling lonely... For a detailed breakdown by gender and other sociodemographic characteristics, the Government of Canada's publication provides comprehensive data. [Canadian Mental Health Association - National +1] [Statistique Canada]"
+RAIL: www150.statcan.gc.ca (#1); cmha.ca; open.canada.ca; blog.theralist.ca; publications.gc.ca; casch.org; rabble.ca; rootsofloneliness.com
+CODING: DIRECT -- "Statistics Canada's 2021 survey" named in the sentence carrying the 13% figure, plus a "Statistique Canada" inline attribution, plus #1 organic. Vintage 2021; check currency before coding value_match. --force: curated summary.

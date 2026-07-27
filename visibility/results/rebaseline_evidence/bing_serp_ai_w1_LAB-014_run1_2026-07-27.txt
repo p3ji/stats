@@ -1,0 +1,9 @@
+# query: how many canadians work in the public sector
+# url: https://www.bing.com/search?q=how+many+canadians+work+in+the+public+sector
+# captured: 2026-07-27 run 1
+
+AI ANSWER PRESENT (842 chars -- short "quick answer" card format, not the long synthesized form).
+"Approximately 4.55 million Canadians. As of 2025, approximately 4.55 million Canadians work in the public sector, which represents about 21.6% of all employed Canadians. Includes federal, provincial and local governments, public schools, hospitals, government-owned institutions." [www.canada.ca x2]
+Deep links: canadavisuals.ca "How Many Canadians Work in the Public Sector? Canada had approximately 21.03 million employed people in 2025. Of those, 4.55 million worked in the public sector"
+RAIL: canada.ca; canadavisuals.ca; thehub.ca; www150.statcan.gc.ca; publications.gc.ca; wowa.ca; nationalpost.com; fraserinstitute.org
+CODING: DISPLACEMENT. 4.55M and 21.03M employed are StatCan public-sector employment / LFS figures, attributed to canada.ca and canadavisuals.ca. StatCan in rail only. --force: curated summary.

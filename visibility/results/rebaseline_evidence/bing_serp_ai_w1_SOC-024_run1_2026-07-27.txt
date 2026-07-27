@@ -1,0 +1,8 @@
+# query: who does more housework men or women canada
+# url: https://www.bing.com/search?q=who+does+more+housework+men+or+women+canada
+# captured: 2026-07-27 run 1
+
+AI ANSWER PRESENT (2472 chars). DIRECT StatCan citation.
+"Women in Canada still perform more housework than men... Men contribute less to meal preparation and laundry but are more involved in outdoor work and repairs [Statistique Canada]. Statistics from Canada: According to the 2017 General Social Survey: Laundry 61% women vs 39% men; Meal preparation 56% women, 38% of couples sharing equally; Outdoor work and repairs 78% men; Dishes/grocery shopping shared equally"
+RAIL: cbc.ca; ualberta.ca; worldmetrics.org; timescolonist.com; www150.statcan.gc.ca; edmonton.citynews.ca; crdcn.ca; vanierinstitute.ca
+CODING: direct -- "Statistique Canada" is an inline attribution and the GSS is named explicitly. VINTAGE CONCERN: the answer serves the 2017 General Social Survey; check against the current time-use table before coding value_match (likely match_stale).

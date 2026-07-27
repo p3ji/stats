@@ -1,0 +1,8 @@
+# query: how religious is canada
+# url: https://www.bing.com/search?q=how+religious+is+canada
+# captured: 2026-07-27 run 1
+
+AI ANSWER PRESENT (2845 chars). TEXTBOOK DISPLACEMENT -- census data credited to Wikipedia.
+"As of the 2021 census, 53.3% of Canadians identified as Christian, with Catholics the largest group at 29.9%. United Church 3.3%, Anglican 3.1%, Orthodox 1.7%, Baptists 1.2%, Pentecostals 1.1% [Wikipedia +1]. Islam 4.9%, Hinduism 2.3%, Sikhism 2.1%, Buddhism 1.0%, Judaism 0.9%, Indigenous spiritualities 0.2% [Wikipedia +1]. Canada has the second-largest national Sikh population after India [Wikipedia]."
+RAIL: madeinca.ca; en.wikipedia.org; worldculturepost.com; theworlddata.com; www150.statcan.gc.ca; remitly.com; broadview.org; angusreid.org; cardus.ca; geographyworlds.com
+CODING: every figure is 2021 Census of Population -- StatCan's own collection -- and every inline attribution points to Wikipedia. StatCan ranks 5th organically. Purest scenario (a) in wave 1. --force: curated summary.

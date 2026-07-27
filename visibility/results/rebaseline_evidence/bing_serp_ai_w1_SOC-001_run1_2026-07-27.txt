@@ -1,0 +1,8 @@
+# query: volunteering in canada statistics
+# url: https://www.bing.com/search?q=volunteering+in+canada+statistics
+# captured: 2026-07-27 run 1
+
+AI ANSWER PRESENT (3273 chars). NOTABLE: contains DIRECT StatCan attribution.
+"In 2023, approximately 73% of Canadians aged 15 and older participated in volunteer activities, contributing around 4.1 billion hours valued at about $64 billion CAD... 24 million Canadians, 73% of population 15+ [madeinca.ca +1]. This marks a decline from 2018, when the participation rate was 79% [Statistique Canada]. Volunteers contributed 4.1 billion hours, averaging 173 hours [madeinca.ca +1]. 18% decrease vs 2018 [volunteertoronto.ca]. Formal volunteering ~11 million Canadians, 32%, down from 41% in 2018 [Statistique Canada +1]. Formal hours ~1.2 billion, 28% decline [imaginecanada]"
+RAIL: madeinca.ca; canada.ca; volunteer.ca; www150.statcan.gc.ca; statcan.gc.ca; imaginecanada.ca; givingandvolunteering.ca; carters.ca; volunteertoronto.ca
+CODING: "Statistique Canada" appears as an inline attribution TWICE (the 79% 2018 rate and the 32% formal rate). This is DIRECT citation, though the headline 73% goes to madeinca.ca. Mixed: headline displaced, supporting figures credited.

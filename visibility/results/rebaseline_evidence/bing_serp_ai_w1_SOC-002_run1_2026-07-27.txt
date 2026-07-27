@@ -1,0 +1,8 @@
+# query: what percentage of canadians volunteer
+# url: https://www.bing.com/search?q=what+percentage+of+canadians+volunteer
+# captured: 2026-07-27 run 1
+
+NO AI ANSWER for "what percentage of canadians volunteer". Container present (2 .b_ans) but EMPTY after ~12s poll on a cache-busted load.
+--force used: with no answer text there is nothing for the relevance guard to match. Relevance verified live from the DOM -- the organic results are all volunteering sites, so this is a genuine non-population, not a junk load.
+RAIL: madeinca.ca; imaginecanada.ca; volunteer.ca; statcan.gc.ca; www150.statcan.gc.ca; canada.ca; volunteertoronto.ca; carters.ca
+NOTE: StatCan ranks organically on two domains but no synthesized answer was served. Contrast SOC-001 ("volunteering in canada statistics") -- near-identical topic, asked differently, DID return an answer citing Statistique Canada directly. Phrasing, not topic, drives whether the module fills. This pair is the cleanest evidence in the set that "no AI answer" is a property of the query string, not of StatCan's coverage.

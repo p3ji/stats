@@ -1,0 +1,8 @@
+# query: do canadians trust the government
+# url: https://www.bing.com/search?q=do+canadians+trust+the+government
+# captured: 2026-07-27 run 1
+
+NO AI MODULE AT ALL for "do canadians trust the government". nAns = 0 -- not an empty container, no container rendered. This is the `absent` state, distinct from LAB-002/SOC-002 `empty`.
+Whole-page regex for statcan/statistique: FALSE. StatCan absent from the entire SERP.
+RAIL: policyoptions.irpp.org; publicsectornetwork.com; frontiercentre.org; canada.ca; getproof.com; uwaterloo.ca; cbc.ca; narcity.com; ipolitics.ca
+CODING: results are on-topic (trust/government think tanks and media), so not a junk load. StatCan's GSS trust-in-institutions data does not surface anywhere. --force: no answer text for the guard to match; relevance verified live from the DOM.

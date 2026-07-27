@@ -1,0 +1,10 @@
+# query: average salary in canada by province
+# url: https://www.bing.com/search?q=average+salary+in+canada+by+province
+# captured: 2026-07-27 run 1
+
+AI ANSWER PRESENT (3047 chars).
+"The average salary in Canada in 2026 ranges from approximately CAD $57,000 to $72,000 per year depending on the province, with Alberta and Ontario leading. National average ~CAD $67,000-$68,400; median ~$57,000-$63,000" [wealthnorth.ca +1]
+Provincial breakdown: Alberta $72,000 [wealthnorth.ca +1]; Ontario $70,000 [canadianow.com +1]; BC $68,000 [jobqoo.com]; Saskatchewan $65,000 [jobqoo.com]; Manitoba $64,000.
+Sectors attribution: jobqoo.com.
+RAIL: wealthnorth.ca; canadianow.com; jobqoo.com; www150.statcan.gc.ca; narcity.com; takehomepaycalculatorcanada.com
+CODING: every number in the answer is attributed to an SEO site. StatCan present in the organic rail only, never in the answer. Scenario (b)/(a) boundary -- SEPH/LFS provincial earnings exist at StatCan and are not used.
