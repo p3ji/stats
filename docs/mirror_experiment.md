@@ -150,7 +150,7 @@ Secondary: does the mirror page itself get indexed (site: queries) and crawled
 
 Full design audit run **before any post-treatment measurement exists** (treatment deployed
 2026-07-25; first re-audit not due until ~2026-08-08). Nothing here is a post-hoc change to
-a rule after seeing results — no results exist yet. Amendments A1–A13 are binding from now.
+a rule after seeing results — no results exist yet. Amendments A1–A14 are binding from now.
 
 ### A1. Primary outcome and endpoint (was under-specified — multiplicity risk)
 
@@ -424,6 +424,35 @@ directly onto the selection rule.
 `absent` AI modules into `none`, losing a distinction A12 established as meaningful. The
 `ai_module` field preserves it, so analysis must read the two fields together; `none` alone
 does not mean the engine had nothing to say.
+
+### A14. Claude as an exploratory third surface (pre-registered 2026-07-27, before any data)
+
+**Recorded BEFORE the first capture, so it cannot be a post-hoc addition.** Wave-1 and
+wave-2 results on the Bing SERP are known at the time of writing; no Claude data exists.
+
+Bing composes over a live search index and Duck.ai is RAG over a chat model. A Claude agent
+may answer from **parametric memory without searching at all** -- a third mechanism, and the
+reason this is worth measuring: a surface the mirrors physically cannot reach is a natural
+comparison for the two they can.
+
+**Binding rules:**
+
+1. **Exploratory and secondary, always.** Never pooled with, substituted for, or used to
+   reinterpret the primary outcome fixed in A1. Reported in its own section.
+2. **Isolation is the whole instrument.** The answering agent gets the bare question and
+   nothing else: no repository access (the mirror pages sit on local disk), no design
+   documents, no mention of Statistics Canada, no indication a study exists. Priming toward
+   StatCan would manufacture the finding. Any capture where isolation was breached is void.
+3. **Record whether the agent searched.** `searched: yes/no` per capture. An answer from
+   memory is not evidence about crawlability -- the treatment cannot reach it. This field,
+   not the citation class, determines whether a capture is informative about the mechanism.
+4. **Establish index reachability before interpreting.** The mirrors are indexed in Bing;
+   whatever index the agent's search tool queries may differ. If the pages are absent from
+   it, this arm is a control surface, not a treatment test, and must be described as one.
+5. **Conflict of interest, disclosed in any write-up.** This study is executed by Claude and
+   this arm measures Claude. It is a self-assessment. It also measures Claude via the agent
+   SDK with a web-search tool -- **not** the consumer claude.ai product, which has a
+   different retrieval stack. This arm cannot carry a headline claim about "AI assistants."
 
 ### Design features that are sound (checked, no change needed)
 
