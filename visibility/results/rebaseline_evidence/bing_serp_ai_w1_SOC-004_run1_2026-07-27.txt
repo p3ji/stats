@@ -1,0 +1,15 @@
+# query: are charitable donations declining in canada
+# url: https://www.bing.com/search?q=are+charitable+donations+declining+in+canada
+# captured: 2026-07-27 run 1
+
+Charitable giving in Canada has been steadily declining over the past decade, driven by economic pressures, generational shifts, and changing social behaviors.
+
+Over the last ten years, the proportion of Canadians donating to charity has fallen significantly. According to the Fraser Institute's 2025 Generosity Index, the share of tax filers donating dropped from 21.9% in 2013 to just 16.8% in 2023, while Statistics Canada reports that the percentage of Canadians giving declined from 82% to 54% over the same period [LinkedIn +1]. The average donation as a share of income has also slightly decreased [canadiandebtrelief.ca]. Top 5% of earners contribute 49% of all donation dollars; 65+ represent 35% of donors but 50% of dollars [LinkedIn].
+
+Causes: economic pressures [canadiandebtrelief.ca]; generational shifts, over a quarter of adults 18-35 not giving in past five years [moneysense.ca]; declining religious participation / social isolation [LinkedIn]; pandemic, avg annual drop 2020-2022 of -3.4% [Carleton University].
+
+In 2022, Canada had ~2.5 million fewer donors than if rates held since 1997, ~$2.9B in lost annual donations [Carleton University].
+
+SOURCE RAIL: LinkedIn; moneysense.ca; canadiandebtrelief.ca; Carleton University (PDF, profbrouard) "only 17.1% of Canadian tax filers claiming charitable donations, down from 17.7% last year"; canadahelps.org; hilborn-charityenews.ca; CTV News (x2); Fraser Institute (PDF x2); Foundation Magazine; charityaxess.ca
+
+NOTE: statcan.gc.ca does NOT appear in the source rail. "Statistics Canada" is named in the answer text but the inline attribution points to LinkedIn.

@@ -1,0 +1,14 @@
+# query: average salary in canada by age
+# url: https://www.bing.com/search?q=average+salary+in+canada+by+age
+# captured: 2026-07-27 run 1
+
+NO AI ANSWER BOX. Organic results only. About 3,550 results.
+
+1. wealthnorth.ca -- "Average Salary in Canada 2026 | By Province, Age, Occupation" (Jun 17, 2026): average salary ~$67,000/year in 2026; median ~$57,000; Alberta leads at $72,000.
+2. wealthvieu.com -- "Canadian Income Percentile by Age (2026)" (May 5, 2026): "2026 income percentile data by age group from Statistics Canada -- median employment income, top 10%".
+3. wealthnorth.ca -- "Average Income by Age in Canada 2026": "using the latest Statistics Canada data".
+Videos: YouTube x3.
+Rail: ca.indeed.com; compareyoursalary.ca; protectyourwealth.ca; wealthawesome.com; Statistics Canada (www150.statcan.gc.ca/daily-quotidien); Statistics Canada (www150.statcan.gc.ca/en/tv.action); Open Government (open.canada.ca).
+"Some results have been removed."
+
+NOTE (corrected 2026-07-27): the earlier claim 'verified stable across 2 consecutive loads' was WRONG -- repeated identical URLs are served from cache, so the stability was the cache, not the phenomenon. Re-checked with a cache-busted URL and ~25s wait: the AI answer CONTAINER is present but stays EMPTY (.b_ans with zero-length text). ai_module=empty, not 'no box'. Same browser rendered a full AI answer for SOC-004 minutes earlier, so this is not a browser limitation. StatCan present in the rail but below three SEO sites; the top results claim to be built ON StatCan data without linking it.

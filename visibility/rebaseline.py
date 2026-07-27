@@ -46,10 +46,28 @@ BASELINE = {
 
 FIELDS = [
     "run_date", "engine", "wave", "run", "id", "subject", "arm", "query_asked",
-    "answerable", "citation_class", "cited_sources", "answer_value",
+    "ai_module", "answerable", "citation_class", "cited_sources", "answer_value",
     "statcan_value", "statcan_vintage_cited", "best_available_vintage",
     "value_match", "evidence", "note",
 ]
+
+# ai_module -- recorded per capture, NOT inferred later.
+#
+# Discovered 2026-07-27 while re-verifying the wave-2 "no AI answer" cases. The
+# SERP's AI answer container is present far more often than it is filled, and
+# the two were being collapsed into one code:
+#
+#   populated  the module rendered an answer -> code the citation normally
+#   empty      the container exists but never filled, even after ~25s and a
+#              cache-busted reload. Whether Bing declined to answer or the
+#              answer failed to stream is UNRESOLVED -- do not read it as
+#              "Bing had no answer".
+#   absent     no container at all
+#
+# The wave-2 16/60 "no AI answer box" rate mixes `empty` with genuine absence
+# and with mismatched junk loads, so it cannot be compared to a re-audit coded
+# with this field. See amendment A12.
+AI_MODULE_STATES = ("populated", "empty", "absent")
 
 
 def _queries(wave):
@@ -152,7 +170,7 @@ def cmd_record(args):
         w.writerow({
             "run_date": date, "engine": ENGINE, "wave": args.wave, "run": args.run,
             "id": qid, "subject": subject, "arm": arm, "query_asked": query,
-            "evidence": ev,
+            "ai_module": args.ai_module, "evidence": ev,
             # left blank deliberately -- coded by hand, blind to arm (A3)
             "answerable": "", "citation_class": "", "cited_sources": "",
             "answer_value": "", "statcan_value": "", "statcan_vintage_cited": "",
@@ -216,6 +234,9 @@ def main():
     b.add_argument("--wave", type=int, required=True, choices=sorted(BASELINE))
     b.add_argument("--id", required=True)
     b.add_argument("--run", type=int, required=True)
+    b.add_argument("--ai-module", required=True, choices=AI_MODULE_STATES,
+                   dest="ai_module",
+                   help="state of the SERP AI answer container -- see AI_MODULE_STATES")
     b.add_argument("--date")
     b.add_argument("--force", action="store_true",
                    help="record even if the text fails the relevance guard")
