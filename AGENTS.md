@@ -1,11 +1,12 @@
-# statcan_codr — Agent Guide
+# stats (Open Stats Lab) — Agent Guide
 
 > Single source of truth for *how to work on this repo*. Claude and Antigravity both read this (`CLAUDE.md` → `@AGENTS.md`; `GEMINI.md` → pointer). Keep it short.
 
 **Brain note (goals, backlog, full context):** [statcan_codr.md](file:///H:/My%20Drive/Brain2_backup/Projects/statcan_codr.md)
 **GitHub:** `https://github.com/p3ji/stats`
 **Live site:** `https://p3ji.github.io/stats/`
-**Naming:** repo/URL, public brand, and local folder are all `stats` / **Open Stats Lab** (repo renamed 2026-07-19 from `statcan_codr`; local folder consolidated to `stats` on 2026-07-24 — the old `Projects\statcan_codr` clone is retired). The Brain note file may still be named `statcan_codr.md`, and the planned Python library keeps the `statcan_codr` name; those are fine to leave.
+**Work in `Projects\stats` — it is the only clone.** The old `Projects\statcan_codr` clone was deleted 2026-07-27; its gitignored `.claude/settings.local.json` was copied here first, so nothing is left behind. If a `statcan_codr` folder reappears, it is a stale re-clone — do not work in it.
+**Naming:** repo/URL, public brand, and local folder are all `stats` / **Open Stats Lab** (repo renamed 2026-07-19 from `statcan_codr`). The Brain note file may still be named `statcan_codr.md`, and the planned Python library keeps the `statcan_codr` name; those are fine to leave.
 **Plan of record:** `docs/phaseone.md` · Visibility study: `docs/visibility.md` (query bank: `visibility/queries.yaml`)
 **Stack:** Python (pipeline) + plain HTML/JS + DuckDB-Wasm (site, no build step)
 
