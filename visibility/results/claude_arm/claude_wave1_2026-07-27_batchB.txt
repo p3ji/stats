@@ -1,0 +1,32 @@
+# Claude arm (A14, exploratory) -- captured 2026-07-27
+# Isolated agent, bare questions only, no repo access, no mention of StatCan, no study context.
+
+QUERY SOC-002  what percentage of canadians volunteer
+SEARCHED: yes
+CITATION: DIRECT -- Statistics Canada named as the source; two www150.statcan.gc.ca URLs given
+   (The Daily 250623b, and 75-006-x volunteering article).
+VALUES: 73% informal-inclusive, 32% formal (11M), down from 41% in 2018; hours 5.0B->4.1B (-18%).
+NOTE: distinguishes the formal vs informal measures unprompted and explains which figure people
+   mean when they say "one in three" vs "three in four".
+
+QUERY SOC-024  who does more housework men or women canada
+SEARCHED: yes
+CITATION: DIRECT -- two StatCan sources (The Daily 180730a; Women in Canada 89-503-x) plus Vanier.
+VALUES: 3.9h vs 2.4h unpaid work (25-54); 2015 housework 89.9% vs 76.2% participation; 2022 WFH
+   102.9 vs 62.5 min/day; historical narrowing from ~3h (mid-1980s) to <2h (mid-2000s).
+
+QUERY DIG-014  how many businesses in canada use artificial intelligence
+SEARCHED: yes
+CITATION: DIRECT -- two StatCan Analysis-in-Brief URLs (11-621-M2026010, 11-621-M2025008).
+VALUES: 19.2% Q2 2026; 6.1% Q2 2024; 12.2% Q2 2025; sector splits 42.3/40.4/32.4.
+NOTE: volunteers the methodological caveat that CSBC is self-reported, not audited.
+
+QUERY LAB-014  how many canadians work in the public sector
+SEARCHED: yes
+CITATION: MIXED -- StatCan LFS cited, but the 4.5-4.6M headline is partly sourced via The Hub
+   (secondary reporting); TBS cited for the 368k federal figure.
+VALUES: 4.5-4.6M broad public sector (~1 in 5 employed); composition 38/29/24/9; federal public
+   service 368k, core public administration ~274k.
+NOTE: explicitly flags its own uncertainty -- "some of the 4.6M figure I'm relaying comes via
+   secondary reporting rather than a StatCan release I read directly" -- and tells the user to
+   pull StatCan's table directly for a citable number.
