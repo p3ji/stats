@@ -22,6 +22,7 @@ import argparse
 import csv
 import datetime
 import os
+import re
 import sys
 import urllib.parse
 from collections import Counter, defaultdict
@@ -81,7 +82,40 @@ def cmd_plan(args):
             print(f"  {qid}  {SERP.format(urllib.parse.quote_plus(q))}")
         print()
     print("Run the three passes separately, not back to back per query -- consecutive\n"
-          "identical queries can be served from cache and would understate the noise floor.")
+          "identical queries can be served from cache and would understate the noise floor.\n")
+    print("Capture protocol: navigate -> RELOAD -> read the text and confirm it is actually\n"
+          "about the query before recording. Bing's first load often serves a page with the\n"
+          "right title and the wrong results; `record` guards against it but the guard is a\n"
+          "backstop, not a substitute for looking.")
+
+
+STOPWORDS = {"a", "an", "the", "in", "of", "on", "by", "to", "is", "are", "do",
+             "does", "how", "what", "who", "many", "much", "more", "and", "or"}
+
+
+def _relevance(query, text):
+    """Fraction of the query's content words present in the captured text.
+
+    Observed 2026-07-27: Bing's FIRST load after navigation repeatedly served a
+    page whose <title> matched the query but whose results were for something
+    else entirely ("average salary in canada by age" -> dictionary definitions
+    of "average"; a charity query -> Chinese-language results about Paris). The
+    page looked structurally valid -- right URL, right title, no CAPTCHA -- so
+    nothing but the text itself catches it. A reload fixed it every time.
+
+    This matters beyond a nuisance: a junk load has no AI answer box, so
+    recording one would inflate the "no AI answer" rate -- the exact statistic
+    A5 reports. Capture protocol is therefore navigate -> reload -> verify.
+    """
+    words = [w for w in "".join(c if c.isalnum() else " " for c in query.lower()).split()
+             if w not in STOPWORDS and len(w) > 2]
+    if not words:
+        return 1.0
+    # Whole-word matching only. Substring matching scores junk as relevant:
+    # "age" occurs inside "average", so a page of dictionary definitions of
+    # "average" passed as relevant to "average salary in canada by age".
+    present = set(re.findall(r"[a-z0-9]+", text.lower()))
+    return sum(1 for w in words if w in present) / len(words)
 
 
 def cmd_record(args):
@@ -95,6 +129,13 @@ def cmd_record(args):
     text = sys.stdin.read()
     if not text.strip():
         sys.exit("no evidence text on stdin -- pipe the captured answer in")
+
+    rel = _relevance(query, text)
+    if rel < 0.5 and not args.force:
+        sys.exit(f"REFUSED: only {rel:.0%} of the query's content words appear in the "
+                 f"captured text.\nThis is the mismatched-load failure (see _relevance). "
+                 f"Reload the SERP and re-capture.\nIf the answer is genuinely off-topic, "
+                 f"re-run with --force and say so in the note field.")
 
     os.makedirs(EVIDENCE, exist_ok=True)
     ev = f"{ENGINE}_w{args.wave}_{qid}_run{args.run}_{date}.txt"
@@ -176,6 +217,8 @@ def main():
     b.add_argument("--id", required=True)
     b.add_argument("--run", type=int, required=True)
     b.add_argument("--date")
+    b.add_argument("--force", action="store_true",
+                   help="record even if the text fails the relevance guard")
     b.set_defaults(func=cmd_record)
 
     c = sub.add_parser("summarize", help="modal coding across runs + noise floor")
