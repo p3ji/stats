@@ -8,4 +8,4 @@ AI ANSWER PRESENT (3425 chars). Reproduces the wave-2 coding.
 
 StatCan present in body text (organic results) but the answer's numbers come from madeinca / CAMH.
 
-RE-VERIFICATION: CONFIRMS wave-2 coding (indirect / different_metric, scenario (b)). StatCan's perceived-mental-health data neither cited nor used in the answer. Not a junk load -- a full answer rendered.
+RE-VERIFICATION: CONFIRMS the earlier coding (indirect / different_metric): StatCan's data neither cited nor used. StatCan's perceived-mental-health data neither cited nor used in the answer. Not a junk load -- a full answer rendered.

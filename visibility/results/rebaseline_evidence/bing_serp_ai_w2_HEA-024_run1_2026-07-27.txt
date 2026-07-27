@@ -12,6 +12,6 @@ DEEP LINKS: canada.ca (PHAC) "Coping and positive mental health in Canada"; cana
 
 ORGANIC RAIL: Canada.ca x2 (PHAC); Statistique Canada (statcan.gc.ca quality-of-life indicator: Perceived mental health); Statistics Canada (www150 daily-quotidien); CIHI x2; Mental Health Research Canada x2; camh.ca; phac-aspc.gc.ca infobase.
 
-CRITICAL: the AI answer's 53.7% comes from the Canadian Community Health Survey -- which IS a Statistics Canada survey -- but the attribution is to www.canada.ca (PHAC), not StatCan. StatCan appears in the organic rail only, below PHAC. This is scenario (a) DISPLACEMENT, not scenario (b).
+CRITICAL: the AI answer's 53.7% comes from the Canadian Community Health Survey -- which IS a Statistics Canada survey -- but the attribution is to www.canada.ca (PHAC), not StatCan. StatCan appears in the organic rail only, below PHAC. This is DISPLACEMENT: StatCan's number served, credited elsewhere.
 
-RE-VERIFICATION NOTE: wave-2 baseline coded this "situation (b): no AI answer generated". That was a mismatched-load artifact -- the first load returned SELF Magazine / the philosophical "self" and carried no AI box. A reload produced this full answer. The original coding is wrong on both counts: an answer exists, and the scenario is (a) not (b).
+RE-VERIFICATION NOTE: wave-2 baseline coded this "no AI answer generated". That was a mismatched-load artifact -- the first load returned SELF Magazine / the philosophical "self" and carried no AI box. A reload produced this full answer. The original coding is wrong on both counts: an answer exists, and the pattern is displacement, not absence.

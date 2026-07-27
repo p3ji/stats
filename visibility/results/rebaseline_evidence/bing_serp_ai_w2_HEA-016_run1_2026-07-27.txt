@@ -10,4 +10,4 @@ CRITICAL: a regex for /statistics canada|statcan/i over the ENTIRE page body ret
 
 StatCan's own 2024 access-to-care survey (17100009) carries 81.0% -- the SAME headline number the OurCare/CMA survey is credited for. The public gets the right number and never learns the national statistical agency measured it.
 
-RE-VERIFICATION: CONFIRMS wave-2 coding. Cleanest scenario (b) in the set.
+RE-VERIFICATION: CONFIRMS wave-2 coding. Cleanest case of StatCan being wholly absent while its number is served.

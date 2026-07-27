@@ -150,7 +150,7 @@ Secondary: does the mirror page itself get indexed (site: queries) and crawled
 
 Full design audit run **before any post-treatment measurement exists** (treatment deployed
 2026-07-25; first re-audit not due until ~2026-08-08). Nothing here is a post-hoc change to
-a rule after seeing results — no results exist yet. Amendments A1–A12 are binding from now.
+a rule after seeing results — no results exist yet. Amendments A1–A13 are binding from now.
 
 ### A1. Primary outcome and endpoint (was under-specified — multiplicity risk)
 
@@ -395,6 +395,35 @@ full answer citing Statistique Canada directly; "what percentage of canadians vo
 same topic, same underlying StatCan data, different phrasing — returns an **empty** container.
 Therefore the absence of an AI answer can **never** be read as evidence about whether
 StatCan's data was available or used.
+
+### A13. Blinding leaked through the evidence files (2026-07-27)
+
+**A3 requires coding blind to arm. The evidence files were leaking the arm.** Found when a
+blind coder -- given only the evidence directory and the coding schema, and explicitly
+barred from the manifest and design docs -- reported that it had nonetheless learned one
+query's arm from the *capture notes themselves*. Offending phrases included "negative
+control inside the treatment arm" and repeated "scenario (a)/(b)" labels, which map
+directly onto the selection rule.
+
+**Binding rules:**
+
+1. **Evidence files record what was observed, never what it means for the design.** No arm
+   labels, no "treatment"/"control", no scenario (a)/(b) shorthand, no reference to
+   selection rules. Describe the observation: "StatCan's number served, credited
+   elsewhere" rather than "scenario (a)".
+2. **The five affected files were scrubbed** on 2026-07-27 and the directory now greps
+   clean for those phrases. The coding produced before the scrub
+   (`visibility/results/wave1_blind_coding.csv`) is retained with this caveat recorded: one
+   query (DIG-014) was coded with knowledge of its arm. Its coding is `direct` on all three
+   runs and follows unambiguously from StatCan carrying every inline attribution, so the
+   leak is judged non-material -- but it is recorded rather than quietly corrected.
+3. **Blind coding is delegated to a coder with no access to the design documents.** This is
+   the operational form of A3; a coder who knows the arms cannot self-blind.
+
+**A limitation this surfaced, recorded honestly:** `citation_class` collapses `empty` and
+`absent` AI modules into `none`, losing a distinction A12 established as meaningful. The
+`ai_module` field preserves it, so analysis must read the two fields together; `none` alone
+does not mean the engine had nothing to say.
 
 ### Design features that are sound (checked, no change needed)
 
