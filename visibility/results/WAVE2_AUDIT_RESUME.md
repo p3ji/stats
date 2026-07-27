@@ -34,6 +34,15 @@ Screenshot only gaps — see [[visibility-audit-screenshots]] rationale.
 > `bing_serp_ai`. **Re-audit this wave on the SERP, not Copilot Search** — mixing them
 > would make the before/after difference a surface artifact. See amendment A10 in
 > `docs/mirror_experiment.md`. Do not pool wave-1 and wave-2 rates.
+>
+> **UPDATE — amendment A11 (2026-07-25).** The **ordinary Bing SERP is now the single
+> primary surface for both waves**, because no mirror page is indexed yet
+> (`site:p3ji.github.io/stats` → no results, checked 2026-07-25), so wave 1 can be
+> re-baselined onto the SERP and still count as pre-treatment. **Action required before
+> ~2026-08-08:** re-run wave 1's 11 experiment queries on `bing.com/search?q=`, 3 runs each
+> (A2), `engine=bing_serp_ai`. Once that lands, the waves pool into one 17-table experiment
+> (10 treatment / 7 control). If any page is found indexed before this is captured, A11
+> lapses — do not re-baseline after that point.
 
 - **Bing:** `https://www.bing.com/search?q=<query>` → `get_page_text` (~1500 chars). The
   inline AI answer + source rail is in the page text. 2 tool calls/query. NOTE: the

@@ -122,6 +122,9 @@ Secondary: does the mirror page itself get indexed (site: queries) and crawled
 
 ## Re-audit protocol
 
+- **Primary surface: the ordinary Bing SERP** (`bing.com/search?q=`) for *both* waves —
+  amendment **A11**, which supersedes the earlier "Bing Copilot Search primary" below.
+  Wave 1 is re-baselined onto the SERP before indexing.
 - Same 11 queries, same phrasing, same engines (Bing Copilot Search primary; DDG organic
   re-run via `run_audit_ddg.py`; Duck.ai if consented), fresh sessions, screenshots saved
   with the same naming scheme (`<engine>_<ID>_<date>.png`).
@@ -147,7 +150,7 @@ Secondary: does the mirror page itself get indexed (site: queries) and crawled
 
 Full design audit run **before any post-treatment measurement exists** (treatment deployed
 2026-07-25; first re-audit not due until ~2026-08-08). Nothing here is a post-hoc change to
-a rule after seeing results — no results exist yet. Amendments A1–A9 are binding from now.
+a rule after seeing results — no results exist yet. Amendments A1–A11 are binding from now.
 
 ### A1. Primary outcome and endpoint (was under-specified — multiplicity risk)
 
@@ -279,6 +282,38 @@ the SERP module often doesn't render at all. Consequences and rules:
 Ideally both surfaces would be measured at every round. Given effort limits, the **primary
 outcome (A1) stays on each wave's own baseline surface**; adding the second surface is
 optional and, if done, is a new arm reported separately — never merged into the primary.
+
+> **Superseded in part by A11 (2026-07-25).** Point 1 above ("re-audit each wave on its own
+> surface") and this paragraph are replaced by a single standardized surface, made possible
+> because no mirror page is indexed yet. Points 2–5 stand.
+
+### A11. Standardize on the ordinary Bing SERP and re-baseline both waves (2026-07-25)
+
+A10's "each wave keeps its own surface" was forced only by the assumption that the baselines
+were locked. They are not: **treatment is still inert.** Checked 2026-07-25 —
+`site:p3ji.github.io/stats` returns **no results** (DuckDuckGo, Bing-powered; Bing direct
+served a CAPTCHA, not solved). Nothing is crawled, so a baseline captured now is still a
+pre-treatment baseline and the surface choice can be re-made at no cost to the design.
+
+**Binding rules:**
+
+1. **The single primary surface is the ordinary Bing SERP**, `https://www.bing.com/search?q=`,
+   inline AI module. Rationale: (a) ecological validity — it is the default surface a member
+   of the public hits, which is the claim the study actually makes; (b) the wave-2 Health
+   clean-(b) tables that carry the experiment are already baselined on it; (c) it costs ~2
+   tool calls per query versus 60–150s of polling on Copilot Search, which is what makes the
+   A2 replicates affordable.
+2. **Re-baseline wave 1's 11 experiment queries on the SERP** before any page is indexed.
+   The Copilot Search baseline is retained as a separate, secondary record — never merged
+   into the primary outcome.
+3. **This must be completed before indexing** (~2026-08-08 estimate). If any mirror page is
+   found indexed before the re-baseline is captured, A11 lapses and A10 point 1 reverts —
+   record that fact here rather than proceeding.
+4. **With one surface, the two waves pool** into a single 17-table experiment
+   (10 treatment / 7 control) for the primary DiD, instead of separate n=9 and n=8. This is
+   the main reason to do it and partly mitigates the power limitation in A6. Per-wave
+   estimates are still reported alongside the pooled one.
+5. Every results row records the surface explicitly (`bing_serp_ai`), per A10 point 2.
 
 ### Design features that are sound (checked, no change needed)
 
