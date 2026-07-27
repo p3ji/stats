@@ -449,6 +449,18 @@ comparison for the two they can.
 4. **Establish index reachability before interpreting.** The mirrors are indexed in Bing;
    whatever index the agent's search tool queries may differ. If the pages are absent from
    it, this arm is a control surface, not a treatment test, and must be described as one.
+**Reachability check, run 2026-07-27 before any answer was captured (rule 4):** two searches
+through the agent's own web-search tool -- a direct site query for the mirror host and a
+topical query naming the project -- returned **zero mirror pages**. Results were StatCan's
+own pages, the Open Government Portal, CAMH, and third-party R/Python wrappers. The mirrors
+are indexed in Bing but are **not** in the index this tool reaches.
+
+**Therefore this arm is a CONTROL SURFACE, not a treatment test**, and must be described as
+one until a later reachability check says otherwise. Its value is as a comparison: if Bing
+citation shifts after indexing while this surface does not, that is evidence the shift came
+through the crawl path rather than from secular model drift. Re-run the reachability check
+at each round and record the date.
+
 5. **Conflict of interest, disclosed in any write-up.** This study is executed by Claude and
    this arm measures Claude. It is a self-assessment. It also measures Claude via the agent
    SDK with a web-search tool -- **not** the consumer claude.ai product, which has a
