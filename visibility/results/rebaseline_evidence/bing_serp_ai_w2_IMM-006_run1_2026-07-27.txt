@@ -1,0 +1,8 @@
+# query: canada immigration rate over time
+# url: https://www.bing.com/search?q=canada+immigration+rate+over+time
+# captured: 2026-07-27 run 1
+
+AI ANSWER PRESENT (1122 chars). OVERTURNS the wave-2 coding of "no synthesized answer".
+"Canada's immigration rate has fluctuated significantly over the past 150 years. The highest annual immigration rate occurred in 1913, when 400,900 new immigrants accounted for 5.3 percent of the total population..."
+StatCan named in the answer. Rail: www150.statcan.gc.ca (#1); immigrationstatistics.ca; statcan.gc.ca; canada.ca; en.wikipedia.org; statista.com; macrotrends.net; theworlddata.com
+RE-VERIFICATION: second confirmed junk-load artifact in the wave-2 no-box set, after HEA-024. Running tally of that set: 2 overturned (HEA-024, IMM-006), 1 confirmed (IMM-013).

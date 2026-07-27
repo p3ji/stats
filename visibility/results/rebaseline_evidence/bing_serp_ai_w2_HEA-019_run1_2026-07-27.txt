@@ -1,0 +1,7 @@
+# query: unmet health care needs canada
+# url: https://www.bing.com/search?q=unmet+health+care+needs+canada
+# captured: 2026-07-27 run 1
+
+AI ANSWER PRESENT (3372 chars). "Millions of Canadians experience unmet health care needs, with barriers most pronounced in mental health services, specialist care, and among younger adults... In Canada, this is measured through surveys such as the Canadian Income Survey..."
+StatCan named in the answer as the SURVEY VEHICLE. Rail: www150.statcan.gc.ca (#1); statcan.gc.ca; cihi.ca; link.springer.com; sciencedirect.com; cbc.ca; open-science.canada.ca; inspq.qc.ca
+RE-VERIFICATION: the wave-2 note ("StatCan named generically as the survey but contributes no value") is CONFIRMED in substance -- StatCan is credited as the instrument rather than as the source of a figure. ai_module = populated (the wave-2 row carried value_match=no_number, not a no-box coding, so this was never a junk-load candidate).

@@ -1,0 +1,7 @@
+# query: does income affect health in canada
+# url: https://www.bing.com/search?q=does+income+affect+health+in+canada
+# captured: 2026-07-27 run 1
+
+AI ANSWER PRESENT but QUALITATIVE (1291 chars, short-card format). "Yes, income does affect health in Canada. Research indicates that higher socio-economic status, based on income, education, or occupation, is associated with better health outcomes..."
+NO NUMBERS. Whole-answer regex for StatCan: FALSE. Rail: cihi.ca; link.springer.com; canada.ca; healthcouncilcanada.ca; cpha.ca; www150.statcan.gc.ca; nccdh.ca
+RE-VERIFICATION: CONFIRMS the wave-2 coding (indirect / no_number). StatCan's health-adjusted-life-expectancy-by-income-quintile crossing -- a rare and directly responsive series -- ranks organically but supplies nothing to the answer. The question gets a qualitative "yes" where a quantified answer exists.
