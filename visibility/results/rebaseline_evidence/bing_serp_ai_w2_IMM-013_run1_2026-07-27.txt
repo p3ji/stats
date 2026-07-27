@@ -1,0 +1,13 @@
+# query: what percentage of canada population is foreign born
+# url: https://www.bing.com/search?q=what+percentage+of+canada+population+is+foreign+born
+# captured: 2026-07-27 run 1
+
+NO AI ANSWER. Verified across 2 independent cache-busted loads (cb2, cb3), each polled ~12s.
+
+DOM state: 2 .b_ans containers -- one video carousel ("Videos of What Percentage Of Canada Population Is Foreign Born", YouTube: Stats Media, Data Trend Race), one EMPTY container (innerText length 0). No Like/Dislike feedback widget, which was present on populated answers (HEA-024, SOC-004).
+
+Body text mentions Statistics Canada (organic results), consistent with the wave-2 note that StatCan census + Daily rank #1 organically.
+
+ai_module = empty: the AI answer container is placed but never fills. Distinct from the mismatched-load artifact -- the results here ARE about the query (foreign-born population), so this is a genuine non-population, not a junk load.
+
+RE-VERIFICATION NOTE: wave-2 coding of "no synthesized answer" is CONFIRMED for this query, unlike HEA-024 where the same coding proved to be a junk-load artifact.

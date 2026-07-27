@@ -1,0 +1,17 @@
+# query: self rated mental health canada
+# url: https://www.bing.com/search?q=self+rated+mental+health+canada
+# captured: 2026-07-27 run 1
+
+AI ANSWER PRESENT (1770 chars). Headline stat: 53.7%
+
+"Self-rated mental health Canada -- In Canada, self-rated mental health (SRMH) is a key indicator of overall well-being. Recent data from the Canadian Community Health Survey indicates that 53.7% of the population reported excellent or very good mental health in 2024." [attributed: www.canada.ca]
+
+Further paragraphs on COVID impact and access to services -- all three attributed to www.canada.ca.
+
+DEEP LINKS: canada.ca (PHAC) "Coping and positive mental health in Canada"; canada.ca "Self-rated mental health, community belonging, life satisfaction..." (51.5% high SRMH winter/spring 2021 vs 59.9% fall 2020).
+
+ORGANIC RAIL: Canada.ca x2 (PHAC); Statistique Canada (statcan.gc.ca quality-of-life indicator: Perceived mental health); Statistics Canada (www150 daily-quotidien); CIHI x2; Mental Health Research Canada x2; camh.ca; phac-aspc.gc.ca infobase.
+
+CRITICAL: the AI answer's 53.7% comes from the Canadian Community Health Survey -- which IS a Statistics Canada survey -- but the attribution is to www.canada.ca (PHAC), not StatCan. StatCan appears in the organic rail only, below PHAC. This is scenario (a) DISPLACEMENT, not scenario (b).
+
+RE-VERIFICATION NOTE: wave-2 baseline coded this "situation (b): no AI answer generated". That was a mismatched-load artifact -- the first load returned SELF Magazine / the philosophical "self" and carried no AI box. A reload produced this full answer. The original coding is wrong on both counts: an answer exists, and the scenario is (a) not (b).
