@@ -150,7 +150,7 @@ Secondary: does the mirror page itself get indexed (site: queries) and crawled
 
 Full design audit run **before any post-treatment measurement exists** (treatment deployed
 2026-07-25; first re-audit not due until ~2026-08-08). Nothing here is a post-hoc change to
-a rule after seeing results — no results exist yet. Amendments A1–A14 are binding from now.
+a rule after seeing results — no results exist yet. Amendments A1–A15 are binding from now.
 
 ### A1. Primary outcome and endpoint (was under-specified — multiplicity risk)
 
@@ -474,6 +474,31 @@ at each round and record the date.
    this arm measures Claude. It is a self-assessment. It also measures Claude via the agent
    SDK with a web-search tool -- **not** the consumer claude.ai product, which has a
    different retrieval stack. This arm cannot carry a headline claim about "AI assistants."
+
+### A15. Two codes must be read together, never singly (2026-07-27)
+
+Raised by the independent wave-2 blind coder, and correct. **`citation_class` and
+`value_match` each mislead on their own.**
+
+The clearest case is HEA-016. StatCan's access-to-care table carries 81.0% and the served
+answer says 81%, so `value_match = match_current` is literally true -- while the actual
+finding recorded in the evidence is that **StatCan appears nowhere on the page**. Read alone,
+`match_current` says "StatCan was matched." Read with `citation_class = indirect`, it says
+the right thing: someone else was credited for StatCan's number. That pairing *is* the
+displacement measure.
+
+**Binding rules:**
+
+1. **Never report `value_match` without `citation_class`, or the reverse.** Any table, chart,
+   or sentence in the public report that gives one must give the other.
+2. **`citation_class = none` must be reported alongside `ai_module`.** `none` collapses
+   `empty` (container placed, never filled) and `absent` (no container) -- a distinction A12
+   established as meaningful and which the coding scheme cannot express. Wave-2 split: empty
+   = IMM-013/015/021, absent = IMM-012/018/019/023.
+3. **Historical-value questions do not fit the `value_match` axis.** IMM-006 serves a 1913
+   figure; "current vs stale" is not defined for it and it was forced to `unverifiable`.
+   Flagged rather than fixed -- the scheme is adequate for the rest of the set and changing
+   it now would be a post-hoc rule change.
 
 ### Design features that are sound (checked, no change needed)
 
