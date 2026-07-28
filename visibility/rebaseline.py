@@ -180,6 +180,35 @@ def cmd_record(args):
     print(f"row      -> {os.path.relpath(out, REPO)} (coding fields blank -- fill by hand)")
 
 
+CLAUDE_RAW = os.path.join(RESULTS, "claude_arm", "raw")
+
+
+def cmd_archive(args):
+    """Archive one Claude-arm response VERBATIM, before any coding.
+
+    Exists because the first Claude-arm round did not do this. Only curated
+    summaries were kept, so an independent blind coder could not verify one
+    row -- it was re-reading the study author's own label rather than the
+    evidence. The Bing arm never had this problem because `record` writes raw
+    text before coding. This closes the gap (A14 + A13).
+
+    Archive first, code second. Never the other way round.
+    """
+    text = sys.stdin.read()
+    if not text.strip():
+        sys.exit("no response text on stdin -- pipe the agent's verbatim reply in")
+    date = args.date or datetime.date.today().isoformat()
+    os.makedirs(CLAUDE_RAW, exist_ok=True)
+    name = f"claude_w{args.wave}_run{args.run}_{date}.txt"
+    path = os.path.join(CLAUDE_RAW, name)
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(f"# Claude arm raw response -- VERBATIM, uncoded\n"
+                 f"# wave {args.wave}, run {args.run}, captured {date}\n"
+                 f"# Isolated agent: bare questions only, no repo access, no mention of\n"
+                 f"# Statistics Canada, no indication a study exists.\n\n{text}")
+    print(f"archived -> {os.path.relpath(path, REPO)} ({len(text)} chars)")
+
+
 def cmd_summarize(args):
     import glob
     pat = os.path.join(RESULTS, f"rebaseline_wave{args.wave}_{ENGINE}_*.csv")
@@ -241,6 +270,12 @@ def main():
     b.add_argument("--force", action="store_true",
                    help="record even if the text fails the relevance guard")
     b.set_defaults(func=cmd_record)
+
+    d = sub.add_parser("archive", help="archive a Claude-arm response verbatim, before coding")
+    d.add_argument("--wave", type=int, required=True, choices=sorted(BASELINE))
+    d.add_argument("--run", type=int, required=True)
+    d.add_argument("--date")
+    d.set_defaults(func=cmd_archive)
 
     c = sub.add_parser("summarize", help="modal coding across runs + noise floor")
     c.add_argument("--wave", type=int, required=True, choices=sorted(BASELINE))
