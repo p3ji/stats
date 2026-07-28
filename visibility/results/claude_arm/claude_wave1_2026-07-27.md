@@ -60,3 +60,35 @@ answer told the user to pull the StatCan table directly rather than trust its ow
   citation class does not.
 - Coding done by the same agent that ran the study (me), not blind. Unlike the wave-1
   Bing coding, this has not been through an independent blind coder.
+
+---
+
+## Independent blind coding (2026-07-27) and where it disagreed with me
+
+A coder with no access to the design documents re-coded this arm from these files alone:
+**15 direct, 3 indirect, 0 none** across both waves. It agreed with all seven wave-2 labels
+and nine of eleven wave-1 labels. Two disagreements, both recorded rather than reconciled:
+
+- **SOC-004** -- I wrote "mixed"; the coder called it **indirect**, on the grounds that a
+  headline figure owned by a think tank with StatCan alongside is the textbook indirect case.
+  The coder is right and "mixed" was me avoiding a call the rubric already decides.
+- **LAB-014** -- I wrote "mixed"; the coder called it **direct** but flagged it as its weakest
+  call, noting it would flip to indirect if the headline headcount came from the Treasury
+  Board rather than the Labour Force Survey. Unresolved; the summary text cannot settle it.
+
+**"mixed" is not a value in the coding rubric.** It was doing work the three-way scheme does
+not allow and it hid a real asymmetry -- SOC-004 and LAB-014 are not the same kind of case.
+Both are re-coded to the rubric above.
+
+## A LIMITATION THIS EXPOSED -- raw answers were not archived for this arm
+
+The Bing arm writes every capture's raw text to `rebaseline_evidence/` **before** any coding.
+This arm does not: only these curated summaries exist. The blind coder could therefore not
+verify SOC-001 independently -- it recorded that it "coded purely on the file's own assertion
+rather than on evidence, which makes it not independent of the label I am supposed to be
+checking."
+
+That is correct and it is a defect in how I ran this arm, not in the coding. **Before any
+future Claude-arm round, archive each agent's full response verbatim** the way
+`rebaseline.py record` does for Bing. Until then, this arm's codings are weaker evidence than
+the Bing arm's and must not be presented as equivalent.
