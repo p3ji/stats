@@ -1,0 +1,7 @@
+# query: what percentage of immigrants become canadian citizens
+# url: https://www.bing.com/search?q=what+percentage+of+immigrants+become+canadian+citizens
+# captured: 2026-07-27 run 1
+
+NO AI ANSWER. nAns=1, container present but unfilled. CONFIRMS the wave-2 coding.
+Rail: www12.statcan.gc.ca (#1 -- the census portal); statcan.gc.ca; www150.statcan.gc.ca; immigration.ca; madeinca.ca; forcitizenship.ca; theworlddata.com
+StatCan holds the top THREE organic positions on this query and still no answer is synthesized. Results on-topic, so not a junk load. ai_module = empty.

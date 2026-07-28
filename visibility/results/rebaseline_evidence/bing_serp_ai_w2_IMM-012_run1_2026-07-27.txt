@@ -1,0 +1,7 @@
+# query: how many immigrants in canada are on welfare
+# url: https://www.bing.com/search?q=how+many+immigrants+in+canada+are+on+welfare
+# captured: 2026-07-27 run 1
+
+NO AI MODULE. nAns=0. CONFIRMS the wave-2 coding.
+Rail: statcan.gc.ca; canada.ca; theworlddata.com; madeinca.ca; maytree.com; www150.statcan.gc.ca; ontario-bakery.com; reviewlution.ca
+On-topic results, not a junk load. The wave-2 note ("StatCan lacks a direct table for this; provinces own caseloads") stands -- this is a question StatCan cannot answer directly, so it is excluded from the answerable denominator per A9. ai_module = absent.

@@ -363,6 +363,15 @@ inspection of live Bing SERPs while re-verifying wave-2 codings under A11.
    query's content words.
 2. **Record `ai_module` at capture time** as `populated` / `empty` / `absent`. Never infer it
    later from stored text.
+**Re-verification result (completed 2026-07-27, 12 queries):** of the 10 wave-2 queries
+originally coded as producing no answer, **3 were wrong -- a 30% error rate.** HEA-024,
+IMM-006 and POP-006 all return full AI answers on a properly cache-busted, verified load.
+The remaining 7 are confirmed (3 `empty`, 4 `absent`). Two of the confirmed cases (IMM-018
+undocumented immigrants, IMM-019 immigrant crime) are politically charged questions with no
+authoritative statistic, where declining to synthesize an answer is arguably correct
+behaviour rather than a failure -- they are outside the answerable denominator under A9
+regardless.
+
 3. **The wave-2 16/60 "no AI answer box" rate is retired as a quantity.** It mixes genuine
    absence, unfilled containers, and mismatched junk loads, and is **not comparable** to any
    re-audit coded with `ai_module`. It must not be used as a baseline quantity for the primary

@@ -1,0 +1,7 @@
+# query: how many undocumented immigrants in canada
+# url: https://www.bing.com/search?q=how+many+undocumented+immigrants+in+canada
+# captured: 2026-07-27 run 1
+
+NO AI MODULE. nAns=0. CONFIRMS the wave-2 coding.
+Rail: immigrationnewscanada.ca; www150.statcan.gc.ca; canada.ca; statcan.gc.ca; xvv.ca; irb-cisr.gc.ca; cbsa-asfc.gc.ca; theworlddata.com
+On-topic, not a junk load. StatCan has no official undocumented-population estimate, so this is outside the answerable denominator per A9. Notably Bing declines to synthesize an answer on a contested question where no authoritative number exists -- arguably the correct behaviour.

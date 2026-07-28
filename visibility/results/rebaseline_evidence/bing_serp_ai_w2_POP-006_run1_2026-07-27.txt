@@ -1,0 +1,9 @@
+# query: canada population growth rate
+# url: https://www.bing.com/search?q=canada+population+growth+rate
+# captured: 2026-07-27 run 1
+
+AI ANSWER PRESENT (891 chars). OVERTURNS the wave-2 coding of "no synthesized answer".
+"0.6% -- As of July 1, 2024, Canada's population is estimated to be 41,288,599, with a quarterly growth rate of 0.6%... total growth of 1,205,115 people from July 1, 2023 to July 1, 2024."
+StatCan named in the answer; www150.statcan.gc.ca ranks #1. Rail also: macrotrends.net; worlddata.info; worldometers.info; statcan.gc.ca; en.wikipedia.org; rbc.com; cbc.ca; georank.org
+VALUE CURRENCY: the served figure is StatCan's July 1 2024 estimate. StatCan's current estimate is higher (~41.42M). So this is StatCan's own number, correctly attributed, but STALE -- a match_stale case rather than a displacement case.
+RE-VERIFICATION: third confirmed junk-load artifact in the wave-2 no-box set.

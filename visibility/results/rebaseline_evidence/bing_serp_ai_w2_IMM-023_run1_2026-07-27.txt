@@ -1,0 +1,7 @@
+# query: discrimination against immigrants in canada statistics
+# url: https://www.bing.com/search?q=discrimination+against+immigrants+in+canada+statistics
+# captured: 2026-07-27 run 1
+
+NO AI MODULE. nAns=0 -- no container rendered at all. CONFIRMS the wave-2 coding.
+Rail: statista.com; canada.ca; www150.statcan.gc.ca; statcan.gc.ca; madeinca.ca; cbc.ca; torontomu.ca
+Results on-topic, so not a junk load. StatCan ranks 3rd-4th organically but no answer is synthesized. ai_module = absent (distinct from empty).

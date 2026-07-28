@@ -1,0 +1,13 @@
+# query: second generation immigrants in canada statistics
+# url: https://www.bing.com/search?q=second+generation+immigrants+in+canada+statistics
+# captured: 2026-07-27 run 1
+
+NO AI ANSWER. Container present, unfilled. CONFIRMS the wave-2 coding.
+The only >150-char block was a "People also ask" list ("Do second-generation immigrants in Canada have a difficult outlook? / Do second-generation Canadians resemble non-immigrants? / What is a second-generation immigrant?") -- a PAA module, not a synthesized answer. Whole-answer regex for StatCan: FALSE.
+Rail: fsc-ccf.ca; statcan.gc.ca; environicsinstitute.org; torontomu.ca; centuryinitiative.ca; canada.ca; assets-global.website-files.com
+Results are on-topic, so not a junk load. ai_module = empty.
+
+DETECTOR NOTE: the capture selector excluded video carousels (.b_vidAns/.b_mop) but not
+"People also ask" blocks. A PAA list can exceed the 150-char threshold and be mistaken for an
+answer. Corrected going forward; recorded here because this capture is the instance that
+surfaced it.

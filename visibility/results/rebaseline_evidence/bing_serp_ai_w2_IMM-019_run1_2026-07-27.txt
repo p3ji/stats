@@ -1,0 +1,7 @@
+# query: do immigrants commit more crime in canada
+# url: https://www.bing.com/search?q=do+immigrants+commit+more+crime+in+canada
+# captured: 2026-07-27 run 1
+
+NO AI MODULE. nAns=0. CONFIRMS the wave-2 coding.
+Rail: canadacrimeindex.com; crdcn.ca; immigroup.com; factcheck.afp.com; mcgill.ca; www150.statcan.gc.ca; open.library.ubc.ca; en.wikipedia.org; johnhoward.ca
+On-topic, not a junk load. StatCan has analytical articles but no direct table, so outside the answerable denominator per A9. Second case (with IMM-018) where the module declines to answer a politically charged question that lacks an authoritative statistic -- a pattern worth noting rather than scoring as a failure.
