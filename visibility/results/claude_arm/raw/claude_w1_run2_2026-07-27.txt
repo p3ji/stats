@@ -1,0 +1,100 @@
+# Claude arm raw response -- VERBATIM, uncoded
+# wave 1, run 2, captured 2026-07-27
+# Isolated agent: bare questions only, no repo access, no mention of
+# Statistics Canada, no indication a study exists.
+
+QUESTION: 1. Are charitable donations declining in Canada?
+SEARCHED: yes
+ANSWER: Yes on participation, more mixed on dollars. The share of tax filers claiming charitable donations fell from 25.1% in 2002 to 21.9% in 2013 to 17.1% in 2022 and a record-low 16.8% in 2023 -- just under 5 million donors. The share of aggregate income donated also slipped, from 0.54% in 2018 to 0.50% in 2022. Total dollars donated have held up better because remaining donors (especially higher-income ones) give more, so the picture is "fewer, larger donors" rather than a collapse in total giving. Separately, the 2023 Survey on Giving, Volunteering and Participating found the donation rate fell alongside volunteering.
+SOURCES:
+- Statistics Canada, Charitable donors, 2022 (The Daily) -- https://www150.statcan.gc.ca/n1/daily-quotidien/240314/dq240314b-eng.htm
+- Statistics Canada, Volunteering and charitable giving in Canada, 2018 to 2023 (The Daily) -- https://www150.statcan.gc.ca/n1/daily-quotidien/250623/dq250623b-eng.htm
+- Hill Strategies, Fewer charitable donors in Canada, but more money given -- https://statsinsights.hillstrategies.com/p/donations-sponsorships-2023
+- Imagine Canada, A Tipping Balance? (May 2025 update) -- https://imaginecanada.ca/sites/default/files/donations-research-note-2024.pdf
+- Fraser Institute, Generosity in Canada: The 2024 Generosity Index -- https://www.fraserinstitute.org/sites/default/files/2024-12/generosity-in-canada-the-generosity-index-2024.pdf
+
+QUESTION: 2. What is the average salary in Canada by age?
+SEARCHED: yes
+ANSWER: Income rises steeply through the 20s and 30s, peaks in the 45-54 band, and falls after 55 as people move to part-time work and retirement. Using Statistics Canada's income-of-individuals table, median total income runs roughly $48,000 for ages 25-34, about $60,000 for 35-44, about $60,000-$62,000 for 45-54 (the peak), somewhat lower for 55-64, and around $35,000-$40,000 for 65+ where pensions and OAS/CPP dominate. Under-25s are well below all of these, typically in the $15,000-$25,000 range because of part-time and student work. I'd flag two caveats: these are *total income* (all sources, all individuals with income), not salaries of full-time workers, which run considerably higher; and the exact year matters, so the live table is the thing to check.
+SOURCES:
+- Statistics Canada Table 11-10-0239-01, Income of individuals by age group, gender and income source -- https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1110023901
+- Statistics Canada, Canadian Income Survey, 2023 (The Daily) -- https://www150.statcan.gc.ca/n1/daily-quotidien/250501/dq250501b-eng.htm
+- Statistics Canada, Average earnings or employment income, by age group and highest certificate, diploma or degree (Census) -- https://open.canada.ca/data/dataset/4ff619b2-ce85-4684-af83-d46e669e043a
+
+QUESTION: 3. What is the average salary in Canada by province?
+SEARCHED: yes
+ANSWER: From SEPH payroll data for October 2025, average weekly earnings nationally were $1,312.16 (roughly $68,200 annualized). By province: Ontario $1,357.26, Alberta $1,353.54, British Columbia $1,310.62, Newfoundland and Labrador $1,293.43, Saskatchewan $1,277.40, Quebec $1,259.63, New Brunswick $1,193.47, Nova Scotia $1,179.42, Manitoba $1,177.18, and Prince Edward Island lowest at $1,141.86. All three territories exceed every province -- Nunavut $1,774.16, Northwest Territories $1,753.40, Yukon $1,514.94. Note these are payroll averages including overtime, not median salaries, and they're pulled up in Alberta and the territories by resource and public-sector composition.
+SOURCES:
+- Statistics Canada, Payroll employment, earnings and hours, and job vacancies, October 2025 (The Daily) -- https://www150.statcan.gc.ca/n1/daily-quotidien/251218/dq251218a-eng.htm
+- Statistics Canada, Canadian Income Survey, 2023 (provincial median after-tax income: Alberta $88,500, Ontario $78,600, Nova Scotia $62,900, New Brunswick $62,700) -- https://www150.statcan.gc.ca/n1/daily-quotidien/250501/dq250501b-eng.htm
+
+QUESTION: 4. Volunteering in Canada -- what do the statistics say?
+SEARCHED: yes
+ANSWER: The headline from the 2023 Survey on Giving, Volunteering and Participating is a broad decline. Formal volunteering (through a nonprofit or charity) fell from 44% in 2013 to 41% in 2018 to 32% in 2023, and informal volunteering (helping people directly, outside any organization) fell from 74% to 66% over 2018-2023. Combining both, about 73% of Canadians volunteered in some form in 2023, averaging 173 hours each -- down 33 hours from 2018. Total formal volunteer hours dropped to roughly 1.2 billion, down more than a quarter from about 1.7 billion in 2018. The load is also concentrated: a small minority of volunteers contributes the large majority of hours.
+SOURCES:
+- Statistics Canada, Volunteering and charitable giving in Canada, 2018 to 2023 (The Daily) -- https://www150.statcan.gc.ca/n1/daily-quotidien/250623/dq250623b-eng.htm
+- Statistics Canada, Volunteering counts: Formal and informal contributions of Canadians in 2018 -- https://www150.statcan.gc.ca/n1/pub/75-006-x/2021001/article/00002-eng.htm
+- Imagine Canada, New Results from Statistics Canada's Survey of Giving, Volunteering and Participating -- https://imaginecanada.ca/en/360/new-results-statistics-canadas-survey-giving-volunteering-and-participating
+- Volunteer Canada, Data on Giving, Volunteering and Participating in Canada -- https://volunteer.ca/data-on-giving-volunteering-and-participating-in-canada/
+
+QUESTION: 5. What percentage of Canadians volunteer?
+SEARCHED: yes
+ANSWER: It depends which definition you use. For formal volunteering through a charity or nonprofit, 32% of Canadians aged 15+ volunteered in 2023 -- down from 41% in 2018 and 44% in 2013. For informal volunteering (directly helping neighbours, friends, or others outside an organization), it was 66% in 2023, down from 74% in 2018. Counting either type, about 73% volunteered in 2023. The number most people mean by "volunteer rate" is the formal one: roughly one in three.
+SOURCES:
+- Statistics Canada, Volunteering and charitable giving in Canada, 2018 to 2023 (The Daily) -- https://www150.statcan.gc.ca/n1/daily-quotidien/250623/dq250623b-eng.htm
+- Imagine Canada, New Results from Statistics Canada's Survey of Giving, Volunteering and Participating -- https://imaginecanada.ca/en/360/new-results-statistics-canadas-survey-giving-volunteering-and-participating
+
+QUESTION: 6. Who does more housework, men or women, in Canada?
+SEARCHED: yes
+ANSWER: Women, consistently and by a wide margin. Statistics Canada's satellite account estimated women did about 820 hours of unpaid housework in 2019 versus 540 hours for men -- roughly 50% more. In time-use terms, women aged 25-54 averaged about 3.9 hours a day on unpaid work versus 2.4 hours for men. The 2022 Time Use Survey showed the gap persists regardless of telework: among teleworkers, women spent 102.9 minutes a day on housework versus 62.5 for men; among non-teleworkers, 87.3 versus 48.5 minutes. Women also do about an hour more routine child care per day (2.3 vs 1.4 hours). The gap has narrowed over three decades -- women's chore time is down about 42 minutes a day, men's up about 24 -- and the task mix differs, with women doing more daily repetitive work (cooking, cleaning, laundry) and men more episodic work (repairs, yard work, garbage).
+SOURCES:
+- Statistics Canada, Time use and teleworkers: Highlights from the 2022 Time Use Survey (The Daily) -- https://www150.statcan.gc.ca/n1/daily-quotidien/240605/dq240605a-eng.htm
+- Statistics Canada, Time use: Total work burden, unpaid work, and leisure (The Daily) -- https://www150.statcan.gc.ca/n1/daily-quotidien/180730/dq180730a-eng.htm
+- Vanier Institute of the Family, Men are more involved in unpaid work at home, but the gender gap persists -- https://vanierinstitute.ca/families-count-2024/men-are-more-involved-in-unpaid-work-at-home-but-the-gender-gap-persists/
+- CBC News, Women spend 50% more time doing unpaid work than men -- https://www.cbc.ca/news/canada/calgary/men-women-housework-unpaid-statistics-canada-1.4141367
+
+QUESTION: 7. How many businesses in Canada use artificial intelligence?
+SEARCHED: yes
+ANSWER: As of the second quarter of 2026, 19.2% of Canadian businesses reported using AI to produce goods or deliver services in the preceding 12 months. That has tripled in two years: 6.1% in Q2 2024, 12.2% in Q2 2025, 19.2% in Q2 2026. Adoption is heavily concentrated by sector -- information and cultural industries 42.3%, finance and insurance 40.4%, professional/scientific/technical services 32.4% -- while most goods-producing and small-business sectors lag well behind. Notably, as of Q3 2025 about two-thirds of businesses (66.7%) still reported no plans to adopt AI, and Statistics Canada research finds the adoption gap with the U.S. is closing faster than the associated productivity gap.
+SOURCES:
+- Statistics Canada, Analysis on artificial intelligence use by businesses in Canada, second quarter of 2026 -- https://www150.statcan.gc.ca/n1/pub/11-621-m/11-621-m2026010-eng.htm
+- Statistics Canada, Analysis on expected use of artificial intelligence by businesses -- https://www150.statcan.gc.ca/n1/pub/11-621-m/11-621-m2025011-eng.htm
+- Statistics Canada, Artificial intelligence adoption and productivity in Canadian firms -- https://www150.statcan.gc.ca/n1/pub/36-28-0001/2026004/article/00002-eng.htm
+
+QUESTION: 8. How many Canadians work in the public sector?
+SEARCHED: yes
+ANSWER: About 4.5 million -- roughly 4.55 million as of December 2025, up from about 4.46 million a year earlier. That's around one in five employed Canadians. The figure covers all three levels of government plus government-funded institutions: federal, provincial and municipal administration, public schools, universities, hospitals and other health institutions, and Crown corporations. The federal public service itself is only a fraction of that, in the range of 350,000-450,000. Growth has largely flattened recently -- public sector employment was little changed over the twelve months ending April 2026 -- after a substantial run-up over 2015-2024.
+SOURCES:
+- Statistics Canada Table 14-10-0027-01, Employment by class of worker -- https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410002701
+- Statistics Canada, Labour Force Survey, April 2026 (The Daily) -- https://www150.statcan.gc.ca/n1/daily-quotidien/260508/dq260508a-eng.htm
+- Statistics Canada, Labour Force Survey, January 2026 (The Daily) -- https://www150.statcan.gc.ca/n1/daily-quotidien/260206/dq260206a-eng.htm
+- Fraser Institute, Public and private sector job growth across Canada, 2015 to 2024 -- https://www.fraserinstitute.org/sites/default/files/2026-02/public-and-private-sector-job-growth-across-canada-2015-to-2024_0.pdf
+
+QUESTION: 9. Do Canadians trust the government?
+SEARCHED: yes
+ANSWER: Only partly, and less than they trust most other institutions. Statistics Canada's 2023 confidence survey found just 28% of Canadians reported high confidence in the federal Parliament -- the lowest-scoring institution measured, well behind the justice system and courts (49%), the school system (45%), and police. The OECD's 2024 trust survey is somewhat kinder, putting 49% of Canadians at high or moderately high trust in the federal government in 2023 -- above the OECD average of 39% and up 4 points from 2021. So Canada looks relatively good internationally while still having a majority that does not express confidence, and trust in institutions like the media and Parliament has eroded over the past decade.
+SOURCES:
+- Statistics Canada, Confidence in institutions and the media, 2023 (The Daily) -- https://www150.statcan.gc.ca/n1/daily-quotidien/240213/dq240213a-eng.pdf
+- OECD, Survey on Drivers of Trust in Public Institutions 2024 -- Canada country note -- https://www.oecd.org/en/publications/2024/06/oecd-survey-on-drivers-of-trust-in-public-institutions-2024-results-country-notes_33192204/canada_1769aff6.html
+- University of Waterloo TRUST Network, Trust in Canada: Recent Trends in Measures of Trust (April 2024) -- https://uwaterloo.ca/trust-research-undertaken-science-technology-scholarly-network/sites/default/files/uploads/documents/trust-in-canada-recent-trends-in-measures-of-trust-april-2024.pdf
+- Proof Strategies CanTrust Index 2024 (via Canadian Government Executive) -- https://canadiangovernmentexecutive.ca/exploring-trust-in-canada-insights-from-the-2024-cantrust-index/
+
+QUESTION: 10. How religious is Canada?
+SEARCHED: yes
+ANSWER: Affiliated on paper for most, but practising for a minority, and declining fast on both. In the 2021 Census, 34.6% of Canadians -- about 12.6 million people -- reported no religious affiliation, more than double the 16.5% of 2001. Religious affiliation overall fell from 87.5% in 1991 to 65.4% in 2021, with Christianity accounting for nearly all of the drop (about 53%, down from roughly 77% in 2001) while Islam, Hinduism and Sikhism grew, largely through immigration. Practice has fallen further than identity: monthly-or-more attendance at group religious activities dropped from 35.0% in 1991 to 23.3% in 2019, and the share saying religious or spiritual beliefs are somewhat or very important fell from 71.0% in 2003 to 53.7% in 2020. The generational split is stark -- 59.1% of under-25s reported an affiliation versus 80.9% of those 65+.
+SOURCES:
+- Statistics Canada, The Canadian census: A rich portrait of the country's religious and ethnocultural diversity (2021 Census, The Daily, Oct 26 2022) -- https://www150.statcan.gc.ca/n1/daily-quotidien/221026/dq221026b-eng.htm
+- Statistics Canada, Losing Our Religion? It's Not That Simple (Eh Sayers) -- https://www150.statcan.gc.ca/n1/en/catalogue/452000032025005
+- Vanier Institute of the Family, Religious affiliation has declined but is still reported by most people -- https://vanierinstitute.ca/families-count-2024/religious-affiliation-has-declined-but-is-still-reported-by-most-people/
+- CBC News, More Canadians than ever have no religious affiliation, census shows -- https://www.cbc.ca/news/canada/kitchener-waterloo/canadian-census-religious-affiliation-none-1.6631293
+
+QUESTION: 11. Loneliness in Canada -- what do the statistics say?
+SEARCHED: yes
+ANSWER: In the first quarter of 2024, 13% of Canadians aged 15 and over said they always or often felt lonely -- more than one in ten. Contrary to the common assumption, it skews young: 17% of those aged 15-24 reported frequent loneliness, versus 14% of those 25-54, 11% of those 55-64, and 10% of those 65 and over. LGBTQ2+ Canadians reported the highest rate of any group at 27%. Loneliness also tracks strongly with other measures -- people reporting frequent loneliness report much lower life satisfaction and worse self-rated mental health -- and rates among people living alone and among those with disabilities are elevated. Statistics Canada monitors this quarterly through the Canadian Social Survey, so the series is worth checking for the latest quarter.
+SOURCES:
+- Statistics Canada, Canadian Social Survey: Loneliness in Canada (The Daily) -- https://www150.statcan.gc.ca/n1/daily-quotidien/211124/dq211124e-eng.htm
+- Statistics Canada, Loneliness in Canada (Infographic, 11-627-M) -- https://www150.statcan.gc.ca/n1/pub/11-627-m/11-627-m2021090-eng.htm
+- Statistics Canada, You've got a friend in me -- https://www.statcan.gc.ca/o1/en/plus/6735-youve-got-friend-me
+- Statistics Canada, A look at loneliness among seniors -- https://statcan.gc.ca/o1/en/plus/4881-look-loneliness-among-seniors
+
+AGENT'S OWN CONFIDENCE NOTE (verbatim): "Q2 is the weakest -- I could not retrieve current age-banded median income figures directly from Table 11-10-0239, so those numbers are approximate and partly from 2022 data; the table itself is the authoritative check. Q8's federal public service sub-figure is from memory, not a retrieved source. Everything else is grounded in the sources listed."
