@@ -26,7 +26,8 @@ ranking model rewards persistence rather than penalizing it.
 
 News retrieval. Scheduling or automation. French. Cross-cube joins. LLM-authored query
 specs. More than one release date per run. Anything that publishes without a human in the
-loop.
+loop. A skill for authoring new probes — defer until at least one has been added by hand
+and the procedure is actually known.
 
 ## Architecture
 
@@ -50,6 +51,10 @@ remine/index.html  # feed
 remine/article.html
 remine/app.js
 remine/style.css
+
+.claude/skills/
+  remine/SKILL.md            # the release workflow
+  remine-editorial/SKILL.md  # the writing pass
 ```
 
 `remine/cache/` and `remine/briefs/` are added to `.gitignore` (cube downloads run to tens
@@ -220,10 +225,15 @@ untouched material. The factor is tuned in `surveys.yaml`, starting at 0.5.
 ~40 ranked facts as structured data with numbers already computed, the **full verbatim
 prose of the Daily article**, the mention map, and cube provenance.
 
-The editorial pass then happens in a Claude Code session reading that brief. No API key,
-no secret to manage (AGENTS.md forbids committing secrets), and a human in the loop by
-construction. `editor.py` exposes the brief-out / draft-in interface so an API-calling
-implementation can be dropped in later without touching any other stage.
+The editorial pass then happens in a Claude Code session reading that brief, driven by the
+`remine-editorial` skill (see "The skill layer"). No API key, no secret to manage
+(AGENTS.md forbids committing secrets), and a human in the loop by construction.
+`editor.py` exposes the brief-out / draft-in interface so an API-calling implementation
+can be dropped in later without touching any other stage.
+
+The rules below state *what* the editorial output must satisfy and *why*. The procedure
+for satisfying them is the `remine-editorial` skill's job; the mechanical checks are
+`editor.py`'s.
 
 The editorial output must:
 
@@ -280,6 +290,60 @@ If v1's output still reads as technical after these, the fault is in the probe l
 it is generating findings about the data rather than about the country — and the response
 is to add probes framed on people and places, not to add more editorial instruction.
 
+## The skill layer
+
+Because the editorial stage runs in a Claude Code session rather than behind an API key,
+the workflow is packaged as project skills in `.claude/skills/`. This turns "a pipeline
+plus several remembered steps" into one repeatable, committed operation, and puts the
+editorial procedure somewhere an agent will actually read it at the moment it matters.
+
+### Instructions are not enforcement
+
+**Skills carry procedure and judgment. Python carries arithmetic and checks.**
+
+A skill is a set of instructions to an agent. It cannot guarantee anything. Every hard
+guarantee in this design — unresolved token fails the build, unknown token fails the
+build, bare numeral fails the build, `"not discussed"` contradicted by the mention map
+gets flagged — **stays implemented in `editor.py`**. A skill *tells the agent to run*
+`editor.py bind`; a skill never *is* the bind.
+
+If these checks migrate into skill prose they stop being properties of the system and
+become suggestions, and the "numbers come from code, not the model" guarantee silently
+evaporates. This is the single most likely way to get the skill layer wrong.
+
+Corollary: `generate.py` and `editor.py` must stay fully runnable with no agent present.
+That is what makes them testable.
+
+### `remine` — the release workflow
+
+Invoked as `/remine 260807`. Runs the loop end to end:
+
+1. `python remine/generate.py --date <date>` — stages 1-5, writes briefs
+2. for each article in the release, invoke `remine-editorial` with its brief
+3. `python remine/editor.py --bind` on each draft
+4. resolve anything `bind` flags, by re-reading the Daily article rather than by
+   overriding the check
+5. write article JSON, update the feed index, commit
+
+### `remine-editorial` — the writing pass
+
+Invoked with a single brief; usable standalone so an article can be redrafted without
+re-running the pipeline. This matters more than it sounds: the first several drafts are
+how you find out whether the probe library is generating anything worth reading, and that
+loop should be cheap.
+
+It carries the parts that are genuine judgment — selecting 2-4 facts that cohere, naming
+the assumption in words a person would actually use, applying the one-sentence test, the
+`differs_from_daily` discipline, and the token contract. The *rationale* for each rule
+stays in this spec; the *procedure* for following it lives in the skill.
+
+It invokes the existing global **`my-voice`** skill (creative mode) for the prose itself,
+rather than specifying a house style of its own.
+
+For v1 the editorial pass runs in the main session, not a subagent: while the probes and
+briefs are still unproven, watching the drafting is how the tuning signal arrives. Revisit
+if multi-article releases make main-session context painful.
+
 ## Site
 
 `/remine/` is a feed of cards: date, source Daily article, headline. Each article page
@@ -313,8 +377,11 @@ call or a network request; network-dependent code is exercised against cached fi
 ```
 python remine/generate.py --date 260807              # all articles that day
 python remine/generate.py --date 260807 --pid 14100287
-python remine/generate.py --brief remine/briefs/260807-a.json --bind draft.md
+python remine/editor.py --brief remine/briefs/260807-a.json --bind draft.md
 ```
+
+Everything above runs without an agent present. `/remine 260807` is the skill-driven
+equivalent of the whole loop, and adds only orchestration and the editorial pass.
 
 ## Risks
 
@@ -326,6 +393,10 @@ python remine/generate.py --brief remine/briefs/260807-a.json --bind draft.md
   reader cares about. Mitigated by mechanical humanizing, the one-sentence test, and the
   requirement that a named assumption be a real belief rather than a paraphrase. If it
   persists, the fix is new probes, not new prompt text.
+- **The skill layer drifting into enforcement.** Over time it is tempting to move a check
+  into skill prose because it is easier to edit there. Any guarantee that lives only in a
+  skill is not a guarantee. `editor.py`'s tests are the guard: they run with no agent
+  present, so a check that has drifted out of Python fails the suite.
 - **Cube downloads are large** (60 MB for the LFS table). Mitigated by caching keyed on
   release time; cache is gitignored.
 - **Legibility scoring and the mention-demotion factor are heuristics** and will need
