@@ -68,7 +68,9 @@ def download_cube(pid: int, release_time: str, cache_dir: Path) -> Path:
     dest = cache_dir / f"{pid}-{stamp}.zip"
     if dest.exists():
         return dest
-    envelope = requests.get(CSV_URL.format(pid=pid), timeout=60).json()
+    envelope_resp = requests.get(CSV_URL.format(pid=pid), timeout=60)
+    envelope_resp.raise_for_status()
+    envelope = envelope_resp.json()
     if envelope.get("status") != "SUCCESS":
         raise RuntimeError(f"WDS full-table download failed for {pid}: {envelope}")
     with requests.get(envelope["object"], stream=True, timeout=600) as resp:
