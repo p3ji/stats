@@ -27,7 +27,9 @@ def test_load_cube_reads_bom_csv_with_typed_columns():
     df = load_cube(FIXTURES / "mini_cube.zip", 99999999)
     assert list(df.columns)[:3] == ["REF_DATE", "GEO", "DGUID"]
     assert df["VALUE"].dtype.kind == "f"
-    assert len(df) == 12
+    # New fixture: 4 (measure, gender) combinations x 2 geographies x 3
+    # periods x 2 statistics (Estimate, SE) = 48 rows.
+    assert len(df) == 48
 
 
 def test_load_cube_strips_bom_from_first_column_name():

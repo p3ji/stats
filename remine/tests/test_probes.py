@@ -1,7 +1,9 @@
 from pathlib import Path
 
+import pytest
+
 from remine.cube import load_cube
-from remine.probes import PROBES, Fact, prepare, run_probes
+from remine.probes import PROBES, Fact, prepare, run_probes, slice_frame
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -10,6 +12,9 @@ CFG = {
     "se_members": {"level": "Standard error of estimate"},
     "filters": {"Data type": "Seasonally adjusted"},
     "aggregate_members": {}, "legibility": {"Geography": 1.0}, "min_periods": 1,
+    "measure_dimension": "Labour force characteristics",
+    "measures": ["Employment", "Unemployment rate"],
+    "hold_at": {"Gender": "Total - Gender"},
 }
 
 
@@ -17,11 +22,20 @@ def mini():
     return load_cube(FIXTURES / "mini_cube.zip", 99999999)
 
 
+def sliced(measure="Employment"):
+    """The slice a probe actually sees once Gender and the measure are pinned:
+    2 geographies x 3 periods, one row each, for the given measure."""
+    return slice_frame(prepare(mini(), CFG), CFG, measure, "Geography")
+
+
 def test_prepare_keeps_only_estimate_rows_and_attaches_se():
     out = prepare(mini(), CFG)
     assert set(out["Statistics"]) == {"Estimate"}
     assert out["SE"].notna().all()
-    assert len(out) == 6  # 2 geographies x 3 periods
+    # New fixture: 2 measures x 2 genders x 2 geographies x 3 periods = 24
+    # Estimate rows; prepare() no longer collapses to a single series — that
+    # is now slice_frame's job (see the `sliced()` helper above).
+    assert len(out) == 24
 
 
 def test_gap_between_members_is_registered():
@@ -30,7 +44,7 @@ def test_gap_between_members_is_registered():
 
 def test_gap_between_members_computes_the_arithmetic_difference():
     # fixture: Ontario 2026-07 = 102.0, Alberta 2026-07 = 84.0 -> gap 18.0
-    facts = PROBES["gap_between_members"](prepare(mini(), CFG), "Geography", CFG)
+    facts = PROBES["gap_between_members"](sliced(), "Geography", CFG)
     latest = [f for f in facts if f.periods[-1] == "2026-07"]
     assert len(latest) == 1
     assert latest[0].values[0] == 18.0
@@ -38,18 +52,18 @@ def test_gap_between_members_computes_the_arithmetic_difference():
 
 
 def test_fact_carries_vectors_and_periods_for_provenance():
-    fact = PROBES["gap_between_members"](prepare(mini(), CFG), "Geography", CFG)[0]
+    fact = PROBES["gap_between_members"](sliced(), "Geography", CFG)[0]
     assert fact.vectors and all(v.startswith("v") for v in fact.vectors)
     assert fact.periods
 
 
 def test_fact_human_field_is_reader_scale():
-    fact = PROBES["gap_between_members"](prepare(mini(), CFG), "Geography", CFG)[0]
+    fact = PROBES["gap_between_members"](sliced(), "Geography", CFG)[0]
     assert "people" in fact.human
 
 
 def test_fact_key_is_stable_and_order_independent_within_a_cut():
-    f = PROBES["gap_between_members"](prepare(mini(), CFG), "Geography", CFG)[0]
+    f = PROBES["gap_between_members"](sliced(), "Geography", CFG)[0]
     assert f.key() == f.key()
     assert f.probe in f.key()
 
@@ -70,13 +84,13 @@ def test_all_eight_v1_probes_are_registered():
 
 def test_streak_counts_consecutive_moves_in_one_direction():
     # fixture Ontario: 100.0, 101.0, 102.0 -> a 2-period rising streak
-    facts = PROBES["streak"](prepare(mini(), CFG), "Geography", CFG)
+    facts = PROBES["streak"](sliced(), "Geography", CFG)
     ont = [f for f in facts if f.cut["Geography"] == "Ontario"]
     assert ont and ont[0].values[0] == 2.0
 
 
 def test_rank_order_identifies_leader_and_trailer():
-    facts = PROBES["rank_order"](prepare(mini(), CFG), "Geography", CFG)
+    facts = PROBES["rank_order"](sliced(), "Geography", CFG)
     latest = [f for f in facts if f.periods[-1] == "2026-07"][0]
     assert latest.meta["leader"] == "Ontario"
     assert latest.meta["trailer"] == "Alberta"
@@ -84,13 +98,13 @@ def test_rank_order_identifies_leader_and_trailer():
 
 def test_gap_trend_reports_widening_when_the_gap_grows():
     # Ontario 100->102 (+2), Alberta 80->84 (+4): the gap narrows by 2
-    facts = PROBES["gap_trend"](prepare(mini(), CFG), "Geography", CFG)
+    facts = PROBES["gap_trend"](sliced(), "Geography", CFG)
     assert facts and facts[0].values[0] == -2.0
     assert facts[0].meta["direction"] == "narrowing"
 
 
 def test_share_of_total_is_a_percentage_of_the_period_sum():
-    facts = PROBES["share_of_total"](prepare(mini(), CFG), "Geography", CFG)
+    facts = PROBES["share_of_total"](sliced(), "Geography", CFG)
     ont = [f for f in facts if f.cut["Geography"] == "Ontario" and f.periods[-1] == "2026-07"]
     assert abs(ont[0].values[0] - 102.0 / (102.0 + 84.0) * 100) < 1e-6
 
@@ -137,6 +151,60 @@ def test_prepare_drops_statcan_unreliable_and_suppressed_rows():
     out = prepare(df, {"value_dimension": "Statistics", "value_member": "Estimate",
                        "se_members": {}, "filters": {}})
     assert out["REF_DATE"].tolist() == ["2026-05"]
+
+
+def test_slice_frame_yields_one_row_per_period_and_member():
+    from remine.probes import slice_frame
+    cfg = {**CFG, "measure_dimension": "Labour force characteristics",
+           "hold_at": {"Geography": "Canada", "Gender": "Total - Gender",
+                       "Age group": "15 years and over"}}
+    out = slice_frame(prepare(mini(), cfg), cfg, "Employment", "Geography")
+    assert out.groupby(["REF_DATE", "Geography"]).size().max() == 1
+
+
+def test_slice_frame_holds_gender_at_the_total_member():
+    from remine.probes import slice_frame
+    cfg = {**CFG, "measure_dimension": "Labour force characteristics",
+           "hold_at": {"Gender": "Total - Gender"}}
+    out = slice_frame(prepare(mini(), cfg), cfg, "Employment", "Geography")
+    assert set(out["Gender"]) == {"Total - Gender"}
+
+
+def test_run_probes_refuses_a_slice_that_still_has_duplicate_rows():
+    # No hold_at, so Gender and the measure dimension both still vary: exactly
+    # the condition that made the pipeline compare unrelated series.
+    cfg = {**CFG, "hold_at": {}, "measures": [], "measure_dimension": None}
+    with pytest.raises(ValueError, match="rows per"):
+        run_probes(prepare(mini(), cfg), ["Geography"], cfg)
+
+
+def test_run_probes_rejects_a_measure_that_is_also_an_aggregate():
+    cfg = {**CFG, "measures": ["Employment"],
+           "aggregate_members": {"Labour force characteristics": ["Employment"]}}
+    with pytest.raises(ValueError, match="aggregate_members"):
+        run_probes(prepare(mini(), cfg), ["Geography"], cfg)
+
+
+def test_window_keeps_only_the_most_recent_periods():
+    from remine.probes import window
+    out = window(prepare(mini(), CFG), {"window_periods": 2}, "streak")
+    assert sorted(out["REF_DATE"].unique()) == ["2026-06", "2026-07"]
+
+
+def test_window_gives_long_run_compare_the_full_history():
+    from remine.probes import window
+    out = window(prepare(mini(), CFG), {"window_periods": 2}, "long_run_compare")
+    assert len(sorted(out["REF_DATE"].unique())) == 3
+
+
+def test_facts_record_which_measure_they_describe():
+    cfg = {**CFG, "measure_dimension": "Labour force characteristics",
+           "measures": ["Employment"],
+           "hold_at": {"Gender": "Total - Gender", "Age group": "15 years and over"}}
+    facts = run_probes(prepare(mini(), cfg), ["Geography"], cfg)
+    assert facts
+    assert all(f.meta["measure"] == "Employment" for f in facts)
+    assert all(f.cut.get("Labour force characteristics") == "Employment" for f in facts)
 
 
 def test_prepare_drops_rows_with_no_value():

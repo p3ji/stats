@@ -14,6 +14,10 @@ defaults:
   aggregate_members: {}
   filters: {}
   se_members: {}
+  window_periods: 60
+  measure_dimension: null
+  measures: []
+  hold_at: {}
 
 cubes:
   14100287:
@@ -44,3 +48,14 @@ cubes:
       seniors: 55 years and over
       women: Women+
       men: Men+
+    measure_dimension: Labour force characteristics
+    measures:
+      - Employment
+      - Unemployment rate
+      - Participation rate
+      - Employment rate
+    hold_at:
+      Geography: Canada
+      Gender: Total - Gender
+      Age group: 15 years and over
+    window_periods: 60

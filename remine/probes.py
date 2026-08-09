@@ -25,6 +25,10 @@ PROBES: dict[str, Callable] = {}
 # them: a suppressed value must never reach a Fact in the first place.
 _UNRELIABLE_STATUS = {"F", "x", "E", "..", "..."}
 
+# long_run_compare exists to reach back before the window; everything else is
+# making a claim about now.
+_FULL_HISTORY_PROBES = {"long_run_compare"}
+
 
 def probe(name: str):
     def wrap(fn):
@@ -331,14 +335,66 @@ def long_run_compare(df, dim, cfg):
     return facts
 
 
+def slice_frame(df: pd.DataFrame, cfg: dict, measure, probe_dim: str) -> pd.DataFrame:
+    """Reduce the frame to one row per (period, member of probe_dim).
+
+    Every dimension other than probe_dim is pinned to a single member, so a
+    comparison across probe_dim is like-for-like. Without this the probes
+    silently compare unrelated series that happen to share a key.
+    """
+    out = df
+    mdim = cfg.get("measure_dimension")
+    if mdim and measure is not None and mdim in out.columns:
+        out = out[out[mdim] == measure]
+    for dim, member in (cfg.get("hold_at") or {}).items():
+        if dim == probe_dim or dim not in out.columns:
+            continue
+        out = out[out[dim] == member]
+    return out
+
+
+def window(df: pd.DataFrame, cfg: dict, probe_name: str) -> pd.DataFrame:
+    """Limit most probes to a recent window; long-run comparison sees everything."""
+    n = int(cfg.get("window_periods") or 0)
+    if not n or probe_name in _FULL_HISTORY_PROBES:
+        return df
+    keep = sorted(df["REF_DATE"].unique())[-n:]
+    return df[df["REF_DATE"].isin(keep)]
+
+
 def run_probes(df: pd.DataFrame, dimensions: list[str], cfg: dict) -> list[Fact]:
+    mdim = cfg.get("measure_dimension")
+    measures = list(cfg.get("measures") or [None])
+    aggregates = {n for names in (cfg.get("aggregate_members") or {}).values() for n in names}
+    clash = {m for m in measures if m in aggregates}
+    if clash:
+        raise ValueError(
+            f"measures {sorted(clash)} are also listed as aggregate_members; the gate "
+            f"would drop every fact about them — fix surveys.yaml")
+
+    hold = cfg.get("hold_at") or {}
+    probe_dims = [d for d in dimensions if d in hold] or list(dimensions)
     facts: list[Fact] = []
-    for name, fn in PROBES.items():
-        for dim in dimensions:
-            if dim not in df.columns or df[dim].nunique() < 2:
+    for measure in measures:
+        for dim in probe_dims:
+            sliced = slice_frame(df, cfg, measure, dim)
+            if dim not in sliced.columns or sliced[dim].nunique() < 2:
                 continue
-            try:
-                facts.extend(fn(df, dim, cfg))
-            except Exception as exc:  # a broken probe must not sink the run
-                print(f"  probe {name} failed on {dim}: {exc}")
+            dupes = sliced.groupby(["REF_DATE", dim]).size().max()
+            if dupes and dupes > 1:
+                raise ValueError(
+                    f"slice for measure={measure!r} dim={dim!r} still has {dupes} rows "
+                    f"per (period, member); probes would compare unrelated series")
+            for name, fn in PROBES.items():
+                frame = window(sliced, cfg, name)
+                try:
+                    produced = fn(frame, dim, cfg)
+                except Exception as exc:   # a broken probe must not sink the run
+                    print(f"  probe {name} failed on {dim} ({measure}): {exc}")
+                    continue
+                for f in produced:
+                    f.meta["measure"] = measure
+                    if mdim and measure is not None:
+                        f.cut = {**f.cut, mdim: measure}
+                    facts.append(f)
     return facts
