@@ -121,3 +121,33 @@ def test_gap_trend_survives_a_lead_swap():
     assert facts[0].meta["lead_changed"] is True
     # gap goes 20.0 -> 5.0, so it narrowed by 15.0
     assert facts[0].values[0] == -15.0
+
+
+def test_prepare_drops_statcan_unreliable_and_suppressed_rows():
+    import pandas as pd
+    base = {"Geography": "Ontario", "Statistics": "Estimate",
+            "Data type": "Seasonally adjusted", "UOM": "Persons in thousands",
+            "SCALAR_FACTOR": "thousands", "VECTOR": "v1", "DECIMALS": 1}
+    df = pd.DataFrame([
+        {**base, "REF_DATE": "2026-05", "VALUE": 10.0, "STATUS": ""},
+        {**base, "REF_DATE": "2026-06", "VALUE": 11.0, "STATUS": "F"},   # too unreliable
+        {**base, "REF_DATE": "2026-07", "VALUE": 12.0, "STATUS": "x"},   # suppressed
+        {**base, "REF_DATE": "2026-08", "VALUE": 13.0, "STATUS": "E"},   # use with caution
+    ])
+    out = prepare(df, {"value_dimension": "Statistics", "value_member": "Estimate",
+                       "se_members": {}, "filters": {}})
+    assert out["REF_DATE"].tolist() == ["2026-05"]
+
+
+def test_prepare_drops_rows_with_no_value():
+    import pandas as pd
+    base = {"Geography": "Ontario", "Statistics": "Estimate",
+            "Data type": "Seasonally adjusted", "UOM": "Persons in thousands",
+            "SCALAR_FACTOR": "thousands", "VECTOR": "v1", "DECIMALS": 1, "STATUS": ""}
+    df = pd.DataFrame([
+        {**base, "REF_DATE": "2026-05", "VALUE": 10.0},
+        {**base, "REF_DATE": "2026-06", "VALUE": float("nan")},
+    ])
+    out = prepare(df, {"value_dimension": "Statistics", "value_member": "Estimate",
+                       "se_members": {}, "filters": {}})
+    assert out["REF_DATE"].tolist() == ["2026-05"]

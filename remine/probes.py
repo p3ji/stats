@@ -18,6 +18,13 @@ from remine.humanize import humanize, humanize_delta
 
 PROBES: dict[str, Callable] = {}
 
+# StatCan's own reliability verdicts. F = too unreliable to publish,
+# x = suppressed for confidentiality, E = use with caution, .. / ... = not
+# available or not applicable. The spec's first gate rule is to honour these,
+# and the cheapest place to honour them is before any probe can compute on
+# them: a suppressed value must never reach a Fact in the first place.
+_UNRELIABLE_STATUS = {"F", "x", "E", "..", "..."}
+
 
 def probe(name: str):
     def wrap(fn):
@@ -57,6 +64,10 @@ def prepare(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
         # to GEO; every other dimension keeps its WDS dimensionNameEn as-is.
         # Downstream config (legibility, probes) refers to it as "Geography".
         df = df.rename(columns={"GEO": "Geography"})
+    # Honour StatCan's own reliability verdicts before anything is computed.
+    if "STATUS" in df.columns:
+        df = df[~df["STATUS"].fillna("").str.strip().isin(_UNRELIABLE_STATUS)]
+    df = df[df["VALUE"].notna()]
     for dim, member in (cfg.get("filters") or {}).items():
         df = df[df[dim] == member]
     vdim = cfg.get("value_dimension")

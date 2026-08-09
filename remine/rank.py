@@ -8,20 +8,23 @@ mostly surface noise.
 
 from remine.probes import Fact
 
-_UNRELIABLE_STATUS = {"F", "x", "..", "...", "E"}
-
-
 def _uses_aggregate(fact: Fact, cfg: dict) -> bool:
-    aggregates = cfg.get("aggregate_members") or {}
-    members = set(fact.meta.get(k) for k in ("high", "low", "leader", "trailer"))
-    members |= set(fact.cut.values())
-    for names in aggregates.values():
-        for name in names:
-            if name in members:
-                return True
-            if any(isinstance(m, str) and name in m for m in members if m):
-                return True
-    return False
+    """Exact membership, never substring.
+
+    This is a silent-drop path, so a false positive discards a real story with
+    no trace. A substring test would drop any member whose name merely contains
+    an aggregate's name (a geography containing "Canada", say).
+    """
+    aggregates = {name
+                  for names in (cfg.get("aggregate_members") or {}).values()
+                  for name in names}
+    members = {str(v) for v in fact.cut.values()}
+    members |= {str(fact.meta[k]) for k in ("high", "low", "leader", "trailer")
+                if fact.meta.get(k)}
+    # A pair probe's cut value may be a composite built from two members, so
+    # also compare the parts a composite is built from.
+    members |= {part.strip() for m in list(members) for part in m.split(" vs ")}
+    return bool(members & aggregates)
 
 
 def gate(facts: list[Fact], df, cfg: dict) -> list[Fact]:
