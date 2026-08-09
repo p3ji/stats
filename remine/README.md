@@ -10,6 +10,12 @@ Remine reads a Daily release, computes what the same table supports saying, and 
 articles that were left out. The data has already been mined once, by the people who released
 it. Remine goes back through the same material for value that was not extracted the first time.
 
+Remine is one of the sub-apps in [Open Stats Lab](../). It shares that repository's data sources
+and conventions, and nothing else. In particular it is unrelated to the AI-visibility study and
+the crawlable table mirrors that also live here: those are an experiment about how answer
+engines cite official statistics, and they share no code, no data, and no research question with
+this.
+
 ## What counts as a finding
 
 A finding is worth publishing when it concretizes a widely held assumption or challenges one.
@@ -68,11 +74,12 @@ check any number against the source table.
 
 ## Using it
 
-You need Python 3.11 or later and the dependencies in `requirements.txt` (`pandas`, `pyyaml`,
-`requests`). There are no API keys to configure, and no secrets of any kind.
+You need Python 3.11 or later and the dependencies in `remine/requirements.txt` (`pandas`,
+`pyyaml`, `requests`). There are no API keys to configure, and no secrets of any kind. Run every
+command below from the repository root.
 
 ```bash
-pip install -r requirements.txt
+pip install -r remine/requirements.txt
 ```
 
 Build the fact briefs for a release, using the Daily's date in `YYMMDD` form:
@@ -90,7 +97,7 @@ Draft from the brief, then bind the draft against it:
 
 ```bash
 python remine/editor.py --brief remine/briefs/260807-dq260807a.json \
-  --draft draft.json --out articles/260807-dq260807a.json
+  --draft draft.json --out remine/articles/260807-dq260807a.json
 ```
 
 If `bind` fails, fix the draft rather than the check. A failure is usually telling you something
@@ -110,8 +117,11 @@ how legible each dimension is to a reader.
 
 In development. Stages 1 and 3 (discovery and cube access) are implemented and tested. The probe
 library, ranking, brief assembly, and the binding step are specified but not yet built, so the
-usage instructions above describe the intended interface rather than working commands. The design
-document and the implementation plan are in `docs/`.
+usage instructions above describe the intended interface rather than working commands.
+
+The design document is `docs/superpowers/specs/2026-08-07-remine-design.md` and the
+implementation plan is `docs/superpowers/plans/2026-08-08-remine.md`. Tests run with
+`python -m pytest remine/tests/` and make no network calls.
 
 ## Attribution
 
