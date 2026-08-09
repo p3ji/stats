@@ -59,3 +59,48 @@ def test_run_probes_returns_facts_from_the_registry():
     meta_dims = ["Geography"]
     facts = run_probes(df, meta_dims, CFG)
     assert facts and all(isinstance(f, Fact) for f in facts)
+
+
+def test_all_eight_v1_probes_are_registered():
+    assert set(PROBES) == {
+        "gap_between_members", "gap_trend", "level_threshold", "streak",
+        "rank_order", "rank_reversal", "share_of_total", "long_run_compare",
+    }
+
+
+def test_streak_counts_consecutive_moves_in_one_direction():
+    # fixture Ontario: 100.0, 101.0, 102.0 -> a 2-period rising streak
+    facts = PROBES["streak"](prepare(mini(), CFG), "Geography", CFG)
+    ont = [f for f in facts if f.cut["Geography"] == "Ontario"]
+    assert ont and ont[0].values[0] == 2.0
+
+
+def test_rank_order_identifies_leader_and_trailer():
+    facts = PROBES["rank_order"](prepare(mini(), CFG), "Geography", CFG)
+    latest = [f for f in facts if f.periods[-1] == "2026-07"][0]
+    assert latest.meta["leader"] == "Ontario"
+    assert latest.meta["trailer"] == "Alberta"
+
+
+def test_gap_trend_reports_widening_when_the_gap_grows():
+    # Ontario 100->102 (+2), Alberta 80->84 (+4): the gap narrows by 2
+    facts = PROBES["gap_trend"](prepare(mini(), CFG), "Geography", CFG)
+    assert facts and facts[0].values[0] == -2.0
+    assert facts[0].meta["direction"] == "narrowing"
+
+
+def test_share_of_total_is_a_percentage_of_the_period_sum():
+    facts = PROBES["share_of_total"](prepare(mini(), CFG), "Geography", CFG)
+    ont = [f for f in facts if f.cut["Geography"] == "Ontario" and f.periods[-1] == "2026-07"]
+    assert abs(ont[0].values[0] - 102.0 / (102.0 + 84.0) * 100) < 1e-6
+
+
+def test_probes_never_emit_a_fact_without_vectors():
+    facts = run_probes(prepare(mini(), CFG), ["Geography"], CFG)
+    assert facts
+    assert all(f.vectors for f in facts)
+
+
+def test_probes_never_emit_a_fact_without_a_human_string():
+    facts = run_probes(prepare(mini(), CFG), ["Geography"], CFG)
+    assert all(f.human for f in facts)

@@ -113,6 +113,206 @@ def gap_between_members(df: pd.DataFrame, dim: str, cfg: dict) -> list[Fact]:
     return facts
 
 
+def _series(df: pd.DataFrame, dim: str, cfg: dict):
+    """Yield (member, sorted rows) for non-aggregate members."""
+    aggregates = set((cfg.get("aggregate_members") or {}).get(dim, []))
+    for member, chunk in df.groupby(dim):
+        if member in aggregates:
+            continue
+        yield str(member), chunk.sort_values("REF_DATE")
+
+
+def _base(probe_name, dim, member, rows, cfg, values, periods) -> Fact:
+    last = rows.iloc[-1]
+    return Fact(
+        probe=probe_name, cut={dim: member}, values=values, periods=periods,
+        vectors=[str(v) for v in rows["VECTOR"].unique()],
+        uom=str(last.get("UOM", "")), scalar=str(last.get("SCALAR_FACTOR", "")),
+        decimals=int(last.get("DECIMALS", 1) or 1),
+        legibility=_legibility(dim, cfg),
+    )
+
+
+@probe("streak")
+def streak(df, dim, cfg):
+    facts = []
+    for member, rows in _series(df, dim, cfg):
+        vals = rows["VALUE"].tolist()
+        if len(vals) < 2:
+            continue
+        direction = 1 if vals[-1] >= vals[-2] else -1
+        n = 0
+        for i in range(len(vals) - 1, 0, -1):
+            if (vals[i] - vals[i - 1]) * direction > 0:
+                n += 1
+            else:
+                break
+        if n < 2:
+            continue
+        f = _base("streak", dim, member, rows, cfg, [float(n), float(vals[-1])],
+                  [str(p) for p in rows["REF_DATE"].tolist()])
+        word = "rising" if direction > 0 else "falling"
+        f.magnitude = abs(float(vals[-1] - vals[-1 - n]))
+        f.statement = f"{member} has been {word} for {n} consecutive periods."
+        f.human = f"{member}: {n} periods of {word} in a row, now {humanize(float(vals[-1]), f.uom, f.scalar, f.decimals)}"
+        f.meta = {"direction": word, "periods_in_streak": n}
+        facts.append(f)
+    return facts
+
+
+@probe("rank_order")
+def rank_order(df, dim, cfg):
+    aggregates = set((cfg.get("aggregate_members") or {}).get(dim, []))
+    facts = []
+    for period, chunk in df.groupby("REF_DATE"):
+        chunk = chunk[~chunk[dim].isin(aggregates)].sort_values("VALUE", ascending=False)
+        if len(chunk) < 2:
+            continue
+        top, bottom = chunk.iloc[0], chunk.iloc[-1]
+        f = Fact(
+            probe="rank_order",
+            cut={f"{dim}_leader": str(top[dim]), f"{dim}_trailer": str(bottom[dim])},
+            values=[float(top["VALUE"]), float(bottom["VALUE"])], periods=[str(period)],
+            vectors=[str(top["VECTOR"]), str(bottom["VECTOR"])],
+            uom=str(top.get("UOM", "")), scalar=str(top.get("SCALAR_FACTOR", "")),
+            decimals=int(top.get("DECIMALS", 1) or 1),
+            magnitude=float(top["VALUE"] - bottom["VALUE"]), legibility=_legibility(dim, cfg),
+        )
+        f.statement = f"In {period}, {top[dim]} ranked highest and {bottom[dim]} lowest."
+        f.human = (f"{top[dim]} highest at {humanize(float(top['VALUE']), f.uom, f.scalar, f.decimals)}; "
+                   f"{bottom[dim]} lowest at {humanize(float(bottom['VALUE']), f.uom, f.scalar, f.decimals)}")
+        f.meta = {"leader": str(top[dim]), "trailer": str(bottom[dim])}
+        facts.append(f)
+    return facts
+
+
+@probe("rank_reversal")
+def rank_reversal(df, dim, cfg):
+    ordered = rank_order(df, dim, cfg)
+    ordered.sort(key=lambda f: f.periods[-1])
+    facts = []
+    for prev, cur in zip(ordered, ordered[1:]):
+        if prev.meta["leader"] == cur.meta["leader"]:
+            continue
+        f = Fact(
+            probe="rank_reversal",
+            cut={f"{dim}_leader": str(cur.meta["leader"]),
+                 f"{dim}_overtook": str(prev.meta["leader"])},
+            values=cur.values, periods=[prev.periods[-1], cur.periods[-1]],
+            vectors=cur.vectors, uom=cur.uom, scalar=cur.scalar, decimals=cur.decimals,
+            magnitude=cur.magnitude, legibility=cur.legibility,
+        )
+        f.statement = (f"{cur.meta['leader']} overtook {prev.meta['leader']} "
+                       f"between {prev.periods[-1]} and {cur.periods[-1]}.")
+        f.human = f"{cur.meta['leader']} moved ahead of {prev.meta['leader']} in {cur.periods[-1]}"
+        f.meta = {"from": prev.meta["leader"], "to": cur.meta["leader"]}
+        facts.append(f)
+    return facts
+
+
+@probe("gap_trend")
+def gap_trend(df, dim, cfg):
+    gaps = gap_between_members(df, dim, cfg)
+    by_pair: dict[str, list[Fact]] = {}
+    for g in gaps:
+        by_pair.setdefault(f"{g.meta['high']}|{g.meta['low']}", []).append(g)
+    facts = []
+    for pair, series in by_pair.items():
+        series.sort(key=lambda f: f.periods[-1])
+        if len(series) < 2:
+            continue
+        change = float(series[-1].values[0] - series[0].values[0])
+        if change == 0:
+            continue
+        hi, lo = pair.split("|")
+        f = Fact(
+            probe="gap_trend", cut={f"{dim}_high": hi, f"{dim}_low": lo}, values=[change],
+            periods=[series[0].periods[-1], series[-1].periods[-1]],
+            vectors=series[-1].vectors, uom=series[-1].uom, scalar=series[-1].scalar,
+            decimals=series[-1].decimals, magnitude=abs(change),
+            legibility=series[-1].legibility,
+        )
+        direction = "widening" if change > 0 else "narrowing"
+        f.statement = (f"The gap between {hi} and {lo} has been {direction} "
+                       f"since {series[0].periods[-1]}.")
+        f.human = f"gap between {hi} and {lo} is {direction}: {humanize_delta(change, f.uom, f.scalar, f.decimals)}"
+        f.meta = {"direction": direction, "high": hi, "low": lo}
+        facts.append(f)
+    return facts
+
+
+@probe("share_of_total")
+def share_of_total(df, dim, cfg):
+    aggregates = set((cfg.get("aggregate_members") or {}).get(dim, []))
+    facts = []
+    for period, chunk in df.groupby("REF_DATE"):
+        chunk = chunk[~chunk[dim].isin(aggregates)]
+        total = float(chunk["VALUE"].sum())
+        if total == 0 or len(chunk) < 2:
+            continue
+        for _, row in chunk.iterrows():
+            share = float(row["VALUE"]) / total * 100
+            f = Fact(
+                probe="share_of_total", cut={dim: str(row[dim])},
+                values=[share, float(row["VALUE"])], periods=[str(period)],
+                vectors=[str(row["VECTOR"])], uom=str(row.get("UOM", "")),
+                scalar=str(row.get("SCALAR_FACTOR", "")),
+                decimals=int(row.get("DECIMALS", 1) or 1),
+                magnitude=share, legibility=_legibility(dim, cfg),
+            )
+            f.statement = f"In {period}, {row[dim]} accounted for {share:.1f}% of the total."
+            f.human = f"{row[dim]} is {share:.1f}% of the total"
+            f.meta = {"share": share}
+            facts.append(f)
+    return facts
+
+
+@probe("level_threshold")
+def level_threshold(df, dim, cfg):
+    facts = []
+    for member, rows in _series(df, dim, cfg):
+        vals = rows["VALUE"].tolist()
+        if len(vals) < 2:
+            continue
+        prev, cur = float(vals[-2]), float(vals[-1])
+        step = 10 ** max(0, len(str(int(abs(cur) or 1))) - 1)
+        crossed = [t for t in (int(min(prev, cur) / step) * step + step,)
+                   if min(prev, cur) < t <= max(prev, cur)]
+        if not crossed:
+            continue
+        f = _base("level_threshold", dim, member, rows, cfg, [cur, float(crossed[0])],
+                  [str(rows["REF_DATE"].iloc[-2]), str(rows["REF_DATE"].iloc[-1])])
+        word = "above" if cur > prev else "below"
+        f.magnitude = abs(cur - prev)
+        f.statement = f"{member} moved {word} {crossed[0]:g} in {f.periods[-1]}."
+        f.human = f"{member} crossed {humanize(float(crossed[0]), f.uom, f.scalar, 0)}"
+        f.meta = {"threshold": crossed[0], "direction": word}
+        facts.append(f)
+    return facts
+
+
+@probe("long_run_compare")
+def long_run_compare(df, dim, cfg):
+    facts = []
+    for member, rows in _series(df, dim, cfg):
+        vals = rows["VALUE"].tolist()
+        if len(vals) < 2:
+            continue
+        first, last = float(vals[0]), float(vals[-1])
+        change = last - first
+        if change == 0:
+            continue
+        f = _base("long_run_compare", dim, member, rows, cfg, [change, first, last],
+                  [str(rows["REF_DATE"].iloc[0]), str(rows["REF_DATE"].iloc[-1])])
+        f.magnitude = abs(change)
+        f.statement = (f"{member} changed by {change:.1f} between "
+                       f"{f.periods[0]} and {f.periods[-1]}.")
+        f.human = f"{member}: {humanize_delta(change, f.uom, f.scalar, f.decimals)} than in {f.periods[0]}"
+        f.meta = {"from_period": f.periods[0], "to_period": f.periods[-1]}
+        facts.append(f)
+    return facts
+
+
 def run_probes(df: pd.DataFrame, dimensions: list[str], cfg: dict) -> list[Fact]:
     facts: list[Fact] = []
     for name, fn in PROBES.items():
