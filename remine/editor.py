@@ -78,6 +78,18 @@ def check_differs_from_daily(draft: dict, mentions: dict[str, bool], facts: dict
     return problems
 
 
+def _no_numerals(text: str, where: str) -> None:
+    bare = check_bare_numerals(text)
+    if bare:
+        raise BindError(f"bare numeral(s) {bare} in {where} — every number must be a "
+                        f"{{{{fact_n.field}}}} token so it comes from computed data")
+
+
+def _no_tokens(text: str, where: str) -> None:
+    if TOKEN.search(text or ""):
+        raise BindError(f"{where} is framing text and cannot carry fact tokens")
+
+
 def bind(draft: dict, brief: dict) -> dict:
     facts = {f["id"]: f for f in brief["facts"]}
     if not (draft.get("daily_story") or "").strip():
@@ -86,25 +98,48 @@ def bind(draft: dict, brief: dict) -> dict:
     if not 2 <= len(stories) <= 4:
         raise BindError(f"expected 2-4 stories, got {len(stories)}")
 
+    # Framing text is published too, so it is held to the same standard. It
+    # carries no tokens because it makes no claim about our computed data —
+    # including the Daily's own headline number here would publish a figure
+    # this pipeline never verified.
+    for field in ("headline", "daily_story"):
+        _no_numerals(draft.get(field, ""), f"draft {field!r}")
+        _no_tokens(draft.get(field, ""), f"draft {field!r}")
+
     problems = check_differs_from_daily(draft, brief.get("mentions", {}), facts)
     if problems:
         raise BindError("; ".join(problems))
 
     bound = []
     for story in stories:
+        label = story.get("headline")
         if not (story.get("assumption") or "").strip():
-            raise BindError(f"story {story.get('headline')!r} names no assumption")
+            raise BindError(f"story {label!r} names no assumption")
         if story.get("stance") not in STANCES:
-            raise BindError(f"story {story.get('headline')!r} has stance "
+            raise BindError(f"story {label!r} has stance "
                             f"{story.get('stance')!r}; expected one of {sorted(STANCES)}")
-        body = story.get("body", "")
-        bare = check_bare_numerals(body)
-        if bare:
-            raise BindError(f"bare numeral(s) {bare} in {story.get('headline')!r} — "
-                            f"every number must be a {{{{fact_n.field}}}} token")
+        for field in ("headline", "body", "differs_from_daily"):
+            _no_numerals(story.get(field, ""), f"story {label!r} {field}")
+        _no_tokens(story.get("differs_from_daily", ""), f"story {label!r} differs_from_daily")
+
+        # A token may only cite a fact the story itself claims as a source.
+        # Otherwise a story could show fact_7's number under fact_1's
+        # provenance block, and the audit trail would point at the wrong series.
+        allowed = set(story.get("fact_ids", []))
+
+        def _resolve(match, _allowed=allowed, _label=label):
+            token = match.group(1).strip()
+            fact_id = token.partition(".")[0]
+            if fact_id not in _allowed:
+                raise BindError(
+                    f"story {_label!r} uses {{{{{token}}}}} but does not list "
+                    f"{fact_id} in fact_ids — its provenance would cite the wrong series")
+            return resolve_token(token, facts)
+
         bound.append({
             **story,
-            "body": TOKEN.sub(lambda m: resolve_token(m.group(1), facts), body),
+            "headline": TOKEN.sub(_resolve, story.get("headline", "")),
+            "body": TOKEN.sub(_resolve, story.get("body", "")),
             "provenance": [
                 {"id": fid, "vectors": facts[fid]["vectors"], "periods": facts[fid]["periods"],
                  "cut": facts[fid]["cut"], "table_url": brief["cube"]["table_url"]}

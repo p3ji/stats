@@ -9,7 +9,9 @@ FACTS = {"fact_1": {"id": "fact_1", "values": [18.0], "periods": ["2026-07"],
 BRIEF = {"date": "260807", "article": {"url": "http://x", "title": "T", "slug": "dq260807a",
                                        "prose": "Employment rose in Ontario."},
          "cube": {"pid": 14100287, "title": "C", "release_time": "", "table_url": "http://t"},
-         "mentions": {"Geography|Ontario": True, "Geography|Alberta": False},
+         # Both False so the happy-path bind() succeeds. The cross-check tests
+         # pass their own mention maps in directly.
+         "mentions": {"Geography|Ontario": False, "Geography|Alberta": False},
          "facts": [FACTS["fact_1"]]}
 
 
@@ -116,6 +118,29 @@ def test_bind_fails_when_a_story_names_no_assumption():
 def test_bind_fails_on_an_unknown_stance():
     with pytest.raises(BindError, match="stance"):
         bind(draft(story={"stance": "explains"}), BRIEF)
+
+
+def test_a_bare_numeral_in_a_story_headline_fails_the_build():
+    with pytest.raises(BindError, match="bare numeral"):
+        bind(draft(story={"headline": "Employment fell by 4,000"}), BRIEF)
+
+
+def test_a_bare_numeral_in_the_daily_story_fails_the_build():
+    with pytest.raises(BindError, match="bare numeral"):
+        bind(draft(daily_story="The Daily reported 18,000 new jobs."), BRIEF)
+
+
+def test_a_bare_numeral_in_differs_from_daily_fails_the_build():
+    with pytest.raises(BindError, match="bare numeral"):
+        bind(draft(story={"differs_from_daily": "the Daily gave 6.4 nationally"}), BRIEF)
+
+
+def test_a_token_citing_a_fact_the_story_does_not_claim_fails_the_build():
+    # body pulls fact_1 while fact_ids claims only fact_2, so the published
+    # provenance block would cite the wrong series.
+    brief2 = {**BRIEF, "facts": [FACTS["fact_1"], {**FACTS["fact_1"], "id": "fact_2"}]}
+    with pytest.raises(BindError, match="does not list"):
+        bind(draft(story={"fact_ids": ["fact_2"], "body": "It was {{fact_1.human}}."}), brief2)
 
 
 def test_bound_article_carries_provenance_for_every_fact_used():
