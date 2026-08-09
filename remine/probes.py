@@ -213,18 +213,24 @@ def rank_reversal(df, dim, cfg):
 @probe("gap_trend")
 def gap_trend(df, dim, cfg):
     gaps = gap_between_members(df, dim, cfg)
-    by_pair: dict[str, list[Fact]] = {}
+    # Key on the UNORDERED pair. gap_between_members labels high/low per
+    # period, so keying on "high|low" would change the key the moment the lead
+    # swaps, splitting one trend into two single-entry groups that both fail
+    # the len < 2 guard below — silently dropping the trend entirely. A lead
+    # swap is the more newsworthy case, so that failure mode is backwards.
+    by_pair: dict[tuple[str, str], list[Fact]] = {}
     for g in gaps:
-        by_pair.setdefault(f"{g.meta['high']}|{g.meta['low']}", []).append(g)
+        by_pair.setdefault(tuple(sorted((g.meta["high"], g.meta["low"]))), []).append(g)
     facts = []
-    for pair, series in by_pair.items():
+    for _pair, series in by_pair.items():
         series.sort(key=lambda f: f.periods[-1])
         if len(series) < 2:
             continue
         change = float(series[-1].values[0] - series[0].values[0])
         if change == 0:
             continue
-        hi, lo = pair.split("|")
+        hi, lo = series[-1].meta["high"], series[-1].meta["low"]
+        lead_changed = any(g.meta["high"] != hi for g in series)
         f = Fact(
             probe="gap_trend", cut={f"{dim}_high": hi, f"{dim}_low": lo}, values=[change],
             periods=[series[0].periods[-1], series[-1].periods[-1]],
@@ -233,10 +239,11 @@ def gap_trend(df, dim, cfg):
             legibility=series[-1].legibility,
         )
         direction = "widening" if change > 0 else "narrowing"
+        swap = f" {lo} led at the start of this period and {hi} leads now." if lead_changed else ""
         f.statement = (f"The gap between {hi} and {lo} has been {direction} "
-                       f"since {series[0].periods[-1]}.")
+                       f"since {series[0].periods[-1]}.{swap}")
         f.human = f"gap between {hi} and {lo} is {direction}: {humanize_delta(change, f.uom, f.scalar, f.decimals)}"
-        f.meta = {"direction": direction, "high": hi, "low": lo}
+        f.meta = {"direction": direction, "high": hi, "low": lo, "lead_changed": lead_changed}
         facts.append(f)
     return facts
 

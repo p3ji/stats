@@ -104,3 +104,20 @@ def test_probes_never_emit_a_fact_without_vectors():
 def test_probes_never_emit_a_fact_without_a_human_string():
     facts = run_probes(prepare(mini(), CFG), ["Geography"], CFG)
     assert all(f.human for f in facts)
+
+
+def test_gap_trend_survives_a_lead_swap():
+    import pandas as pd
+    rows = []
+    # Ontario 100 -> 90, Alberta 80 -> 95: the lead swaps between the periods.
+    for period, ont, alb in [("2026-05", 100.0, 80.0), ("2026-06", 90.0, 95.0)]:
+        for geo, val in [("Ontario", ont), ("Alberta", alb)]:
+            rows.append({"REF_DATE": period, "Geography": geo, "VALUE": val,
+                         "VECTOR": f"v{geo[:2]}", "UOM": "Persons in thousands",
+                         "SCALAR_FACTOR": "thousands", "DECIMALS": 1, "SE": None})
+    df = pd.DataFrame(rows)
+    facts = PROBES["gap_trend"](df, "Geography", {"aggregate_members": {}, "legibility": {}})
+    assert len(facts) == 1, "a lead swap must not split or drop the trend"
+    assert facts[0].meta["lead_changed"] is True
+    # gap goes 20.0 -> 5.0, so it narrowed by 15.0
+    assert facts[0].values[0] == -15.0
