@@ -1,0 +1,46 @@
+# Per-cube configuration. `defaults` applies to every cube; `cubes.<pid>` overrides.
+defaults:
+  top_n: 40
+  mention_demotion: 0.5
+  min_periods: 12
+  weights:
+    magnitude: 0.40
+    persistence: 0.25
+    legibility: 0.20
+    reader_scale: 0.15
+  min_magnitude: 0.0
+  legibility: {}
+  synonyms: {}
+  aggregate_members: {}
+  filters: {}
+  se_members: {}
+
+cubes:
+  14100287:
+    survey: Labour Force Survey
+    value_dimension: Statistics
+    value_member: Estimate
+    se_members:
+      level: Standard error of estimate
+      month_over_month: Standard error of month-to-month change
+      year_over_year: Standard error of year-over-year change
+    filters:
+      Data type: Seasonally adjusted
+    aggregate_members:
+      Geography: [Canada]
+      Gender: [Total - Gender]
+      Age group: [15 years and over, 15 to 64 years]
+      Labour force characteristics: [Population, Labour force]
+    legibility:
+      Geography: 1.0
+      Age group: 0.9
+      Gender: 0.9
+      Labour force characteristics: 0.7
+      Data type: 0.2
+    synonyms:
+      youth: 15 to 24 years
+      young people: 15 to 24 years
+      core-aged: 25 to 54 years
+      seniors: 55 years and over
+      women: Women+
+      men: Men+
