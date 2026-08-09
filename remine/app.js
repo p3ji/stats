@@ -3,9 +3,33 @@
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+// esc() makes a URL safe to sit inside an attribute, but it does not stop a
+// `javascript:` scheme from running on click. These hrefs come from the
+// pipeline today, not from a draft — but nothing in the schema enforces that,
+// so allow only http(s) rather than relying on it staying true.
+const safeUrl = (u) => (/^https?:\/\//i.test(String(u ?? '')) ? String(u) : '#');
+
+async function loadJson(path) {
+  const resp = await fetch(path);
+  if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`);
+  return resp.json();
+}
+
+function fail(el, message) {
+  el.innerHTML = `<p class="intro">${esc(message)}</p>`;
+}
+
 async function renderFeed() {
   const el = document.getElementById('feed');
-  const items = await fetch('articles/index.json').then((r) => r.json());
+  let items;
+  try {
+    items = await loadJson('articles/index.json');
+  } catch (err) {
+    // Without this the page renders blank on a 404 or a truncated file, which
+    // looks identical to "no articles yet" and hides a real problem.
+    fail(el, `Could not load the article index (${err.message}).`);
+    return;
+  }
   if (!items.length) {
     el.innerHTML = '<p class="intro">No articles yet.</p>';
     return;
@@ -22,16 +46,22 @@ async function renderArticle() {
   const el = document.getElementById('article');
   const file = new URLSearchParams(location.search).get('a');
   if (!file || !/^[\w.-]+\.json$/.test(file)) {
-    el.innerHTML = '<p class="intro">Article not found.</p>';
+    fail(el, 'Article not found.');
     return;
   }
-  const a = await fetch(`articles/${file}`).then((r) => r.json());
+  let a;
+  try {
+    a = await loadJson(`articles/${file}`);
+  } catch (err) {
+    fail(el, `Could not load this article (${err.message}).`);
+    return;
+  }
   document.title = `${a.headline} — Remine`;
   el.innerHTML = `
     <div class="eyebrow">${esc(a.date)}</div>
     <h1 class="header-title" style="font-size:1.6rem;margin:6px 0 18px">${esc(a.headline)}</h1>
     <p class="daily-story"><strong>What the Daily reported:</strong> ${esc(a.daily_story)}
-      <br><a href="${esc(a.source.url)}">${esc(a.source.title)}</a></p>
+      <br><a href="${esc(safeUrl(a.source.url))}">${esc(a.source.title)}</a></p>
     ${a.stories.map(renderStory).join('')}`;
 }
 
@@ -49,7 +79,7 @@ function renderStory(s) {
           <div>${esc(Object.values(p.cut).join(', '))} —
             <code>${esc(p.vectors.join(', '))}</code>,
             ${esc(p.periods.join(' to '))},
-            <a href="${esc(p.table_url)}">source table</a></div>`).join('')}
+            <a href="${esc(safeUrl(p.table_url))}">source table</a></div>`).join('')}
       </div>
     </section>`;
 }
