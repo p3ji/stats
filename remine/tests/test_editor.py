@@ -154,6 +154,21 @@ def test_an_unrecognised_prose_field_is_still_checked():
         bind(draft(story={"editors_note": "we also saw 12,000 elsewhere"}), BRIEF)
 
 
+def test_a_bare_numeral_nested_in_a_dict_field_fails_the_build():
+    with pytest.raises(BindError, match="bare numeral"):
+        bind(draft(story={"notes": {"aside": "we also saw 12,000 elsewhere"}}), BRIEF)
+
+
+def test_a_bare_numeral_nested_in_a_list_field_fails_the_build():
+    with pytest.raises(BindError, match="bare numeral"):
+        bind(draft(story={"asides": ["fine", "but 12,000 people moved"]}), BRIEF)
+
+
+def test_a_token_nested_in_a_non_token_field_fails_the_build():
+    with pytest.raises(BindError, match="cannot carry fact tokens"):
+        bind(draft(story={"notes": {"aside": "see {{fact_1.human}}"}}), BRIEF)
+
+
 def test_bound_article_carries_provenance_for_every_fact_used():
     out = bind(draft(), BRIEF)
     prov = out["stories"][0]["provenance"][0]

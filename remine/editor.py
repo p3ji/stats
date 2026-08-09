@@ -84,6 +84,23 @@ def check_differs_from_daily(draft: dict, mentions: dict[str, bool], facts: dict
     return problems
 
 
+def _walk_strings(value, path: str):
+    """Yield (path, text) for every string anywhere inside value.
+
+    Checking only top-level strings left prose reachable by nesting it in a
+    list or dict, which shipped unresolved tokens and bare numerals into the
+    published JSON. There must be nowhere to hide a string.
+    """
+    if isinstance(value, str):
+        yield path, value
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            yield from _walk_strings(item, f"{path}.{key}")
+    elif isinstance(value, (list, tuple)):
+        for i, item in enumerate(value):
+            yield from _walk_strings(item, f"{path}[{i}]")
+
+
 def _no_numerals(text: str, where: str) -> None:
     bare = check_bare_numerals(text)
     if bare:
@@ -129,11 +146,12 @@ def bind(draft: dict, brief: dict) -> dict:
         # unguarded until someone remembers it, and `assumption` was exactly
         # that leak. Default-deny, with the two token-bearing fields named.
         for field, value in story.items():
-            if field in _EXEMPT_FIELDS or not isinstance(value, str):
+            if field in _EXEMPT_FIELDS:
                 continue
-            _no_numerals(value, f"story {label!r} {field}")
-            if field not in _TOKEN_FIELDS:
-                _no_tokens(value, f"story {label!r} {field}")
+            for path, text in _walk_strings(value, field):
+                _no_numerals(text, f"story {label!r} {path}")
+                if field not in _TOKEN_FIELDS:
+                    _no_tokens(text, f"story {label!r} {path}")
 
         # A token may only cite a fact the story itself claims as a source.
         # Otherwise a story could show fact_7's number under fact_1's
