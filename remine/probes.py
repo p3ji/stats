@@ -29,6 +29,13 @@ _UNRELIABLE_STATUS = {"F", "x", "E", "..", "..."}
 # making a claim about now.
 _FULL_HISTORY_PROBES = {"long_run_compare"}
 
+# Comparing members only makes sense for rates: a gap between two groups' raw
+# counts mostly measures how many people are in each group.
+_CROSS_MEMBER_PROBES = {"gap_between_members", "gap_trend", "rank_order", "rank_reversal"}
+# share_of_total normalises by construction, so it is the one cross-member probe
+# that belongs on counts and is meaningless on rates (shares of a rate do not add up).
+_SHARE_PROBES = {"share_of_total"}
+
 
 def probe(name: str):
     def wrap(fn):
@@ -362,6 +369,33 @@ def window(df: pd.DataFrame, cfg: dict, probe_name: str) -> pd.DataFrame:
     return df[df["REF_DATE"].isin(keep)]
 
 
+def partition(df: pd.DataFrame, dim: str, cfg: dict) -> pd.DataFrame:
+    """Keep only members that genuinely partition the population.
+
+    StatCan dimensions nest by design (15+, 15-24, 15-19 ...). Comparing a
+    fifty-year band against a five-year one produces an arithmetic artifact,
+    not a finding.
+    """
+    members = (cfg.get("comparable_members") or {}).get(dim)
+    return df[df[dim].isin(members)] if members else df
+
+
+def dedupe(facts: list[Fact]) -> list[Fact]:
+    """Collapse one finding repeated across periods into a single fact.
+
+    A per-period probe emits the same finding once per month, so sixty
+    near-identical rows crowd out every other finding. Keep the most recent and
+    record how many periods it held, which is what the ranker actually wants.
+    """
+    best: dict[tuple, Fact] = {}
+    for f in sorted(facts, key=lambda f: f.periods[-1]):
+        key = (f.probe, tuple(sorted(f.cut.items())))
+        prior = best.get(key)
+        f.meta["periods_observed"] = (prior.meta.get("periods_observed", 1) + 1) if prior else 1
+        best[key] = f
+    return list(best.values())
+
+
 def run_probes(df: pd.DataFrame, dimensions: list[str], cfg: dict) -> list[Fact]:
     mdim = cfg.get("measure_dimension")
     measures = list(cfg.get("measures") or [None])
@@ -386,7 +420,15 @@ def run_probes(df: pd.DataFrame, dimensions: list[str], cfg: dict) -> list[Fact]
                     f"slice for measure={measure!r} dim={dim!r} still has {dupes} rows "
                     f"per (period, member); probes would compare unrelated series")
             for name, fn in PROBES.items():
-                frame = window(sliced, cfg, name)
+                rates = set(cfg.get("rate_measures") or [])
+                counts = set(cfg.get("count_measures") or [])
+                if name in _CROSS_MEMBER_PROBES and rates and measure not in rates:
+                    continue
+                if name in _SHARE_PROBES and counts and measure not in counts:
+                    continue
+                frame = partition(window(sliced, cfg, name), dim, cfg)
+                if frame[dim].nunique() < 2:
+                    continue
                 try:
                     produced = fn(frame, dim, cfg)
                 except Exception as exc:   # a broken probe must not sink the run
@@ -397,4 +439,4 @@ def run_probes(df: pd.DataFrame, dimensions: list[str], cfg: dict) -> list[Fact]
                     if mdim and measure is not None:
                         f.cut = {**f.cut, mdim: measure}
                     facts.append(f)
-    return facts
+    return dedupe(facts)

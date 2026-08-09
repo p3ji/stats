@@ -18,6 +18,9 @@ defaults:
   measure_dimension: null
   measures: []
   hold_at: {}
+  comparable_members: {}
+  rate_measures: []
+  count_measures: []
 
 cubes:
   14100287:
@@ -51,11 +54,40 @@ cubes:
     measure_dimension: Labour force characteristics
     measures:
       - Employment
+      - Full-time employment
+      - Part-time employment
       - Unemployment rate
-      - Participation rate
       - Employment rate
+      - Participation rate
     hold_at:
       Geography: Canada
       Gender: Total - Gender
       Age group: 15 years and over
     window_periods: 60
+    comparable_members:
+      Age group:
+        - 15 to 24 years
+        - 25 to 54 years
+        - 55 years and over
+      Gender:
+        - Men+
+        - Women+
+      Geography:
+        - Newfoundland and Labrador
+        - Prince Edward Island
+        - Nova Scotia
+        - New Brunswick
+        - Quebec
+        - Ontario
+        - Manitoba
+        - Saskatchewan
+        - Alberta
+        - British Columbia
+    rate_measures:
+      - Unemployment rate
+      - Employment rate
+      - Participation rate
+    count_measures:
+      - Employment
+      - Full-time employment
+      - Part-time employment

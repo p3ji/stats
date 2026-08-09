@@ -219,3 +219,56 @@ def test_prepare_drops_rows_with_no_value():
     out = prepare(df, {"value_dimension": "Statistics", "value_member": "Estimate",
                        "se_members": {}, "filters": {}})
     assert out["REF_DATE"].tolist() == ["2026-05"]
+
+
+def test_partition_drops_members_outside_the_comparable_set():
+    from remine.probes import partition
+    cfg = {"comparable_members": {"Geography": ["Ontario"]}}
+    out = partition(prepare(mini(), CFG), "Geography", cfg)
+    assert set(out["Geography"]) == {"Ontario"}
+
+
+def test_partition_is_a_no_op_when_none_is_configured():
+    from remine.probes import partition
+    before = prepare(mini(), CFG)
+    assert len(partition(before, "Geography", {})) == len(before)
+
+
+def test_dedupe_keeps_one_fact_per_cut_and_counts_the_periods():
+    from remine.probes import dedupe
+    def f(period):
+        return Fact(probe="gap_between_members", cut={"Geography_high": "Ontario",
+                    "Geography_low": "Alberta"}, values=[1.0], periods=[period],
+                    vectors=["v1"], human="h", statement="s")
+    out = dedupe([f("2026-05"), f("2026-06"), f("2026-07")])
+    assert len(out) == 1
+    assert out[0].periods == ["2026-07"], "should keep the most recent"
+    assert out[0].meta["periods_observed"] == 3
+
+
+def test_dedupe_keeps_distinct_cuts_apart():
+    from remine.probes import dedupe
+    def f(hi):
+        return Fact(probe="gap_between_members", cut={"Geography_high": hi,
+                    "Geography_low": "Alberta"}, values=[1.0], periods=["2026-07"],
+                    vectors=["v1"], human="h", statement="s")
+    assert len(dedupe([f("Ontario"), f("Quebec")])) == 2
+
+
+def test_cross_member_probes_are_skipped_for_count_measures():
+    cfg = {**CFG, "measure_dimension": "Labour force characteristics",
+           "measures": ["Employment"], "rate_measures": ["Unemployment rate"],
+           "count_measures": ["Employment"],
+           "hold_at": {"Gender": "Total - Gender", "Age group": "15 years and over"}}
+    facts = run_probes(prepare(mini(), cfg), ["Geography"], cfg)
+    assert not [f for f in facts if f.probe == "gap_between_members"], \
+        "a gap between raw counts mostly measures group size"
+
+
+def test_cross_member_probes_run_for_rate_measures():
+    cfg = {**CFG, "measure_dimension": "Labour force characteristics",
+           "measures": ["Unemployment rate"], "rate_measures": ["Unemployment rate"],
+           "count_measures": ["Employment"],
+           "hold_at": {"Gender": "Total - Gender", "Age group": "15 years and over"}}
+    facts = run_probes(prepare(mini(), cfg), ["Geography"], cfg)
+    assert [f for f in facts if f.probe == "gap_between_members"]

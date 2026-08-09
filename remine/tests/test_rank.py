@@ -67,3 +67,9 @@ def test_mentioned_facts_are_demoted_but_not_dropped():
 def test_rank_sets_the_score_field_on_every_fact():
     ordered = rank([fact()], {}, CFG)
     assert ordered[0].score > 0
+
+
+def test_periods_observed_counts_toward_persistence():
+    a = fact(periods=["2026-07"])
+    b = fact(periods=["2026-07"], meta={"periods_observed": 12})
+    assert score(b, CFG, 10.0) > score(a, CFG, 10.0)

@@ -41,7 +41,9 @@ def gate(facts: list[Fact], df, cfg: dict) -> list[Fact]:
 
 
 def _persistence(fact: Fact) -> float:
-    n = fact.meta.get("periods_in_streak") or len(fact.periods)
+    n = (fact.meta.get("periods_in_streak")
+         or fact.meta.get("periods_observed")
+         or len(fact.periods))
     return min(1.0, float(n) / 12.0)
 
 
