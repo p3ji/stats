@@ -143,6 +143,17 @@ def test_a_token_citing_a_fact_the_story_does_not_claim_fails_the_build():
         bind(draft(story={"fact_ids": ["fact_2"], "body": "It was {{fact_1.human}}."}), brief2)
 
 
+def test_a_bare_numeral_in_the_assumption_fails_the_build():
+    with pytest.raises(BindError, match="bare numeral"):
+        bind(draft(story={"assumption": "unemployment fell by 4,000 last month"}), BRIEF)
+
+
+def test_an_unrecognised_prose_field_is_still_checked():
+    # The sweep is default-deny: a field nobody anticipated is guarded too.
+    with pytest.raises(BindError, match="bare numeral"):
+        bind(draft(story={"editors_note": "we also saw 12,000 elsewhere"}), BRIEF)
+
+
 def test_bound_article_carries_provenance_for_every_fact_used():
     out = bind(draft(), BRIEF)
     prov = out["stories"][0]["provenance"][0]
