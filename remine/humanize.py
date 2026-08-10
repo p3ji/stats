@@ -45,6 +45,26 @@ def humanize_delta(delta: float, uom: str, scalar_factor: str, decimals: int = 1
     return f"{abs(delta):.{decimals}f} {uom} {word}"
 
 
+def humanize_bare(value: float, uom: str, scalar_factor: str, decimals: int = 1,
+                  kind: str = "delta") -> str:
+    """The quantity with its units and no direction word.
+
+    `kind` matters and is not cosmetic. A percentage LEVEL (an employment rate
+    of 86.0%) and a percentage-POINT difference are different quantities;
+    rendering one as the other publishes a wrong unit.
+    """
+    u = (uom or "").strip().lower()
+    if "person" in u:
+        return f"about {_round_people(_scale(value, scalar_factor)):,} people"
+    if "percent" in u:
+        if kind == "level":
+            return f"{value:.{decimals}f}%"
+        return f"{abs(value):.{decimals}f} percentage points"
+    if "dollar" in u:
+        return f"${abs(_scale(value, scalar_factor)):,.0f}"
+    return f"{abs(value):.{decimals}f} {uom}"
+
+
 def humanize_delta_bare(delta: float, uom: str, scalar_factor: str, decimals: int = 1) -> str:
     """Same quantity as humanize_delta, with no trailing direction word.
 

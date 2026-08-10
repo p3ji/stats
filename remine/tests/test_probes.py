@@ -367,3 +367,22 @@ def test_rate_only_probes_are_skipped_for_count_measures():
            "hold_at": {"Gender": "Total - Gender", "Age group": "15 years and over"}}
     facts = run_probes(prepare(mini(), cfg), ["Geography"], cfg)
     assert not [f for f in facts if f.probe in {"long_run_compare", "level_threshold", "streak"}]
+
+
+def test_every_human_string_names_its_subject_and_measure():
+    cfg = {**CFG, "measure_dimension": "Labour force characteristics",
+           "measures": ["Unemployment rate"], "rate_measures": ["Unemployment rate"],
+           "count_measures": ["Employment"], "min_streak_periods": 2,
+           "hold_at": {"Gender": "Total - Gender", "Age group": "15 years and over"}}
+    facts = run_probes(prepare(mini(), cfg), ["Geography"], cfg)
+    assert facts
+    for f in facts:
+        assert "unemployment rate" in f.human.lower(), f"{f.probe}: {f.human}"
+        assert any(m in f.human for m in ("Ontario", "Alberta")), f"{f.probe}: {f.human}"
+        assert f.bare, f"{f.probe} has no bare form"
+
+
+def test_a_level_and_a_difference_render_with_different_units():
+    from remine.humanize import humanize_bare
+    assert humanize_bare(86.0, "Percentage", "units", 1, kind="level") == "86.0%"
+    assert humanize_bare(3.8, "Percentage", "units", 1, kind="delta") == "3.8 percentage points"
