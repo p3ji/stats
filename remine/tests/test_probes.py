@@ -89,6 +89,34 @@ def test_streak_counts_consecutive_moves_in_one_direction():
     assert ont and ont[0].values[0] == 2.0
 
 
+def test_rank_reversal_reports_one_fact_per_pair_not_one_per_crossing():
+    import pandas as pd
+    rows = []
+    # A and B trade the lead three times across four periods.
+    for period, a, b in [("2026-04", 10.0, 8.0), ("2026-05", 8.0, 10.0),
+                         ("2026-06", 10.0, 8.0), ("2026-07", 8.0, 10.0)]:
+        for geo, val in [("Alpha", a), ("Beta", b)]:
+            rows.append({"REF_DATE": period, "Geography": geo, "VALUE": val,
+                         "VECTOR": f"v{geo[:2]}", "UOM": "Percentage",
+                         "SCALAR_FACTOR": "units", "DECIMALS": 1, "SE": None})
+    df = pd.DataFrame(rows)
+    facts = PROBES["rank_reversal"](df, "Geography", {"aggregate_members": {}, "legibility": {}})
+    assert len(facts) == 1, "one pair trading the lead is one finding, not one per flip"
+    assert facts[0].meta["crossings"] == 3
+    assert "traded the lead" in facts[0].human
+
+
+def test_streak_honours_the_configured_minimum_length():
+    cfg = {**CFG, "min_streak_periods": 6}
+    facts = PROBES["streak"](prepare(mini(), cfg), "Geography", cfg)
+    assert facts == [], "the fixture's 2-period runs are below a 6-period floor"
+
+
+def test_streak_still_fires_at_the_configured_floor():
+    cfg = {**CFG, "min_streak_periods": 2}
+    assert PROBES["streak"](prepare(mini(), cfg), "Geography", cfg)
+
+
 def test_rank_order_identifies_leader_and_trailer():
     facts = PROBES["rank_order"](sliced(), "Geography", CFG)
     latest = [f for f in facts if f.periods[-1] == "2026-07"][0]

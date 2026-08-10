@@ -182,7 +182,8 @@ def streak(df, dim, cfg):
                 n += 1
             else:
                 break
-        if n < 2:
+        floor = max(2, int(cfg.get("min_streak_periods", 2)))
+        if n < floor:
             continue
         f = _base("streak", dim, member, rows, cfg, [float(n), float(vals[-1])],
                   [str(p) for p in rows["REF_DATE"].tolist()])
@@ -229,25 +230,54 @@ def rank_order(df, dim, cfg):
 
 @probe("rank_reversal")
 def rank_reversal(df, dim, cfg):
+    """One Fact per unordered pair of members that has ever traded the lead.
+
+    rank_order gives the leader for every period. Walking consecutive periods
+    finds each crossing (a change of leader); crossings are then grouped by
+    the UNORDERED pair of members involved so that a pair that trades the
+    lead repeatedly (A ahead, then B, then A again) reads as one finding
+    about that pair's whole history in the window, not one Fact per flip.
+    """
     ordered = rank_order(df, dim, cfg)
     ordered.sort(key=lambda f: f.periods[-1])
-    facts = []
+    crossings = []  # (period, from_leader, to_leader, rank_order fact at crossing)
     for prev, cur in zip(ordered, ordered[1:]):
         if prev.meta["leader"] == cur.meta["leader"]:
             continue
+        crossings.append((cur.periods[-1], prev.meta["leader"], cur.meta["leader"], cur))
+
+    by_pair: dict[tuple[str, str], list] = {}
+    for c in crossings:
+        pair = tuple(sorted((c[1], c[2])))
+        by_pair.setdefault(pair, []).append(c)
+
+    facts = []
+    for pair, pair_crossings in by_pair.items():
+        pair_crossings.sort(key=lambda c: c[0])
+        first_period = pair_crossings[0][0]
+        last_period, _from_leader, current_leader, latest = pair_crossings[-1]
+        other_member = pair[0] if pair[1] == current_leader else pair[1]
+        n = len(pair_crossings)
         f = Fact(
             probe="rank_reversal",
-            cut={f"{dim}_leader": str(cur.meta["leader"]),
-                 f"{dim}_overtook": str(prev.meta["leader"])},
-            values=cur.values, periods=[prev.periods[-1], cur.periods[-1]],
-            vectors=cur.vectors, uom=cur.uom, scalar=cur.scalar, decimals=cur.decimals,
-            magnitude=cur.magnitude, legibility=cur.legibility,
+            cut={f"{dim}_leader": str(current_leader), f"{dim}_overtook": str(other_member)},
+            values=[float(n), latest.values[0], latest.values[1]],
+            periods=[first_period, last_period],
+            vectors=latest.vectors, uom=latest.uom, scalar=latest.scalar,
+            decimals=latest.decimals, magnitude=latest.magnitude, legibility=latest.legibility,
         )
-        f.statement = (f"{cur.meta['leader']} overtook {prev.meta['leader']} "
-                       f"between {prev.periods[-1]} and {cur.periods[-1]}.")
-        f.human = f"{cur.meta['leader']} moved ahead of {prev.meta['leader']} in {cur.periods[-1]}"
+        times = "once" if n == 1 else f"{n} times"
+        f.statement = (
+            f"{current_leader} and {other_member} have traded the lead {times} "
+            f"since {first_period}; {current_leader} leads now, as of {last_period}."
+        )
+        f.human = (
+            f"{current_leader} and {other_member} have traded the lead {times} "
+            f"since {first_period}; {current_leader} leads now"
+        )
         f.bare = f.human
-        f.meta = {"from": prev.meta["leader"], "to": cur.meta["leader"]}
+        f.meta = {"crossings": n, "leader": current_leader, "other": other_member,
+                   "periods_observed": n}
         facts.append(f)
     return facts
 

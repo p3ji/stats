@@ -33,10 +33,27 @@ happening, it is a distribution problem rather than a data problem, and it is me
    itself built on StatCan, such as Wikipedia or a news article), or `none`. The stated
    number is separately checked against the real StatCan value, which is what makes a
    wrong-number result distinguishable from a merely uncited one.
-2. *Could StatCan have answered?* The query is coded against WDS cube metadata for roughly
-   8,000 tables as `fully`, `partially`, `microdata_only`, or `not_collected`. Crossing
-   this with the first measurement gives the headline result: the cases that are answerable
-   from published data and yet invisible in practice.
+2. *Could StatCan have answered?* Separately from what the engines did, each query is
+   checked against WDS cube metadata for roughly 8,000 tables and coded for whether the
+   data to answer it exists at all:
+
+   - **`fully`** — a published table answers the question at the granularity asked. If
+     someone wants the unemployment rate for a province last month, a table gives exactly
+     that.
+   - **`partially`** — the indicator is published, but not at the disaggregation or
+     geography the question needs. The national figure exists; the question asked for it
+     by city, or by age within a province, and that cut is not published.
+   - **`microdata_only`** — Statistics Canada collected the data but never published a
+     table of it. Answering would mean going to the microdata files, which is beyond what
+     an ordinary person or a search engine will do.
+   - **`not_collected`** — nobody at Statistics Canada has this. The question is outside
+     what the agency measures, and no amount of better search would surface an answer.
+
+   Crossing this with the first measurement is the headline result. The cell that matters
+   is **`fully` answerable and yet not cited**: data that is published, current, and free,
+   which nevertheless failed to reach the person asking. The other cells are context for
+   it. A miss on a `not_collected` question is not a distribution failure, and a miss on a
+   `microdata_only` one is a publication decision rather than a visibility problem.
 3. *Does crawlability change anything?* This is a pre-registered experiment rather than an
    observation. Tables from the "answerable but invisible" cell were randomised at the
    table level into treatment and control. Treatment tables got static, crawlable mirrors
