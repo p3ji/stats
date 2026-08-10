@@ -20,6 +20,7 @@ defaults:
   measures: []
   hold_at: {}
   comparable_members: {}
+  display_names: {}
   rate_measures: []
   count_measures: []
   min_streak_periods: 4
@@ -75,6 +76,16 @@ cubes:
       Gender: Total - Gender
       Age group: 25 to 54 years
     window_periods: 60
+    # StatCan's member names are precise but read as machine labels in prose.
+    # The provenance block still shows the exact band, so plain names here cost
+    # no accuracy and stop an article sounding auto-generated.
+    display_names:
+      "25 to 54 years": core-aged workers
+      "15 to 24 years": young workers
+      "55 years and over": workers aged 55 and over
+      "Women+": women
+      "Men+": men
+      "Total - Gender": all workers
     comparable_members:
       Age group:
         - 15 to 24 years

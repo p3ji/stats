@@ -536,6 +536,36 @@ def change_se(rows, periods_apart: int) -> float | None:
     return None
 
 
+_MONTHS = ("January", "February", "March", "April", "May", "June", "July",
+           "August", "September", "October", "November", "December")
+
+
+def _period(p: str) -> str:
+    """1976-01 -> January 1976. A machine date in prose reads as a machine wrote it."""
+    text = str(p)
+    if len(text) == 7 and text[4] == "-" and text[:4].isdigit() and text[5:].isdigit():
+        month = int(text[5:])
+        if 1 <= month <= 12:
+            return f"{_MONTHS[month - 1]} {text[:4]}"
+    return text
+
+
+def _has(name: str) -> str:
+    """Verb agreeing with a member name: Quebec has, young workers have.
+
+    Display names turn singular places into plural groups, so a fixed verb is
+    wrong roughly half the time and reads as machine output either way.
+    """
+    n = str(name).strip().lower()
+    plural = n.endswith("s") or n in {"women", "men", "people", "children", "youth"}
+    return "have" if plural else "has"
+
+
+def _name(member, cfg: dict) -> str:
+    """StatCan's member label, or the plain-English name configured for it."""
+    return str((cfg.get("display_names") or {}).get(str(member), member))
+
+
 def _possessive(name: str) -> str:
     """Ottawa's, but 15 to 24 years' — a name already ending in s takes a bare apostrophe."""
     name = str(name)
@@ -550,7 +580,8 @@ def _subject(cut: dict, mdim: str | None) -> str:
     return ""
 
 
-def describe(fact: Fact, measure: str | None, mdim: str | None = None) -> None:
+def describe(fact: Fact, measure: str | None, mdim: str | None = None,
+             cfg: dict | None = None) -> None:
     """Rewrite fact.human and fact.bare so each names its own subject.
 
     Whatever `human` holds is what lands verbatim in a published sentence, and
@@ -560,7 +591,8 @@ def describe(fact: Fact, measure: str | None, mdim: str | None = None) -> None:
     first, withdrawn article. Centralised here so the next prose defect is fixed
     in one place rather than eight.
     """
-    m = (measure or "").strip().lower()
+    cfg = cfg or {}
+    m = _name(measure, cfg).strip().lower() if measure else ""
     of_m = f" {m}" if m else ""
     meta, v, d = fact.meta, fact.values, fact.decimals
 
@@ -569,48 +601,48 @@ def describe(fact: Fact, measure: str | None, mdim: str | None = None) -> None:
 
     probe = fact.probe
     if probe == "gap_between_members":
-        hi, lo = meta.get("high"), meta.get("low")
+        hi, lo = _name(meta.get("high"), cfg), _name(meta.get("low"), cfg)
         fact.bare = q(v[0])
         fact.human = (f"the{of_m} gap between {hi} and {lo} is {q(v[0])} "
                       f"({q(v[1], 'level')} against {q(v[2], 'level')})")
     elif probe == "gap_trend":
-        hi, lo = meta.get("high"), meta.get("low")
+        hi, lo = _name(meta.get("high"), cfg), _name(meta.get("low"), cfg)
         verb = "widened" if meta.get("direction") == "widening" else "narrowed"
         fact.bare = q(abs(v[0]))
         fact.human = f"the{of_m} gap between {hi} and {lo} has {verb} by {q(abs(v[0]))}"
     elif probe == "rank_order":
-        top, bottom = meta.get("leader"), meta.get("trailer")
+        top, bottom = _name(meta.get("leader"), cfg), _name(meta.get("trailer"), cfg)
         fact.bare = q(v[0], "level")
-        fact.human = (f"{top} has the highest{of_m} at {q(v[0], 'level')} and "
+        fact.human = (f"{top} {_has(top)} the highest{of_m} at {q(v[0], 'level')} and "
                       f"{bottom} the lowest at {q(v[1], 'level')}")
     elif probe == "rank_reversal":
-        a, b = meta.get("leader"), meta.get("other")
+        a, b = _name(meta.get("leader"), cfg), _name(meta.get("other"), cfg)
         n = int(meta.get("crossings", 1))
         times = "once" if n == 1 else f"{n} times"
         fact.bare = times
         fact.human = (f"{a} and {b} have traded the{of_m} lead {times} since "
-                      f"{fact.periods[0]}; {a} leads now")
+                      f"{_period(fact.periods[0])}; {a} leads now")
     elif probe == "streak":
-        who = _subject(fact.cut, mdim)
+        who = _name(_subject(fact.cut, mdim), cfg)
         n = int(meta.get("periods_in_streak", 0))
         fact.bare = f"{n} periods"
         fact.human = (f"{_possessive(who)}{of_m} has been {meta.get('direction', 'moving')} for "
                       f"{n} periods in a row, now {q(v[1], 'level')}")
     elif probe == "share_of_total":
-        who = _subject(fact.cut, mdim)
+        who = _name(_subject(fact.cut, mdim), cfg)
         fact.bare = f"{abs(float(v[0])):.1f} points"
         fact.human = (f"{_possessive(who)} share of{of_m} {meta.get('direction', 'changed')} "
                       f"{abs(float(v[0])):.1f} points, from "
                       f"{float(meta.get('share_then', 0)):.1f}% to "
                       f"{float(meta.get('share_now', 0)):.1f}%")
     elif probe == "long_run_compare":
-        who = _subject(fact.cut, mdim)
+        who = _name(_subject(fact.cut, mdim), cfg)
         fact.bare = q(abs(v[0]))
         higher = "higher" if v[0] >= 0 else "lower"
         fact.human = (f"{_possessive(who)}{of_m} is {q(abs(v[0]))} {higher} than in "
-                      f"{fact.periods[0]}")
+                      f"{_period(fact.periods[0])}")
     elif probe == "level_threshold":
-        who = _subject(fact.cut, mdim)
+        who = _name(_subject(fact.cut, mdim), cfg)
         fact.bare = q(v[1], "level")
         fact.human = (f"{_possessive(who)}{of_m} crossed {q(v[1], 'level')}, "
                       f"now {q(v[0], 'level')}")
@@ -664,6 +696,6 @@ def run_probes(df: pd.DataFrame, dimensions: list[str], cfg: dict) -> list[Fact]
                     f.meta["measure"] = measure
                     if mdim and measure is not None:
                         f.cut = {**f.cut, mdim: measure}
-                    describe(f, measure, mdim)
+                    describe(f, measure, mdim, cfg)
                     facts.append(f)
     return dedupe_probe_overlap(dedupe(facts), mdim)
