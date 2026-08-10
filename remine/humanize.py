@@ -43,3 +43,21 @@ def humanize_delta(delta: float, uom: str, scalar_factor: str, decimals: int = 1
         return f"${abs(_scale(delta, scalar_factor)):,.0f} {word}"
     word = "higher" if delta >= 0 else "lower"
     return f"{abs(delta):.{decimals}f} {uom} {word}"
+
+
+def humanize_delta_bare(delta: float, uom: str, scalar_factor: str, decimals: int = 1) -> str:
+    """Same quantity as humanize_delta, with no trailing direction word.
+
+    humanize_delta returns a standalone fragment ("53.6 percentage points
+    higher"), which reads correctly only as a full clause. Mid-sentence, after
+    something like "a difference of", the direction word is ungrammatical —
+    this is the same magnitude with nothing to strip.
+    """
+    u = (uom or "").strip().lower()
+    if "person" in u:
+        return f"about {_round_people(_scale(delta, scalar_factor)):,} people"
+    if "percent" in u:
+        return f"{abs(delta):.{decimals}f} percentage points"
+    if "dollar" in u:
+        return f"${abs(_scale(delta, scalar_factor)):,.0f}"
+    return f"{abs(delta):.{decimals}f} {uom}"

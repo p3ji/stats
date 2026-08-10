@@ -59,10 +59,15 @@ cubes:
       - Unemployment rate
       - Employment rate
       - Participation rate
+    # Newfoundland and Labrador is the oldest province and Alberta among the
+    # youngest, so a rate held at the 15-and-over denominator is confounded by
+    # age structure: much of a cross-province gap is demography, not the
+    # labour market. Hold Geography probes on the prime-age band (25 to 54
+    # years) so provincial comparisons are like-for-like.
     hold_at:
       Geography: Canada
       Gender: Total - Gender
-      Age group: 15 years and over
+      Age group: 25 to 54 years
     window_periods: 60
     comparable_members:
       Age group:
@@ -92,3 +97,10 @@ cubes:
       - Full-time employment
       - Part-time employment
     primary_count_measure: Employment
+    # rank_order carries no standard error (only gap_between_members computed
+    # one before this fix), so without a floor here the gate's `se is None`
+    # branch fell back to the global default of 0.0 and let every rank_order
+    # fact through unconditionally — four of the eight facts in the withdrawn
+    # article came through exactly this path. 0.1 is a tenth of a percentage
+    # point for rate measures or a tenth of a thousand persons for counts.
+    min_magnitude: 0.1

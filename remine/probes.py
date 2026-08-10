@@ -14,7 +14,7 @@ from typing import Callable
 
 import pandas as pd
 
-from remine.humanize import humanize, humanize_delta
+from remine.humanize import humanize, humanize_delta, humanize_delta_bare
 
 PROBES: dict[str, Callable] = {}
 
@@ -65,6 +65,11 @@ class Fact:
     mentioned: bool = False
     statement: str = ""
     human: str = ""
+    # The same quantity as `human`, with no direction word ("53.6 percentage
+    # points" rather than "53.6 percentage points higher"). `human` reads as
+    # a whole clause; `bare` is for use mid-sentence, e.g. after "a
+    # difference of", where the direction word is ungrammatical.
+    bare: str = ""
     score: float = 0.0
     meta: dict = field(default_factory=dict)
 
@@ -135,6 +140,7 @@ def gap_between_members(df: pd.DataFrame, dim: str, cfg: dict) -> list[Fact]:
                 f"({fact.uom.lower()})."
             )
             fact.human = humanize_delta(delta, fact.uom, fact.scalar, fact.decimals)
+            fact.bare = humanize_delta_bare(delta, fact.uom, fact.scalar, fact.decimals)
             fact.meta = {"high": str(hi[dim]), "low": str(lo[dim]), "dimension": dim}
             facts.append(fact)
     return facts
@@ -182,6 +188,7 @@ def streak(df, dim, cfg):
         f.magnitude = abs(float(vals[-1] - vals[-1 - n]))
         f.statement = f"{member} has been {word} for {n} consecutive periods."
         f.human = f"{member}: {n} periods of {word} in a row, now {humanize(float(vals[-1]), f.uom, f.scalar, f.decimals)}"
+        f.bare = f.human
         f.meta = {"direction": word, "periods_in_streak": n}
         facts.append(f)
     return facts
@@ -196,6 +203,9 @@ def rank_order(df, dim, cfg):
         if len(chunk) < 2:
             continue
         top, bottom = chunk.iloc[0], chunk.iloc[-1]
+        se = None
+        if pd.notna(top.get("SE")) and pd.notna(bottom.get("SE")):
+            se = float((float(top["SE"]) ** 2 + float(bottom["SE"]) ** 2) ** 0.5)
         f = Fact(
             probe="rank_order",
             cut={f"{dim}_leader": str(top[dim]), f"{dim}_trailer": str(bottom[dim])},
@@ -203,11 +213,12 @@ def rank_order(df, dim, cfg):
             vectors=[str(top["VECTOR"]), str(bottom["VECTOR"])],
             uom=str(top.get("UOM", "")), scalar=str(top.get("SCALAR_FACTOR", "")),
             decimals=int(top.get("DECIMALS", 1) or 1),
-            magnitude=float(top["VALUE"] - bottom["VALUE"]), legibility=_legibility(dim, cfg),
+            magnitude=float(top["VALUE"] - bottom["VALUE"]), se=se, legibility=_legibility(dim, cfg),
         )
         f.statement = f"In {period}, {top[dim]} ranked highest and {bottom[dim]} lowest."
         f.human = (f"{top[dim]} highest at {humanize(float(top['VALUE']), f.uom, f.scalar, f.decimals)}; "
                    f"{bottom[dim]} lowest at {humanize(float(bottom['VALUE']), f.uom, f.scalar, f.decimals)}")
+        f.bare = f.human
         f.meta = {"leader": str(top[dim]), "trailer": str(bottom[dim])}
         facts.append(f)
     return facts
@@ -232,6 +243,7 @@ def rank_reversal(df, dim, cfg):
         f.statement = (f"{cur.meta['leader']} overtook {prev.meta['leader']} "
                        f"between {prev.periods[-1]} and {cur.periods[-1]}.")
         f.human = f"{cur.meta['leader']} moved ahead of {prev.meta['leader']} in {cur.periods[-1]}"
+        f.bare = f.human
         f.meta = {"from": prev.meta["leader"], "to": cur.meta["leader"]}
         facts.append(f)
     return facts
@@ -270,6 +282,7 @@ def gap_trend(df, dim, cfg):
         f.statement = (f"The gap between {hi} and {lo} has been {direction} "
                        f"since {series[0].periods[-1]}.{swap}")
         f.human = f"gap between {hi} and {lo} is {direction}: {humanize_delta(change, f.uom, f.scalar, f.decimals)}"
+        f.bare = f"gap between {hi} and {lo} {direction} by {humanize_delta_bare(change, f.uom, f.scalar, f.decimals)}"
         f.meta = {"direction": direction, "high": hi, "low": lo, "lead_changed": lead_changed}
         facts.append(f)
     return facts
@@ -327,6 +340,7 @@ def share_of_total(df, dim, cfg):
             f"{direction} {abs(change):.1f} points, from {share_then:.1f}% to {share_now:.1f}%."
         )
         f.human = f"{member}'s share{measure_label} {direction} {abs(change):.1f} points, from {share_then:.1f}% to {share_now:.1f}%"
+        f.bare = f.human
         f.meta = {"share_now": share_now, "share_then": share_then, "direction": direction}
         facts.append(f)
     return facts
@@ -351,6 +365,7 @@ def level_threshold(df, dim, cfg):
         f.magnitude = abs(cur - prev)
         f.statement = f"{member} moved {word} {crossed[0]:g} in {f.periods[-1]}."
         f.human = f"{member} crossed {humanize(float(crossed[0]), f.uom, f.scalar, 0)}"
+        f.bare = f.human
         f.meta = {"threshold": crossed[0], "direction": word}
         facts.append(f)
     return facts
@@ -373,6 +388,7 @@ def long_run_compare(df, dim, cfg):
         f.statement = (f"{member} changed by {change:.1f} between "
                        f"{f.periods[0]} and {f.periods[-1]}.")
         f.human = f"{member}: {humanize_delta(change, f.uom, f.scalar, f.decimals)} than in {f.periods[0]}"
+        f.bare = humanize_delta_bare(change, f.uom, f.scalar, f.decimals)
         f.meta = {"from_period": f.periods[0], "to_period": f.periods[-1]}
         facts.append(f)
     return facts
@@ -432,6 +448,38 @@ def dedupe(facts: list[Fact]) -> list[Fact]:
     return list(best.values())
 
 
+# gap_between_members and rank_order can both describe the exact same
+# comparison (same vectors, same measure, same period) — one from each probe.
+# `dedupe` above keys on (probe, cut), so the two spellings never collapse,
+# and the withdrawn brief's fact_1/fact_2 were exactly this: the same finding
+# under two names, which read like debug output once drafted. Scores are not
+# set at this point in the pipeline, so break ties with a configured probe
+# preference order rather than a score comparison.
+_PROBE_PREFERENCE = ["gap_between_members", "rank_order"]
+
+
+def dedupe_probe_overlap(facts: list[Fact], measure_dimension: str | None) -> list[Fact]:
+    """Collapse the same comparison reported by more than one cross-member probe."""
+    def rank(f: Fact) -> int:
+        try:
+            return _PROBE_PREFERENCE.index(f.probe)
+        except ValueError:
+            return len(_PROBE_PREFERENCE)
+
+    best: dict[tuple, Fact] = {}
+    for f in facts:
+        if f.probe not in _PROBE_PREFERENCE:
+            continue
+        key = (tuple(sorted(f.vectors)), f.cut.get(measure_dimension) if measure_dimension else None,
+               f.periods[-1] if f.periods else None)
+        prior = best.get(key)
+        if prior is None or rank(f) < rank(prior):
+            best[key] = f
+    kept_ids = {id(f) for f in best.values()}
+    dropped = {id(f) for f in facts if f.probe in _PROBE_PREFERENCE} - kept_ids
+    return [f for f in facts if id(f) not in dropped]
+
+
 def run_probes(df: pd.DataFrame, dimensions: list[str], cfg: dict) -> list[Fact]:
     mdim = cfg.get("measure_dimension")
     measures = list(cfg.get("measures") or [None])
@@ -481,4 +529,4 @@ def run_probes(df: pd.DataFrame, dimensions: list[str], cfg: dict) -> list[Fact]
                     if mdim and measure is not None:
                         f.cut = {**f.cut, mdim: measure}
                     facts.append(f)
-    return dedupe(facts)
+    return dedupe_probe_overlap(dedupe(facts), mdim)

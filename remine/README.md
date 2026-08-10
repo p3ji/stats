@@ -44,10 +44,10 @@ editorial work, with a model assisting under supervision.
    total, and long-run comparisons. Every number that will ever appear in a published article is
    computed here and nowhere else.
 5. **Rank** first drops what cannot be defended, then orders what remains. The reliability gate
-   honours Statistics Canada's own quality flags, and for surveys that publish standard errors
-   it requires a reported difference to exceed the relevant one. Survivors are scored on
-   magnitude, persistence, how legible the subgroups are to a reader, and whether the finding
-   can be stated in units a person feels.
+   honours Statistics Canada's own quality flags, and applies a standard-error gate where the
+   cube publishes one; where it does not, a configured per-survey magnitude floor stands in
+   instead. Survivors are scored on magnitude, persistence, how legible the subgroups are to a
+   reader, and whether the finding can be stated in units a person feels.
 6. **Brief and bind** writes the top findings to a fact brief, along with the Daily article's
    full text. The editorial pass reads that brief, selects the findings that cohere into a
    piece, names the assumption each one speaks to, and writes the prose. A final `bind` step
@@ -59,15 +59,19 @@ Every number in a published Remine article comes from stage 4, not from a langua
 drafting step never writes a numeral. It writes tokens (`{{fact_3.human}}`), and `editor.py`
 substitutes the computed values.
 
-Three checks enforce this, and all three live in Python rather than in instructions to a model:
+Several checks enforce this, and all of them live in Python rather than in instructions to a
+model:
 
 - An unresolved or unknown token fails the build, so a reference to a fact that does not exist
   cannot ship.
 - A bare numeral in the prose fails the build, with an allowlist for years and ordinals. Without
   this, the token contract could be sidestepped by simply typing a number.
+- A quantity spelled in words ("nearly double", "one in five") fails the build too. A number
+  written in English is still a number, and digit-based checks alone never saw it.
 - Each finding must declare what the Daily said about that cut, or state `not discussed`. A
   `not discussed` claim is cross-checked against the mention map from stage 2, so a draft that
-  did not genuinely engage with the source article gets caught.
+  did not genuinely engage with the source article gets caught. Every other story is still
+  required to state something non-empty about the Daily's coverage.
 
 Published articles carry the vector IDs and reference periods behind each claim, so a reader can
 check any number against the source table.
@@ -115,9 +119,9 @@ how legible each dimension is to a reader.
 
 ## Status
 
-In development. Stages 1 and 3 (discovery and cube access) are implemented and tested. The probe
-library, ranking, brief assembly, and the binding step are specified but not yet built, so the
-usage instructions above describe the intended interface rather than working commands.
+All six stages are built and tested: discovery, mentions, cube access, the probe library,
+ranking, and brief assembly and binding. The usage instructions above describe working commands,
+not an intended interface. No article has yet been published under this pipeline.
 
 The design document is `docs/superpowers/specs/2026-08-07-remine-design.md` and the
 implementation plan is `docs/superpowers/plans/2026-08-08-remine.md`. Tests run with

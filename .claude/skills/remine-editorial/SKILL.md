@@ -18,12 +18,18 @@ judge what is new without knowing what was said.
 
 ## Rules
 
-**Numbers.** Never type a number, in any field. Every number is a token:
-`{{fact_3.human}}`, `{{fact_3.values[0]}}`, `{{fact_3.periods[0]}}`. Prefer `.human` — it
-is already in reader-scale units. `editor.py bind` fails the build on any bare numeral, so
-a typed number is not a style problem, it is a broken build. This applies to every field
-you write and at any nesting depth, not just `body`: `headline`, `assumption` and
-`differs_from_daily` are all published too.
+**Numbers.** Never type a number, in any field — including a number spelled in words
+("nearly double", "one in five"): `check_bare_numerals` catches digits, but a wrong
+quantity written in English ships just as easily and is not checked against the data.
+Every number is a token: `{{fact_3.human}}`, `{{fact_3.values[0]}}`, `{{fact_3.periods[0]}}`.
+Use `{{fact_n.human}}` when the token is the whole clause — it already carries a direction
+word ("53.6 percentage points higher") and reads correctly on its own. Use `{{fact_n.bare}}`
+mid-sentence, e.g. after "a difference of", where `.human`'s direction word would be
+ungrammatical — it carries the same quantity with no direction word ("53.6 percentage
+points"). `editor.py bind` fails the build on any bare numeral or quantity word, so a typed
+number is not a style problem, it is a broken build. This applies to every field you write
+and at any nesting depth, not just `body`: `headline`, `assumption` and `differs_from_daily`
+are all published too.
 
 **Tokens only where they belong.** Only `headline` and `body` may carry tokens.
 `assumption`, `differs_from_daily`, the top-level `headline` and `daily_story` are framing

@@ -36,8 +36,9 @@ actually engage with the Daily article.
      brief; either the claim is wrong, or the mention is incidental and the
      `differs_from_daily` line should say what the Daily actually said about it
 
-5. **Update the feed.** Add the new article to `remine/articles/index.json` (newest
-   first): `{"file","date","headline","source_title","source_url"}`.
+5. **Update the feed.** Regenerate the index from the bound articles themselves —
+   never hand-write it:
+   `python remine/editor.py --rebuild-index`
 
 6. **Verify the site renders** — start the `dashboard` config in `.claude/launch.json`
    and open `/remine/`. Confirm each story shows its numbers, assumption, and

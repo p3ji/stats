@@ -18,6 +18,21 @@ _PID_LINK = re.compile(r"tv\.action\?pid=(\d{10})")
 _TITLE = re.compile(r"<title>(.*?)</title>", re.S | re.I)
 _TAG = re.compile(r"<[^>]+>")
 _SCRIPT_STYLE = re.compile(r"<(script|style)\b.*?</\1>", re.S | re.I)
+# The whole page includes page chrome — e.g. the "Select geography" dropdown
+# listing all ten provinces — which made every province read as "mentioned"
+# regardless of what the article prose actually said. Extract the article
+# body specifically, in order of preference, and fall back to the whole page
+# only if none of these is found.
+_MAIN = re.compile(r"<main\b[^>]*>(.*?)</main>", re.S | re.I)
+_WB_CONT = re.compile(r'<[^>]+\bid="wb-cont"[^>]*>(.*)', re.S | re.I)
+_MWSBODYTEXT = re.compile(r'<[^>]+\bclass="[^"]*\bmwsbodytext\b[^"]*"[^>]*>(.*?)</div>', re.S | re.I)
+# Interactive widgets and download-button navigation embedded inside the body
+# container are chrome, not prose: the province <select> and the per-table
+# "Table N" download buttons both name every province without the article
+# ever discussing them. Strip these before flattening to text so mentions.py
+# sees only what a reader would read as narrative.
+_SELECT = re.compile(r"<select\b.*?</select>", re.S | re.I)
+_TABLEBTN = re.compile(r'<div\b[^>]*\bclass="[^"]*\btablebtn\b[^"]*"[^>]*>.*?</div>', re.S | re.I)
 
 
 @dataclass(frozen=True)
@@ -27,6 +42,7 @@ class DailyArticle:
     slug: str
     pids: tuple[int, ...]
     prose: str
+    body_source: str = "whole-page"
 
 
 @dataclass(frozen=True)
@@ -37,9 +53,31 @@ class Release:
 
 def _text(fragment: str) -> str:
     fragment = _SCRIPT_STYLE.sub(" ", fragment)
+    fragment = _SELECT.sub(" ", fragment)
+    fragment = _TABLEBTN.sub(" ", fragment)
     fragment = _TAG.sub(" ", fragment)
     fragment = html_mod.unescape(fragment)
     return re.sub(r"\s+", " ", fragment).strip()
+
+
+def _extract_body(html: str) -> tuple[str, str]:
+    """Return (body_fragment, source) — the article body rather than the whole page.
+
+    The whole page includes chrome such as the "Select geography" dropdown,
+    which lists every province regardless of what the article discusses. Try
+    increasingly specific containers and record which one was used; fall back
+    to the whole page only if none is found.
+    """
+    match = _MAIN.search(html)
+    if match:
+        return match.group(1), "main"
+    match = _WB_CONT.search(html)
+    if match:
+        return match.group(1), "wb-cont"
+    match = _MWSBODYTEXT.search(html)
+    if match:
+        return match.group(1), "mwsbodytext"
+    return html, "whole-page"
 
 
 def parse_index(html: str, date: str) -> list[str]:
@@ -64,7 +102,9 @@ def parse_article(html: str, url: str) -> DailyArticle:
     title = title.split("—")[-1].strip() or title
     slug_match = re.search(r"(dq\d{6}[a-z])", url)
     slug = slug_match.group(1) if slug_match else url.rsplit("/", 1)[-1]
-    return DailyArticle(url=url, title=title, slug=slug, pids=tuple(pids), prose=_text(html))
+    body_fragment, body_source = _extract_body(html)
+    return DailyArticle(url=url, title=title, slug=slug, pids=tuple(pids),
+                        prose=_text(body_fragment), body_source=body_source)
 
 
 def _fetch(url: str) -> str:

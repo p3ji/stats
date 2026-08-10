@@ -175,3 +175,47 @@ def test_bound_article_carries_provenance_for_every_fact_used():
     assert prov["vectors"] == ["v1"]
     assert prov["periods"] == ["2026-07"]
     assert prov["table_url"] == "http://t"
+
+
+# F1 — a quantity spelled in words is still a number and must fail the build,
+# the same way a digit does. The withdrawn article's "nearly double" headline
+# claimed a 2x ratio when the real one was 2.52x, and no digit-based check
+# ever saw it.
+def test_a_quantity_word_in_a_story_body_fails_the_build():
+    with pytest.raises(BindError, match="quantity word"):
+        bind(draft(story={"body": "Prime-age Canadians work at nearly double the rate."}), BRIEF)
+
+
+def test_a_quantity_word_in_the_headline_fails_the_build():
+    with pytest.raises(BindError, match="quantity word"):
+        bind(draft(headline="Employment nearly triple in some regions"), BRIEF)
+
+
+def test_innocent_prose_using_a_quantity_word_still_fails_deliberately():
+    # This is the intended trade: "one of the provinces" is innocent, but it
+    # still contains a number word and must still fail, so the drafter
+    # rewrites rather than the check being softened to let prose through.
+    with pytest.raises(BindError, match="quantity word"):
+        bind(draft(story={"assumption": "one of the provinces is often overlooked"}), BRIEF)
+
+
+# F3 — ".75" must not slip past the numeral guard just because it starts
+# with a period; "3.75" must still be caught as a single numeral, not two.
+def test_dot_75_is_caught_as_a_bare_numeral():
+    assert check_bare_numerals("The rate rose by .75 points.") == [".75"]
+
+
+def test_3_dot_75_is_still_caught_as_one_numeral():
+    assert check_bare_numerals("The rate rose by 3.75 points.") == ["3.75"]
+
+
+# F4 — _walk_strings must not let a raw numeric field value, or a
+# numeral-bearing dict key, ship unresolved.
+def test_a_raw_numeric_field_value_fails_the_build():
+    with pytest.raises(BindError, match="numeric value"):
+        bind(draft(story={"count": 4000}), BRIEF)
+
+
+def test_a_numeral_bearing_dict_key_fails_the_build():
+    with pytest.raises(BindError, match="bare numeral"):
+        bind(draft(story={"notes": {"53.6 points": "yes"}}), BRIEF)
