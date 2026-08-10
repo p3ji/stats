@@ -22,12 +22,17 @@ defaults:
   comparable_members: {}
   rate_measures: []
   count_measures: []
+  min_streak_periods: 4
 
 cubes:
   14100287:
     survey: Labour Force Survey
     value_dimension: Statistics
     value_member: Estimate
+    # Three consecutive monthly moves in one direction is close to what chance
+    # produces for a monthly labour series; require a longer run before the
+    # streak probe treats it as a finding.
+    min_streak_periods: 6
     se_members:
       level: Standard error of estimate
       month_over_month: Standard error of month-to-month change
