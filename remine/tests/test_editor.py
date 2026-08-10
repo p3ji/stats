@@ -219,3 +219,9 @@ def test_a_raw_numeric_field_value_fails_the_build():
 def test_a_numeral_bearing_dict_key_fails_the_build():
     with pytest.raises(BindError, match="bare numeral"):
         bind(draft(story={"notes": {"53.6 points": "yes"}}), BRIEF)
+
+
+def test_rebuild_index_is_gated_off():
+    from remine import editor
+    assert editor.PUBLISHING_ENABLED is False, \
+        "publishing must stay gated until the known limitations are closed"

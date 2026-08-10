@@ -13,6 +13,15 @@ import json
 import re
 from pathlib import Path
 
+# Publishing is gated off until the limitations in
+# docs/remine-known-limitations.md are closed — chiefly that quantity words
+# written as hyphenated compounds ("one-third") still bypass the guard, which is
+# how a wrong quantitative claim reached the first (withdrawn) article. bind()
+# stays enabled: drafting and inspecting an article is safe, appearing on the
+# public feed is not. Flip this to True once that regex is fixed and a human has
+# read a bound draft end to end.
+PUBLISHING_ENABLED = False
+
 TOKEN = re.compile(r"\{\{([^{}]+)\}\}")
 NUMERAL = re.compile(r"(?<![\w])(?:\d[\d,]*(?:\.\d+)?|\.\d+)(?:st|nd|rd|th)?(?![\w])")
 # A number spelled in words is still a number. "nearly double" shipped a wrong
@@ -264,6 +273,12 @@ def main() -> None:
     args = ap.parse_args()
 
     if args.rebuild_index:
+        if not PUBLISHING_ENABLED:
+            raise SystemExit(
+                "publishing is gated off: see docs/remine-known-limitations.md. "
+                "bind still works — set PUBLISHING_ENABLED = True in remine/editor.py "
+                "once the quantity-word guard covers hyphenated compounds and a human "
+                "has read a bound draft.")
         entries = rebuild_index()
         print(f"index.json <- {len(entries)} article(s)")
         return

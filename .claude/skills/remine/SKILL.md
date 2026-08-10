@@ -36,9 +36,12 @@ actually engage with the Daily article.
      brief; either the claim is wrong, or the mention is incidental and the
      `differs_from_daily` line should say what the Daily actually said about it
 
-5. **Update the feed.** Regenerate the index from the bound articles themselves —
-   never hand-write it:
-   `python remine/editor.py --rebuild-index`
+5. **Update the feed — currently gated off.** `python remine/editor.py --rebuild-index`
+   regenerates the index from the bound articles themselves (never hand-write it), but
+   it refuses to run while `PUBLISHING_ENABLED = False` in `remine/editor.py`. See
+   `docs/remine-known-limitations.md` for what has to close before that flips to `True`.
+   Binding (step 3) still works and articles still land in `remine/articles/` — they just
+   don't reach the public feed yet.
 
 6. **Verify the site renders** — start the `dashboard` config in `.claude/launch.json`
    and open `/remine/`. Confirm each story shows its numbers, assumption, and
