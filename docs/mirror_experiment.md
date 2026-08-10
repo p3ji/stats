@@ -150,7 +150,7 @@ Secondary: does the mirror page itself get indexed (site: queries) and crawled
 
 Full design audit run **before any post-treatment measurement exists** (treatment deployed
 2026-07-25; first re-audit not due until ~2026-08-08). Nothing here is a post-hoc change to
-a rule after seeing results — no results exist yet. Amendments A1–A15 are binding from now.
+a rule after seeing results — no results exist yet. Amendments A1–A16 are binding from now.
 
 ### A1. Primary outcome and endpoint (was under-specified — multiplicity risk)
 
@@ -499,6 +499,44 @@ displacement measure.
    figure; "current vs stale" is not defined for it and it was forced to `unverifiable`.
    Flagged rather than fixed -- the scheme is adequate for the rest of the set and changing
    it now would be a post-hoc rule change.
+
+### A16. The domain-authority confound (recorded 2026-08-10, before any outcome data)
+
+**The intervention is not cleanly "crawlable data". It is "crawlable data published on a
+zero-authority domain."** Recorded now, while the only outcome information in hand is that
+leaf pages are not yet indexed, so this is a stated caveat and not a post-hoc explanation.
+
+At the T+16 index check the `/tables/` directory page was indexed and **no leaf mirror page
+was**. Investigated:
+
+| Hypothesis | Verdict |
+|---|---|
+| Search engines ignore GitHub Pages | **Ruled out.** `open-canada.github.io/Apps`, a deep subpath page, is indexed; so is our own `/tables/` directory page. |
+| Leaf pages are orphaned (no internal links) | **Ruled out.** All 10 are linked from the indexed directory page. (An earlier check of mine wrongly reported otherwise -- it grepped for double-quoted `href` and the template emits single-quoted.) |
+| Self-inflicted deindexing (noindex / foreign canonical) | **Ruled out.** Canonicals are self-referential; no robots meta. |
+| Low domain authority | **Live and unresolved.** |
+
+`p3ji.github.io` is on the Public Suffix List, so it is treated as an independent site and
+inherits none of github.com's authority. The mirrors are therefore ~400-word pages on a
+domain with no backlinks and weeks of history, reproducing figures a high-authority
+government site already publishes -- a textbook "discovered, currently not indexed" profile.
+
+**Consequences, binding:**
+
+1. **A null result is ambiguous and must be reported as such.** "Crawlability does not change
+   citation" and "this publisher could not get indexed" are different conclusions and this
+   design cannot separate them. Any null must state both readings.
+2. **Do NOT change hosting mid-experiment.** Moving to a custom domain would replace the
+   intervention and void the pre-registered comparison. The confound is accepted and
+   disclosed, not fixed.
+3. **Indexing status is a reported outcome in its own right**, not a precondition. If leaf
+   pages remain unindexed at the endpoint, that IS the finding: crawlable, licensed,
+   schema-marked, sitemapped and internally linked was not sufficient for an independent
+   publisher to enter the index. That is a substantive result about the visibility of
+   official statistics, not a failed experiment.
+4. **Diagnostic that would resolve it:** Bing Webmaster URL Inspection on a leaf URL
+   distinguishes *not crawled* from *crawled and declined*. Requires the site owner. Run it
+   at round 1 if leaf pages are still unindexed.
 
 ### Design features that are sound (checked, no change needed)
 
