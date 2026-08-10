@@ -1,0 +1,106 @@
+# Per-cube configuration. `defaults` applies to every cube; `cubes.<pid>` overrides.
+defaults:
+  top_n: 40
+  mention_demotion: 0.5
+  min_periods: 12
+  weights:
+    magnitude: 0.40
+    persistence: 0.25
+    legibility: 0.20
+    reader_scale: 0.15
+  min_magnitude: 0.0
+  legibility: {}
+  synonyms: {}
+  aggregate_members: {}
+  filters: {}
+  se_members: {}
+  window_periods: 60
+  measure_dimension: null
+  measures: []
+  hold_at: {}
+  comparable_members: {}
+  rate_measures: []
+  count_measures: []
+
+cubes:
+  14100287:
+    survey: Labour Force Survey
+    value_dimension: Statistics
+    value_member: Estimate
+    se_members:
+      level: Standard error of estimate
+      month_over_month: Standard error of month-to-month change
+      year_over_year: Standard error of year-over-year change
+    filters:
+      Data type: Seasonally adjusted
+    aggregate_members:
+      Geography: [Canada]
+      Gender: [Total - Gender]
+      Age group: [15 years and over, 15 to 64 years]
+      Labour force characteristics: [Population, Labour force]
+    legibility:
+      Geography: 1.0
+      Age group: 0.9
+      Gender: 0.9
+      Labour force characteristics: 0.7
+      Data type: 0.2
+    synonyms:
+      youth: 15 to 24 years
+      young people: 15 to 24 years
+      core-aged: 25 to 54 years
+      seniors: 55 years and over
+      women: Women+
+      men: Men+
+    measure_dimension: Labour force characteristics
+    measures:
+      - Employment
+      - Full-time employment
+      - Part-time employment
+      - Unemployment rate
+      - Employment rate
+      - Participation rate
+    # Newfoundland and Labrador is the oldest province and Alberta among the
+    # youngest, so a rate held at the 15-and-over denominator is confounded by
+    # age structure: much of a cross-province gap is demography, not the
+    # labour market. Hold Geography probes on the prime-age band (25 to 54
+    # years) so provincial comparisons are like-for-like.
+    hold_at:
+      Geography: Canada
+      Gender: Total - Gender
+      Age group: 25 to 54 years
+    window_periods: 60
+    comparable_members:
+      Age group:
+        - 15 to 24 years
+        - 25 to 54 years
+        - 55 years and over
+      Gender:
+        - Men+
+        - Women+
+      Geography:
+        - Newfoundland and Labrador
+        - Prince Edward Island
+        - Nova Scotia
+        - New Brunswick
+        - Quebec
+        - Ontario
+        - Manitoba
+        - Saskatchewan
+        - Alberta
+        - British Columbia
+    rate_measures:
+      - Unemployment rate
+      - Employment rate
+      - Participation rate
+    count_measures:
+      - Employment
+      - Full-time employment
+      - Part-time employment
+    primary_count_measure: Employment
+    # rank_order carries no standard error (only gap_between_members computed
+    # one before this fix), so without a floor here the gate's `se is None`
+    # branch fell back to the global default of 0.0 and let every rank_order
+    # fact through unconditionally — four of the eight facts in the withdrawn
+    # article came through exactly this path. 0.1 is a tenth of a percentage
+    # point for rate measures or a tenth of a thousand persons for counts.
+    min_magnitude: 0.1

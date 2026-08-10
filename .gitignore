@@ -12,3 +12,5 @@ __pycache__/
 visibility/cache/
 .playwright-mcp/
 .codex/
+remine/cache/
+remine/briefs/

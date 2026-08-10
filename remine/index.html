@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Remine — data stories the Daily didn't tell</title>
+<meta name="description" content="Statistics Canada releases far more data than it narrates. Remine re-mines each Daily release for findings the article did not report.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="header"><div class="header-inner">
+  <h1 class="header-title">Remine</h1>
+  <p class="header-subtitle">Data stories the Daily didn't tell</p>
+</div></header>
+<main class="main">
+  <p class="intro">Statistics Canada releases far more data than it narrates. A Daily
+    article reports the headline cut and a few subgroups, then links to a table holding
+    thousands of series nobody writes about. Remine computes what the same data supports
+    saying, and publishes what was left out. Every number here is computed from the source
+    table by code — never written by a language model — and every claim carries its vector
+    IDs and reference periods. <a href="../">Open Stats Lab</a> is independent and
+    <strong>not affiliated with or endorsed by Statistics Canada</strong>.</p>
+  <div id="feed"></div>
+</main>
+<footer class="footer">
+  <p>Source: Statistics Canada, reproduced under the Statistics Canada Open Licence.
+     Analysis is not Statistics Canada's. Official data lives at
+     <a href="https://www.statcan.gc.ca/">statcan.gc.ca</a>.</p>
+</footer>
+<script src="app.js"></script>
+<script>renderFeed();</script>
+</body>
+</html>
