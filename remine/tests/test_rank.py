@@ -2,7 +2,8 @@ from remine.probes import Fact
 from remine.rank import gate, rank, score
 
 CFG = {
-    "weights": {"magnitude": 0.4, "persistence": 0.25, "legibility": 0.2, "reader_scale": 0.15},
+    "weights": {"magnitude": 0.30, "persistence": 0.20, "legibility": 0.15,
+                "reader_scale": 0.15, "change_story": 0.20},
     "mention_demotion": 0.5, "min_magnitude": 0.0,
     "aggregate_members": {"Geography": ["Canada"]},
 }
@@ -73,3 +74,19 @@ def test_periods_observed_counts_toward_persistence():
     a = fact(periods=["2026-07"])
     b = fact(periods=["2026-07"], meta={"periods_observed": 12})
     assert score(b, CFG, 10.0) > score(a, CFG, 10.0)
+
+
+def test_magnitude_is_normalised_within_a_probe_not_globally():
+    big = fact(probe="gap_between_members", magnitude=50.0)
+    small = fact(probe="gap_trend", magnitude=2.0)
+    ordered = rank([big, small], {}, {**CFG, "weights": {**CFG["weights"], "change_story": 0.0}})
+    # Each is the peak of its own probe, so magnitude contributes equally and
+    # neither is buried purely for being on a smaller scale.
+    assert abs(ordered[0].score - ordered[1].score) < 1e-9
+
+
+def test_a_change_finding_outranks_an_equally_scaled_level_finding():
+    level = fact(probe="gap_between_members", magnitude=10.0)
+    change = fact(probe="gap_trend", magnitude=10.0)
+    ordered = rank([level, change], {}, CFG)
+    assert ordered[0] is change

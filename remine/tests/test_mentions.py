@@ -45,5 +45,5 @@ def test_load_config_merges_cube_over_defaults():
 
 def test_load_config_for_unknown_cube_returns_defaults():
     cfg = load_config(99999999)
-    assert cfg["weights"]["magnitude"] == 0.40
+    assert cfg["weights"]["magnitude"] == 0.30  # rebalanced for change_story (Task 18)
     assert cfg["se_members"] == {}

@@ -93,17 +93,19 @@ def prepare(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
         df = df[df[dim] == member]
     vdim = cfg.get("value_dimension")
     if not vdim:
-        return df.assign(SE=pd.NA)
-    se_member = (cfg.get("se_members") or {}).get("level")
+        return df.assign(SE=pd.NA, SE_MOM=pd.NA, SE_YOY=pd.NA)
+    se_members = cfg.get("se_members") or {}
     keys = [c for c in df.columns
             if c not in {vdim, "VALUE", "VECTOR", "COORDINATE", "STATUS", "SYMBOL",
                          "TERMINATED", "DECIMALS", "DGUID"}]
     est = df[df[vdim] == cfg["value_member"]].copy()
-    if se_member is not None and se_member in set(df[vdim]):
-        se = df[df[vdim] == se_member][keys + ["VALUE"]].rename(columns={"VALUE": "SE"})
-        est = est.merge(se, on=keys, how="left")
-    else:
-        est["SE"] = pd.NA
+    for col, cfg_key in (("SE", "level"), ("SE_MOM", "month_over_month"), ("SE_YOY", "year_over_year")):
+        se_member = se_members.get(cfg_key)
+        if se_member is not None and se_member in set(df[vdim]):
+            se = df[df[vdim] == se_member][keys + ["VALUE"]].rename(columns={"VALUE": col})
+            est = est.merge(se, on=keys, how="left")
+        else:
+            est[col] = pd.NA
     return est
 
 
@@ -186,6 +188,7 @@ def streak(df, dim, cfg):
                   [str(p) for p in rows["REF_DATE"].tolist()])
         word = "rising" if direction > 0 else "falling"
         f.magnitude = abs(float(vals[-1] - vals[-1 - n]))
+        f.se = change_se(rows.iloc[-(n + 1):], n)
         f.statement = f"{member} has been {word} for {n} consecutive periods."
         f.human = f"{member}: {n} periods of {word} in a row, now {humanize(float(vals[-1]), f.uom, f.scalar, f.decimals)}"
         f.bare = f.human
@@ -277,6 +280,8 @@ def gap_trend(df, dim, cfg):
             decimals=series[-1].decimals, magnitude=abs(change),
             legibility=series[-1].legibility,
         )
+        if series[0].se is not None and series[-1].se is not None:
+            f.se = float((series[0].se ** 2 + series[-1].se ** 2) ** 0.5)
         direction = "widening" if change > 0 else "narrowing"
         swap = f" {lo} led at the start of this period and {hi} leads now." if lead_changed else ""
         f.statement = (f"The gap between {hi} and {lo} has been {direction} "
@@ -363,6 +368,7 @@ def level_threshold(df, dim, cfg):
                   [str(rows["REF_DATE"].iloc[-2]), str(rows["REF_DATE"].iloc[-1])])
         word = "above" if cur > prev else "below"
         f.magnitude = abs(cur - prev)
+        f.se = change_se(rows.iloc[-2:], 1)
         f.statement = f"{member} moved {word} {crossed[0]:g} in {f.periods[-1]}."
         f.human = f"{member} crossed {humanize(float(crossed[0]), f.uom, f.scalar, 0)}"
         f.bare = f.human
@@ -385,6 +391,7 @@ def long_run_compare(df, dim, cfg):
         f = _base("long_run_compare", dim, member, rows, cfg, [change, first, last],
                   [str(rows["REF_DATE"].iloc[0]), str(rows["REF_DATE"].iloc[-1])])
         f.magnitude = abs(change)
+        f.se = change_se(rows, len(rows) - 1)
         f.statement = (f"{member} changed by {change:.1f} between "
                        f"{f.periods[0]} and {f.periods[-1]}.")
         f.human = f"{member}: {humanize_delta(change, f.uom, f.scalar, f.decimals)} than in {f.periods[0]}"
@@ -478,6 +485,25 @@ def dedupe_probe_overlap(facts: list[Fact], measure_dimension: str | None) -> li
     kept_ids = {id(f) for f in best.values()}
     dropped = {id(f) for f in facts if f.probe in _PROBE_PREFERENCE} - kept_ids
     return [f for f in facts if id(f) not in dropped]
+
+
+def change_se(rows, periods_apart: int) -> float | None:
+    """Standard error appropriate to a change within one series.
+
+    StatCan publishes month-to-month and year-over-year change SEs because the
+    two estimates share a sample and are correlated; combining level SEs in
+    quadrature overstates the error. Use the published value where the span
+    matches, and fall back to the (conservative) quadrature otherwise.
+    """
+    last = rows.iloc[-1]
+    if periods_apart == 1 and pd.notna(last.get("SE_MOM")):
+        return float(last["SE_MOM"])
+    if periods_apart == 12 and pd.notna(last.get("SE_YOY")):
+        return float(last["SE_YOY"])
+    first = rows.iloc[0]
+    if pd.notna(first.get("SE")) and pd.notna(last.get("SE")):
+        return float((float(first["SE"]) ** 2 + float(last["SE"]) ** 2) ** 0.5)
+    return None
 
 
 def run_probes(df: pd.DataFrame, dimensions: list[str], cfg: dict) -> list[Fact]:

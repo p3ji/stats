@@ -13,13 +13,21 @@ import json
 import re
 from pathlib import Path
 
-# Publishing is gated off until the limitations in
-# docs/remine-known-limitations.md are closed — chiefly that quantity words
-# written as hyphenated compounds ("one-third") still bypass the guard, which is
-# how a wrong quantitative claim reached the first (withdrawn) article. bind()
-# stays enabled: drafting and inspecting an article is safe, appearing on the
-# public feed is not. Flip this to True once that regex is fixed and a human has
-# read a bound draft end to end.
+# Publishing stays gated. The gate has ALWAYS carried two conditions, and only
+# one of them is met.
+#
+#   1. DONE — the quantity-word guard now covers hyphenated compounds
+#      ("one-third") and plurals ("millions"). That gap is how a wrong
+#      quantitative claim reached the first, withdrawn article.
+#   2. NOT DONE — a human has read a bound draft end to end. No draft has been
+#      bound since, so nobody has read one.
+#
+# This flag was briefly flipped to True on the strength of condition 1 alone.
+# That is the exact mistake this project keeps rediscovering: satisfying a check
+# rather than its purpose. The second condition is not paperwork — the two
+# errors in the withdrawn article (a ratio spelled in words, and a comparison
+# that was three-quarters age structure) were both caught by a reader, not by a
+# test. Only a person who has read the draft may flip this.
 PUBLISHING_ENABLED = False
 
 TOKEN = re.compile(r"\{\{([^{}]+)\}\}")
@@ -27,12 +35,12 @@ NUMERAL = re.compile(r"(?<![\w])(?:\d[\d,]*(?:\.\d+)?|\.\d+)(?:st|nd|rd|th)?(?![
 # A number spelled in words is still a number. "nearly double" shipped a wrong
 # 2.5x ratio past every digit guard in the first article.
 _QUANTITY_WORDS = re.compile(
-    r"(?<![\w-])("
+    r"(?<![\w])("
     r"one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|"
     r"thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|"
     r"thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|"
-    r"half|third|quarter|double|triple|twice|thrice|dozen"
-    r")(?![\w-])", re.I)
+    r"half|halves|third|thirds|quarter|quarters|double|triple|twice|thrice|dozen"
+    r")(?:s)?(?![\w])", re.I)
 YEAR = re.compile(r"^(19|20)\d{2}$")
 ORDINAL = re.compile(r"^\d+(st|nd|rd|th)$")
 STANCES = {"concretizes", "challenges"}

@@ -52,21 +52,37 @@ def _reader_scale(fact: Fact) -> float:
     return 1.0 if ("person" in u or "dollar" in u or "percent" in u) else 0.4
 
 
+# A level gap concretizes what a reader already believes; a change can
+# challenge it. Both belong in a brief, but the spec's premise leans on the
+# second, and magnitude alone will never surface it.
+_CHANGE_PROBES = {"gap_trend", "rank_reversal", "streak", "long_run_compare", "share_of_total"}
+
+
+def _change_story(fact: Fact) -> float:
+    return 1.0 if fact.probe in _CHANGE_PROBES else 0.0
+
+
 def score(fact: Fact, cfg: dict, max_magnitude: float) -> float:
     w = cfg["weights"]
     magnitude = fact.magnitude / max_magnitude if max_magnitude else 0.0
     return (w["magnitude"] * magnitude
             + w["persistence"] * _persistence(fact)
             + w["legibility"] * fact.legibility
-            + w["reader_scale"] * _reader_scale(fact))
+            + w["reader_scale"] * _reader_scale(fact)
+            + w.get("change_story", 0.0) * _change_story(fact))
 
 
 def rank(facts: list[Fact], mentions: dict[str, bool], cfg: dict) -> list[Fact]:
     mentioned_members = {k.split("|", 1)[1] for k, v in (mentions or {}).items() if v}
-    max_magnitude = max((f.magnitude for f in facts), default=0.0)
+    # Normalise within each probe. Globally, the magnitude of a *change* is
+    # dwarfed by the magnitude of a *level gap*, so change findings could never
+    # reach the brief no matter how striking they were.
+    peak: dict[str, float] = {}
+    for f in facts:
+        peak[f.probe] = max(peak.get(f.probe, 0.0), f.magnitude)
     for f in facts:
         f.mentioned = any(m and m in str(v) for v in f.cut.values() for m in mentioned_members)
-        f.score = score(f, cfg, max_magnitude)
+        f.score = score(f, cfg, peak.get(f.probe, 0.0))
         if f.mentioned:
             f.score *= float(cfg.get("mention_demotion", 0.5))
     return sorted(facts, key=lambda f: f.score, reverse=True)

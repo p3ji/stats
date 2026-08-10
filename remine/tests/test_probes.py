@@ -300,6 +300,38 @@ def test_share_of_total_reports_the_change_in_share_not_the_level():
         assert f.meta["direction"] in {"rose", "fell"}
 
 
+def test_long_run_compare_carries_an_se_when_the_frame_has_se_columns():
+    cfg = {**CFG, "measure_dimension": "Labour force characteristics",
+           "measures": ["Employment"], "rate_measures": ["Employment"],
+           "hold_at": {"Gender": "Total - Gender", "Age group": "15 years and over"}}
+    facts = [f for f in run_probes(prepare(mini(), cfg), ["Geography"], cfg)
+             if f.probe == "long_run_compare"]
+    assert facts
+    assert any(f.se is not None for f in facts)
+
+
+def test_change_se_prefers_the_published_mom_value_over_quadrature():
+    import pandas as pd
+    from remine.probes import change_se
+    rows = pd.DataFrame([
+        {"SE": 1.0, "SE_MOM": 0.3, "SE_YOY": pd.NA},
+        {"SE": 2.0, "SE_MOM": 0.3, "SE_YOY": pd.NA},
+    ])
+    # span of one period: published MoM SE (0.3) wins over quadrature of the
+    # level SEs (sqrt(1^2 + 2^2) ~= 2.236)
+    assert change_se(rows, 1) == 0.3
+
+
+def test_change_se_falls_back_to_quadrature_when_the_span_does_not_match():
+    import pandas as pd
+    from remine.probes import change_se
+    rows = pd.DataFrame([
+        {"SE": 1.0, "SE_MOM": 0.3, "SE_YOY": pd.NA},
+        {"SE": 2.0, "SE_MOM": 0.3, "SE_YOY": pd.NA},
+    ])
+    assert abs(change_se(rows, 5) - (1.0 ** 2 + 2.0 ** 2) ** 0.5) < 1e-9
+
+
 def test_rate_only_probes_are_skipped_for_count_measures():
     cfg = {**CFG, "measure_dimension": "Labour force characteristics",
            "measures": ["Employment"], "count_measures": ["Employment"],
