@@ -91,3 +91,4 @@ cubes:
       - Employment
       - Full-time employment
       - Part-time employment
+    primary_count_measure: Employment

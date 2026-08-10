@@ -36,6 +36,11 @@ _CROSS_MEMBER_PROBES = {"gap_between_members", "gap_trend", "rank_order", "rank_
 # that belongs on counts and is meaningless on rates (shares of a rate do not add up).
 _SHARE_PROBES = {"share_of_total"}
 
+# A level, or a raw-count change, is dominated by population growth. Only rates
+# make these probes say something about the labour market rather than the
+# size of the country.
+_RATE_ONLY_PROBES = {"long_run_compare", "level_threshold", "streak"}
+
 
 def probe(name: str):
     def wrap(fn):
@@ -272,27 +277,58 @@ def gap_trend(df, dim, cfg):
 
 @probe("share_of_total")
 def share_of_total(df, dim, cfg):
+    """Change in a member's share of the total, first period to last.
+
+    A share's LEVEL is almost always a population artifact: Ontario is ~39%
+    of national employment every month for decades, regardless of what the
+    labour market is doing. The CHANGE in that share over the window is the
+    part that can actually be news.
+    """
     aggregates = set((cfg.get("aggregate_members") or {}).get(dim, []))
-    facts = []
-    for period, chunk in df.groupby("REF_DATE"):
+    mdim = cfg.get("measure_dimension")
+    measure_label = ""
+    if mdim and mdim in df.columns and df[mdim].nunique() == 1:
+        measure_label = f" of {df[mdim].iloc[0].lower()}"
+
+    def shares(period):
+        chunk = df[df["REF_DATE"] == period]
         chunk = chunk[~chunk[dim].isin(aggregates)]
         total = float(chunk["VALUE"].sum())
         if total == 0 or len(chunk) < 2:
+            return None
+        return {str(row[dim]): (float(row["VALUE"]) / total * 100, row)
+                for _, row in chunk.iterrows()}
+
+    periods = sorted(df["REF_DATE"].unique())
+    if len(periods) < 2:
+        return []
+    first, last = periods[0], periods[-1]
+    then, now = shares(first), shares(last)
+    if not then or not now:
+        return []
+    facts = []
+    for member in sorted(set(then) & set(now)):
+        share_then, _ = then[member]
+        share_now, row = now[member]
+        change = share_now - share_then
+        if round(change, 1) == 0.0:
             continue
-        for _, row in chunk.iterrows():
-            share = float(row["VALUE"]) / total * 100
-            f = Fact(
-                probe="share_of_total", cut={dim: str(row[dim])},
-                values=[share, float(row["VALUE"])], periods=[str(period)],
-                vectors=[str(row["VECTOR"])], uom=str(row.get("UOM", "")),
-                scalar=str(row.get("SCALAR_FACTOR", "")),
-                decimals=int(row.get("DECIMALS", 1) or 1),
-                magnitude=share, legibility=_legibility(dim, cfg),
-            )
-            f.statement = f"In {period}, {row[dim]} accounted for {share:.1f}% of the total."
-            f.human = f"{row[dim]} is {share:.1f}% of the total"
-            f.meta = {"share": share}
-            facts.append(f)
+        direction = "rose" if change > 0 else "fell"
+        f = Fact(
+            probe="share_of_total", cut={dim: member},
+            values=[change, share_now, share_then], periods=[str(first), str(last)],
+            vectors=[str(row["VECTOR"])], uom=str(row.get("UOM", "")),
+            scalar=str(row.get("SCALAR_FACTOR", "")),
+            decimals=int(row.get("DECIMALS", 1) or 1),
+            magnitude=abs(change), legibility=_legibility(dim, cfg),
+        )
+        f.statement = (
+            f"Between {first} and {last}, {member}'s share{measure_label} "
+            f"{direction} {abs(change):.1f} points, from {share_then:.1f}% to {share_now:.1f}%."
+        )
+        f.human = f"{member}'s share{measure_label} {direction} {abs(change):.1f} points, from {share_then:.1f}% to {share_now:.1f}%"
+        f.meta = {"share_now": share_now, "share_then": share_then, "direction": direction}
+        facts.append(f)
     return facts
 
 
@@ -425,6 +461,12 @@ def run_probes(df: pd.DataFrame, dimensions: list[str], cfg: dict) -> list[Fact]
                 if name in _CROSS_MEMBER_PROBES and rates and measure not in rates:
                     continue
                 if name in _SHARE_PROBES and counts and measure not in counts:
+                    continue
+                if name in _RATE_ONLY_PROBES and rates and measure not in rates:
+                    continue
+                primary = cfg.get("primary_count_measure")
+                if (name in _SHARE_PROBES and primary and measure in counts
+                        and measure != primary):
                     continue
                 frame = partition(window(sliced, cfg, name), dim, cfg)
                 if frame[dim].nunique() < 2:

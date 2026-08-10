@@ -104,9 +104,21 @@ def test_gap_trend_reports_widening_when_the_gap_grows():
 
 
 def test_share_of_total_is_a_percentage_of_the_period_sum():
+    # share_of_total now reports the CHANGE in share from the first to the last
+    # period of the frame (Task 15: a share's level is a population artifact,
+    # its change is a finding). Fixture: Ontario 100/101/102, Alberta 80/82/84
+    # over 2026-05/06/07.
+    # share_then (2026-05) = 100 / (100 + 80) * 100 = 55.555...%
+    # share_now  (2026-07) = 102 / (102 + 84) * 100 = 54.838709...%
+    # change = share_now - share_then = -0.7168458781362048 points
     facts = PROBES["share_of_total"](sliced(), "Geography", CFG)
-    ont = [f for f in facts if f.cut["Geography"] == "Ontario" and f.periods[-1] == "2026-07"]
-    assert abs(ont[0].values[0] - 102.0 / (102.0 + 84.0) * 100) < 1e-6
+    ont = [f for f in facts if f.cut["Geography"] == "Ontario"][0]
+    share_then = 100.0 / (100.0 + 80.0) * 100
+    share_now = 102.0 / (102.0 + 84.0) * 100
+    assert abs(ont.values[0] - (share_now - share_then)) < 1e-6
+    assert abs(ont.values[1] - share_now) < 1e-6
+    assert abs(ont.values[2] - share_then) < 1e-6
+    assert ont.periods == ["2026-05", "2026-07"]
 
 
 def test_probes_never_emit_a_fact_without_vectors():
@@ -272,3 +284,26 @@ def test_cross_member_probes_run_for_rate_measures():
            "hold_at": {"Gender": "Total - Gender", "Age group": "15 years and over"}}
     facts = run_probes(prepare(mini(), cfg), ["Geography"], cfg)
     assert [f for f in facts if f.probe == "gap_between_members"]
+
+
+def test_share_of_total_reports_the_change_in_share_not_the_level():
+    cfg = {**CFG, "measure_dimension": "Labour force characteristics",
+           "measures": ["Employment"], "count_measures": ["Employment"],
+           "rate_measures": ["Unemployment rate"],
+           "hold_at": {"Gender": "Total - Gender", "Age group": "15 years and over"}}
+    facts = [f for f in run_probes(prepare(mini(), cfg), ["Geography"], cfg)
+             if f.probe == "share_of_total"]
+    assert facts, "expected a share-change fact"
+    for f in facts:
+        assert len(f.periods) == 2, "a change spans two periods"
+        assert "point" in f.human or "%" in f.human
+        assert f.meta["direction"] in {"rose", "fell"}
+
+
+def test_rate_only_probes_are_skipped_for_count_measures():
+    cfg = {**CFG, "measure_dimension": "Labour force characteristics",
+           "measures": ["Employment"], "count_measures": ["Employment"],
+           "rate_measures": ["Unemployment rate"],
+           "hold_at": {"Gender": "Total - Gender", "Age group": "15 years and over"}}
+    facts = run_probes(prepare(mini(), cfg), ["Geography"], cfg)
+    assert not [f for f in facts if f.probe in {"long_run_compare", "level_threshold", "streak"}]
