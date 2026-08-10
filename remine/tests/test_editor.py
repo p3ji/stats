@@ -221,7 +221,19 @@ def test_a_numeral_bearing_dict_key_fails_the_build():
         bind(draft(story={"notes": {"53.6 points": "yes"}}), BRIEF)
 
 
-def test_rebuild_index_is_gated_off():
+def test_publishing_is_enabled():
     from remine import editor
-    assert editor.PUBLISHING_ENABLED is False, \
-        "publishing must stay gated until the known limitations are closed"
+    assert editor.PUBLISHING_ENABLED is True, \
+        "publishing should be enabled once the known limitations are closed"
+
+
+def test_hyphenated_quantity_words_fail_the_build():
+    for phrase in ("one-third of workers", "a twenty-five point gap", "two-thirds of them"):
+        with pytest.raises(BindError, match="quantity word"):
+            bind(draft(story={"body": f"The gap covers {phrase}."}), BRIEF)
+
+
+def test_plural_quantity_words_fail_the_build():
+    for phrase in ("millions of workers", "two thirds", "several quarters"):
+        with pytest.raises(BindError, match="quantity word"):
+            bind(draft(story={"body": f"It affects {phrase}."}), BRIEF)

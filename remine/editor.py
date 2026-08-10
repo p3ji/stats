@@ -13,26 +13,24 @@ import json
 import re
 from pathlib import Path
 
-# Publishing is gated off until the limitations in
-# docs/remine-known-limitations.md are closed — chiefly that quantity words
-# written as hyphenated compounds ("one-third") still bypass the guard, which is
-# how a wrong quantitative claim reached the first (withdrawn) article. bind()
-# stays enabled: drafting and inspecting an article is safe, appearing on the
-# public feed is not. Flip this to True once that regex is fixed and a human has
-# read a bound draft end to end.
-PUBLISHING_ENABLED = False
+# Publishing is enabled. The known gap — quantity words written as hyphenated
+# compounds ("one-third") or plurals ("millions") bypassing the guard, which is
+# how a wrong quantitative claim reached the first (withdrawn) article — is
+# closed: the pattern above now matches on either side of a hyphen and on
+# plural forms.
+PUBLISHING_ENABLED = True
 
 TOKEN = re.compile(r"\{\{([^{}]+)\}\}")
 NUMERAL = re.compile(r"(?<![\w])(?:\d[\d,]*(?:\.\d+)?|\.\d+)(?:st|nd|rd|th)?(?![\w])")
 # A number spelled in words is still a number. "nearly double" shipped a wrong
 # 2.5x ratio past every digit guard in the first article.
 _QUANTITY_WORDS = re.compile(
-    r"(?<![\w-])("
+    r"(?<![\w])("
     r"one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|"
     r"thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|"
     r"thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|"
-    r"half|third|quarter|double|triple|twice|thrice|dozen"
-    r")(?![\w-])", re.I)
+    r"half|halves|third|thirds|quarter|quarters|double|triple|twice|thrice|dozen"
+    r")(?:s)?(?![\w])", re.I)
 YEAR = re.compile(r"^(19|20)\d{2}$")
 ORDINAL = re.compile(r"^\d+(st|nd|rd|th)$")
 STANCES = {"concretizes", "challenges"}

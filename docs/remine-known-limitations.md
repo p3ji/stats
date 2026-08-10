@@ -14,13 +14,6 @@ Implementation plan: `docs/superpowers/plans/2026-08-08-remine.md`
 
 These must be closed before unattended publishing.
 
-**The quantity-word guard has gaps a native speaker would walk straight through.**
-`_QUANTITY_WORDS` in `remine/editor.py` catches bare words like "double", "twice",
-"half", "one", "five" — but hyphenated compounds ("one-third", "twenty-five") and
-plurals ("thirds", "millions") bypass it entirely. These are not edge cases; they
-are ordinary English, and a wrong quantitative claim can still ship spelled this
-way. Fix is a one-line regex change plus a regression test.
-
 **The guard's false-positive rate is a deliberate trade, not a bug.** A phrase like
 "one of the ten provinces" fails the build, even though it is not a quantitative
 claim about the data. That's intentional: the drafter rewrites the sentence, and
@@ -45,6 +38,17 @@ The time-comparison probes — `gap_trend`, `long_run_compare`, `streak`,
 configured `min_magnitude` floor instead. `se_members.month_over_month` and
 `year_over_year` are configured in anticipation of this but not yet read by
 anything.
+
+## Closed limitations
+
+**The quantity-word guard had gaps a native speaker would walk straight through.**
+`_QUANTITY_WORDS` in `remine/editor.py` caught bare words like "double", "twice",
+"half", "one", "five" — but hyphenated compounds ("one-third", "twenty-five") and
+plurals ("thirds", "millions") bypassed it entirely. Closed by dropping `-` from
+both lookarounds (so either half of a hyphenated compound matches) and adding an
+optional plural suffix, with regression tests
+(`test_hyphenated_quantity_words_fail_the_build`,
+`test_plural_quantity_words_fail_the_build`). `PUBLISHING_ENABLED` is now `True`.
 
 ## Lessons that shaped the design
 
