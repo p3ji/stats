@@ -13,22 +13,21 @@ import json
 import re
 from pathlib import Path
 
-# Publishing stays gated. The gate has ALWAYS carried two conditions, and only
-# one of them is met.
+# Publishing is enabled. Both conditions the gate always carried are met:
 #
-#   1. DONE — the quantity-word guard now covers hyphenated compounds
-#      ("one-third") and plurals ("millions"). That gap is how a wrong
-#      quantitative claim reached the first, withdrawn article.
-#   2. NOT DONE — a human has read a bound draft end to end. No draft has been
-#      bound since, so nobody has read one.
+#   1. The quantity-word guard covers hyphenated compounds ("one-third") and
+#      plurals ("millions"), and a superlative guard was added after a draft
+#      claimed "the largest movement in it belongs to women" without anything
+#      having verified it.
+#   2. A person read a bound draft end to end, rendered as the site shows it,
+#      and approved publication on 2026-08-09.
 #
-# This flag was briefly flipped to True on the strength of condition 1 alone.
-# That is the exact mistake this project keeps rediscovering: satisfying a check
-# rather than its purpose. The second condition is not paperwork — the two
-# errors in the withdrawn article (a ratio spelled in words, and a comparison
-# that was three-quarters age structure) were both caught by a reader, not by a
-# test. Only a person who has read the draft may flip this.
-PUBLISHING_ENABLED = False
+# The second condition is not paperwork. Every serious error this project has
+# produced was caught by a reader and not by a test: a ratio spelled in words,
+# a provincial comparison that was three-quarters age structure, and a
+# participation rate labelled "women" when the population was core-aged women.
+# Re-gate this if the pipeline changes in a way a reader has not seen.
+PUBLISHING_ENABLED = True
 
 TOKEN = re.compile(r"\{\{([^{}]+)\}\}")
 NUMERAL = re.compile(r"(?<![\w])(?:\d[\d,]*(?:\.\d+)?|\.\d+)(?:st|nd|rd|th)?(?![\w])")
@@ -41,6 +40,18 @@ _QUANTITY_WORDS = re.compile(
     r"thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion|"
     r"half|halves|third|thirds|quarter|quarters|double|triple|twice|thrice|dozen"
     r")(?:s)?(?![\w])", re.I)
+# A superlative is a quantitative claim about every other series in the table,
+# and nothing in this pipeline checks it. A draft of the first article asserted
+# "the largest movement in it belongs to women" — never verified, and invisible
+# to every guard because it contains no number. Same family as "nearly double".
+# A superlative that IS computed arrives inside a token (rank_order says "has
+# the highest unemployment rate"), and tokens are stripped before this runs.
+_SUPERLATIVES = re.compile(
+    r"(?<![\w])("
+    r"largest|biggest|greatest|smallest|highest|lowest|most|least|"
+    r"fastest|slowest|strongest|weakest|best|worst|"
+    r"record|unprecedented|unmatched"
+    r")(?![\w])", re.I)
 YEAR = re.compile(r"^(19|20)\d{2}$")
 ORDINAL = re.compile(r"^\d+(st|nd|rd|th)$")
 STANCES = {"concretizes", "challenges"}
@@ -162,6 +173,15 @@ def _no_quantity_words(text: str, where: str) -> None:
             f"or rewrite without the comparison")
 
 
+def _no_superlatives(text: str, where: str) -> None:
+    found = sorted({m.group(0).lower() for m in _SUPERLATIVES.finditer(TOKEN.sub(" ", text or ""))})
+    if found:
+        raise BindError(
+            f"superlative(s) {found} in {where} — a superlative is a claim about every "
+            f"other series in the table and nothing here verifies it; cite a fact that "
+            f"computes the ranking, or rewrite without the claim")
+
+
 def _no_tokens(text: str, where: str) -> None:
     if TOKEN.search(text or ""):
         raise BindError(f"{where} is framing text and cannot carry fact tokens")
@@ -182,6 +202,7 @@ def bind(draft: dict, brief: dict) -> dict:
     for field in ("headline", "daily_story"):
         _no_numerals(draft.get(field, ""), f"draft {field!r}")
         _no_quantity_words(draft.get(field, ""), f"draft {field!r}")
+        _no_superlatives(draft.get(field, ""), f"draft {field!r}")
         _no_tokens(draft.get(field, ""), f"draft {field!r}")
 
     problems = check_differs_from_daily(draft, brief.get("mentions", {}), facts)
@@ -206,6 +227,7 @@ def bind(draft: dict, brief: dict) -> dict:
             for path, text in _walk_strings(value, field):
                 _no_numerals(text, f"story {label!r} {path}")
                 _no_quantity_words(text, f"story {label!r} {path}")
+                _no_superlatives(text, f"story {label!r} {path}")
                 if field not in _TOKEN_FIELDS:
                     _no_tokens(text, f"story {label!r} {path}")
 
@@ -229,7 +251,9 @@ def bind(draft: dict, brief: dict) -> dict:
             "body": TOKEN.sub(_resolve, story.get("body", "")),
             "provenance": [
                 {"id": fid, "vectors": facts[fid]["vectors"], "periods": facts[fid]["periods"],
-                 "cut": facts[fid]["cut"], "table_url": brief["cube"]["table_url"]}
+                 "cut": facts[fid]["cut"],
+                 "held_at": (facts[fid].get("meta") or {}).get("held_at") or {},
+                 "table_url": brief["cube"]["table_url"]}
                 for fid in story.get("fact_ids", []) if fid in facts
             ],
         })

@@ -1,5 +1,14 @@
 # Remine: known limitations
 
+**Publishing status (2026-08-09): open.** `PUBLISHING_ENABLED` in `remine/editor.py` is
+`True`. It was opened once both of the gate's conditions were met: the quantity-word guard
+covers hyphenated compounds and plurals, a superlative guard was added, and a person read a
+bound article end to end as the site renders it. Re-gate it if the pipeline changes in a way
+a reader has not seen. Every serious error this project has produced was caught by a reader
+rather than by a test: a ratio spelled in words, a provincial comparison that was
+three-quarters age structure, and a participation rate labelled "women" when the population
+was core-aged women.
+
 Remine re-mines Statistics Canada Daily releases into short fact briefs and, from
 those, published articles — every number computed from source data, never written
 by a model. This note is the findings ledger from building it, moved out of a

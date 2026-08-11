@@ -221,11 +221,12 @@ def test_a_numeral_bearing_dict_key_fails_the_build():
         bind(draft(story={"notes": {"53.6 points": "yes"}}), BRIEF)
 
 
-def test_publishing_stays_gated_until_a_human_reads_a_draft():
+def test_publishing_is_enabled_after_both_conditions_were_met():
     from remine import editor
-    assert editor.PUBLISHING_ENABLED is False, \
-        "the gate requires BOTH the quantity-word fix AND a human reading a bound " \
-        "draft end to end; closing the first condition alone does not open it"
+    assert editor.PUBLISHING_ENABLED is True, (
+        "opened 2026-08-09: the quantity-word and superlative guards are in place "
+        "and a person read a bound draft end to end. Re-gate if the pipeline "
+        "changes in a way a reader has not seen.")
 
 
 def test_hyphenated_quantity_words_fail_the_build():

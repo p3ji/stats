@@ -38,8 +38,9 @@
 - **Remine's number contract is enforced in Python, not in its skills.** `remine/editor.py`
   fails the build on unresolved tokens, bare numerals, quantity words, and a
   `differs_from_daily` claim of "not discussed" that the mention map contradicts. Never
-  relax a check to make a draft pass — fix the draft. Publishing is gated off until the
-  limitations in `docs/remine-known-limitations.md` are closed.
+  relax a check to make a draft pass — fix the draft. `PUBLISHING_ENABLED` gates
+  `--rebuild-index`; it is open, and should be re-gated if the pipeline changes in a way a
+  reader has not reviewed (see `docs/remine-known-limitations.md`).
 
 ## Do NOT
 - Commit secrets (`.env`) or large build artifacts.

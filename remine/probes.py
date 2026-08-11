@@ -14,7 +14,7 @@ from typing import Callable
 
 import pandas as pd
 
-from remine.humanize import humanize, humanize_delta, humanize_delta_bare
+from remine.humanize import humanize, humanize_bare, humanize_delta, humanize_delta_bare
 
 PROBES: dict[str, Callable] = {}
 
@@ -536,6 +536,127 @@ def change_se(rows, periods_apart: int) -> float | None:
     return None
 
 
+_MONTHS = ("January", "February", "March", "April", "May", "June", "July",
+           "August", "September", "October", "November", "December")
+
+
+def _period(p: str) -> str:
+    """1976-01 -> January 1976. A machine date in prose reads as a machine wrote it."""
+    text = str(p)
+    if len(text) == 7 and text[4] == "-" and text[:4].isdigit() and text[5:].isdigit():
+        month = int(text[5:])
+        if 1 <= month <= 12:
+            return f"{_MONTHS[month - 1]} {text[:4]}"
+    return text
+
+
+def _has(name: str) -> str:
+    """Verb agreeing with a member name: Quebec has, young workers have.
+
+    Display names turn singular places into plural groups, so a fixed verb is
+    wrong roughly half the time and reads as machine output either way.
+    """
+    n = str(name).strip().lower()
+    plural = n.endswith("s") or n in {"women", "men", "people", "children", "youth"}
+    return "have" if plural else "has"
+
+
+def _name(member, cfg: dict) -> str:
+    """StatCan's member label, or the plain-English name configured for it."""
+    return str((cfg.get("display_names") or {}).get(str(member), member))
+
+
+def _possessive(name: str) -> str:
+    """Ottawa's, but 15 to 24 years' — a name already ending in s takes a bare apostrophe."""
+    name = str(name)
+    return f"{name}'" if name.endswith("s") else f"{name}'s"
+
+
+def _subject(cut: dict, mdim: str | None) -> str:
+    """The member a single-member fact is about, ignoring the measure key."""
+    for key, value in cut.items():
+        if key != mdim:
+            return str(value)
+    return ""
+
+
+def describe(fact: Fact, measure: str | None, mdim: str | None = None,
+             cfg: dict | None = None) -> None:
+    """Rewrite fact.human and fact.bare so each names its own subject.
+
+    Whatever `human` holds is what lands verbatim in a published sentence, and
+    the drafting stage never sees the string it is embedding. A string that does
+    not say who it is about, and on which measure, produces prose like "a
+    difference of 53.6 percentage points higher" — which is what reached the
+    first, withdrawn article. Centralised here so the next prose defect is fixed
+    in one place rather than eight.
+    """
+    cfg = cfg or {}
+    m = _name(measure, cfg).strip().lower() if measure else ""
+    # A hold on a genuine subgroup narrows the population the finding is about,
+    # so it belongs in the sentence. A hold on a total ("Canada",
+    # "Total - Gender") does not narrow anything and would only add noise.
+    aggregates = {n for names in (cfg.get("aggregate_members") or {}).values() for n in names}
+    narrowed = [_name(val, cfg) for val in (fact.meta.get("held_at") or {}).values()
+                if val not in aggregates]
+    among = f", among {' and '.join(narrowed)}" if narrowed else ""
+    of_m = f" {m}" if m else ""
+    meta, v, d = fact.meta, fact.values, fact.decimals
+
+    def q(x: float, kind: str = "delta") -> str:
+        return humanize_bare(float(x), fact.uom, fact.scalar, d, kind=kind)
+
+    probe = fact.probe
+    if probe == "gap_between_members":
+        hi, lo = _name(meta.get("high"), cfg), _name(meta.get("low"), cfg)
+        fact.bare = q(v[0])
+        fact.human = (f"in {_period(fact.periods[-1])}, the{of_m} gap between {hi} and "
+                      f"{lo} was {q(v[0])} ({q(v[1], 'level')} against {q(v[2], 'level')}){among}")
+    elif probe == "gap_trend":
+        hi, lo = _name(meta.get("high"), cfg), _name(meta.get("low"), cfg)
+        verb = "widened" if meta.get("direction") == "widening" else "narrowed"
+        fact.bare = q(abs(v[0]))
+        fact.human = (f"between {_period(fact.periods[0])} and {_period(fact.periods[-1])}, "
+                      f"the{of_m} gap between {hi} and {lo} {verb} by {q(abs(v[0]))}{among}")
+    elif probe == "rank_order":
+        top, bottom = _name(meta.get("leader"), cfg), _name(meta.get("trailer"), cfg)
+        fact.bare = q(v[0], "level")
+        fact.human = (f"in {_period(fact.periods[-1])}, {top} had the highest{of_m} "
+                      f"({q(v[0], 'level')}) and {bottom} the lowest ({q(v[1], 'level')}){among}")
+    elif probe == "rank_reversal":
+        a, b = _name(meta.get("leader"), cfg), _name(meta.get("other"), cfg)
+        n = int(meta.get("crossings", 1))
+        times = "once" if n == 1 else f"{n} times"
+        fact.bare = times
+        fact.human = (f"{a} and {b} have traded the{of_m} lead {times} since "
+                      f"{_period(fact.periods[0])}; {a} leads now")
+    elif probe == "streak":
+        who = _name(_subject(fact.cut, mdim), cfg)
+        n = int(meta.get("periods_in_streak", 0))
+        fact.bare = f"{n} periods"
+        fact.human = (f"{_possessive(who)}{of_m} has been {meta.get('direction', 'moving')} for "
+                      f"{n} periods in a row, now {q(v[1], 'level')}")
+    elif probe == "share_of_total":
+        who = _name(_subject(fact.cut, mdim), cfg)
+        fact.bare = f"{abs(float(v[0])):.1f} points"
+        fact.human = (f"between {_period(fact.periods[0])} and {_period(fact.periods[-1])}, "
+                      f"{_possessive(who)} share of{of_m} {meta.get('direction', 'changed')} "
+                      f"from {float(meta.get('share_then', 0)):.1f}% to "
+                      f"{float(meta.get('share_now', 0)):.1f}%{among}")
+    elif probe == "long_run_compare":
+        who = _name(_subject(fact.cut, mdim), cfg)
+        fact.bare = q(abs(v[0]))
+        higher = "higher" if v[0] >= 0 else "lower"
+        fact.human = (f"as of {_period(fact.periods[-1])}, {_possessive(who)}{of_m} was "
+                      f"{q(abs(v[0]))} {higher} than in {_period(fact.periods[0])} "
+                      f"({q(v[2], 'level')} against {q(v[1], 'level')}){among}")
+    elif probe == "level_threshold":
+        who = _name(_subject(fact.cut, mdim), cfg)
+        fact.bare = q(v[1], "level")
+        fact.human = (f"{_possessive(who)}{of_m} crossed {q(v[1], 'level')}, "
+                      f"now {q(v[0], 'level')}")
+
+
 def run_probes(df: pd.DataFrame, dimensions: list[str], cfg: dict) -> list[Fact]:
     mdim = cfg.get("measure_dimension")
     measures = list(cfg.get("measures") or [None])
@@ -582,7 +703,19 @@ def run_probes(df: pd.DataFrame, dimensions: list[str], cfg: dict) -> list[Fact]
                     continue
                 for f in produced:
                     f.meta["measure"] = measure
+                    # Record what was held fixed. Without this the cut says
+                    # "Women+, Participation rate" while the figure is actually
+                    # core-aged women — the population is narrower than the
+                    # label, which is how a confounded claim gets published.
+                    holds = {k: val for k, val in (cfg.get("hold_at") or {}).items()
+                             if k != dim and k not in f.cut}
+                    # meta, never cut: the reliability gate inspects cut for
+                    # aggregate members, and the holds are aggregates by design
+                    # ("Canada", "Total - Gender"), so putting them there drops
+                    # every fact. Provenance renders meta["held_at"] instead.
+                    f.meta["held_at"] = holds
                     if mdim and measure is not None:
                         f.cut = {**f.cut, mdim: measure}
+                    describe(f, measure, mdim, cfg)
                     facts.append(f)
     return dedupe_probe_overlap(dedupe(facts), mdim)

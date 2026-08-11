@@ -36,3 +36,20 @@ a { color: var(--accent-2); }
 .provenance code { font-size: 0.72rem; }
 .footer { max-width: 820px; margin: 0 auto; padding: 0 24px 40px;
           color: var(--text-dim); font-size: 0.78rem; line-height: 1.6; }
+
+/* An analytical article, not a blog post: the boundary between the source
+   release and this project's own analysis has to be unmissable, because every
+   claim below it is ours and none of it is Statistics Canada's. */
+.section-label { font-family: 'Space Grotesk', sans-serif; font-size: .78rem;
+  text-transform: uppercase; letter-spacing: .08em; color: var(--text-dim);
+  font-weight: 600; margin: 0 0 10px; }
+.divider { display: flex; align-items: center; gap: 14px; margin: 38px 0 14px; }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--accent); opacity: .5; }
+.divider-label { font-family: 'Space Grotesk', sans-serif; font-size: .78rem;
+  text-transform: uppercase; letter-spacing: .1em; color: var(--accent-2); font-weight: 700; }
+.divider-note { color: var(--text-dim); font-size: .82rem; line-height: 1.6;
+  margin: 0 0 6px; }
+.story .body p { margin: 0 0 14px; }
+.story h2 { font-weight: 600; letter-spacing: -.01em; }
+.assumption { font-size: .84rem; }
+.provenance { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; line-height: 1.7; }
