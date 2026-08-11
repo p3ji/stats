@@ -252,7 +252,9 @@ def bind(draft: dict, brief: dict) -> dict:
             "body": TOKEN.sub(_resolve, story.get("body", "")),
             "provenance": [
                 {"id": fid, "vectors": facts[fid]["vectors"], "periods": facts[fid]["periods"],
-                 "cut": facts[fid]["cut"], "table_url": brief["cube"]["table_url"]}
+                 "cut": facts[fid]["cut"],
+                 "held_at": (facts[fid].get("meta") or {}).get("held_at") or {},
+                 "table_url": brief["cube"]["table_url"]}
                 for fid in story.get("fact_ids", []) if fid in facts
             ],
         })

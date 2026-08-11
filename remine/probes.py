@@ -593,6 +593,13 @@ def describe(fact: Fact, measure: str | None, mdim: str | None = None,
     """
     cfg = cfg or {}
     m = _name(measure, cfg).strip().lower() if measure else ""
+    # A hold on a genuine subgroup narrows the population the finding is about,
+    # so it belongs in the sentence. A hold on a total ("Canada",
+    # "Total - Gender") does not narrow anything and would only add noise.
+    aggregates = {n for names in (cfg.get("aggregate_members") or {}).values() for n in names}
+    narrowed = [_name(val, cfg) for val in (fact.meta.get("held_at") or {}).values()
+                if val not in aggregates]
+    among = f", among {' and '.join(narrowed)}" if narrowed else ""
     of_m = f" {m}" if m else ""
     meta, v, d = fact.meta, fact.values, fact.decimals
 
@@ -603,18 +610,19 @@ def describe(fact: Fact, measure: str | None, mdim: str | None = None,
     if probe == "gap_between_members":
         hi, lo = _name(meta.get("high"), cfg), _name(meta.get("low"), cfg)
         fact.bare = q(v[0])
-        fact.human = (f"the{of_m} gap between {hi} and {lo} is {q(v[0])} "
-                      f"({q(v[1], 'level')} against {q(v[2], 'level')})")
+        fact.human = (f"in {_period(fact.periods[-1])}, the{of_m} gap between {hi} and "
+                      f"{lo} was {q(v[0])} ({q(v[1], 'level')} against {q(v[2], 'level')}){among}")
     elif probe == "gap_trend":
         hi, lo = _name(meta.get("high"), cfg), _name(meta.get("low"), cfg)
         verb = "widened" if meta.get("direction") == "widening" else "narrowed"
         fact.bare = q(abs(v[0]))
-        fact.human = f"the{of_m} gap between {hi} and {lo} has {verb} by {q(abs(v[0]))}"
+        fact.human = (f"between {_period(fact.periods[0])} and {_period(fact.periods[-1])}, "
+                      f"the{of_m} gap between {hi} and {lo} {verb} by {q(abs(v[0]))}{among}")
     elif probe == "rank_order":
         top, bottom = _name(meta.get("leader"), cfg), _name(meta.get("trailer"), cfg)
         fact.bare = q(v[0], "level")
-        fact.human = (f"{top} {_has(top)} the highest{of_m} at {q(v[0], 'level')} and "
-                      f"{bottom} the lowest at {q(v[1], 'level')}")
+        fact.human = (f"in {_period(fact.periods[-1])}, {top} had the highest{of_m} "
+                      f"({q(v[0], 'level')}) and {bottom} the lowest ({q(v[1], 'level')}){among}")
     elif probe == "rank_reversal":
         a, b = _name(meta.get("leader"), cfg), _name(meta.get("other"), cfg)
         n = int(meta.get("crossings", 1))
@@ -631,16 +639,17 @@ def describe(fact: Fact, measure: str | None, mdim: str | None = None,
     elif probe == "share_of_total":
         who = _name(_subject(fact.cut, mdim), cfg)
         fact.bare = f"{abs(float(v[0])):.1f} points"
-        fact.human = (f"{_possessive(who)} share of{of_m} {meta.get('direction', 'changed')} "
-                      f"{abs(float(v[0])):.1f} points, from "
-                      f"{float(meta.get('share_then', 0)):.1f}% to "
-                      f"{float(meta.get('share_now', 0)):.1f}%")
+        fact.human = (f"between {_period(fact.periods[0])} and {_period(fact.periods[-1])}, "
+                      f"{_possessive(who)} share of{of_m} {meta.get('direction', 'changed')} "
+                      f"from {float(meta.get('share_then', 0)):.1f}% to "
+                      f"{float(meta.get('share_now', 0)):.1f}%{among}")
     elif probe == "long_run_compare":
         who = _name(_subject(fact.cut, mdim), cfg)
         fact.bare = q(abs(v[0]))
         higher = "higher" if v[0] >= 0 else "lower"
-        fact.human = (f"{_possessive(who)}{of_m} is {q(abs(v[0]))} {higher} than in "
-                      f"{_period(fact.periods[0])}")
+        fact.human = (f"as of {_period(fact.periods[-1])}, {_possessive(who)}{of_m} was "
+                      f"{q(abs(v[0]))} {higher} than in {_period(fact.periods[0])} "
+                      f"({q(v[2], 'level')} against {q(v[1], 'level')}){among}")
     elif probe == "level_threshold":
         who = _name(_subject(fact.cut, mdim), cfg)
         fact.bare = q(v[1], "level")
@@ -694,6 +703,17 @@ def run_probes(df: pd.DataFrame, dimensions: list[str], cfg: dict) -> list[Fact]
                     continue
                 for f in produced:
                     f.meta["measure"] = measure
+                    # Record what was held fixed. Without this the cut says
+                    # "Women+, Participation rate" while the figure is actually
+                    # core-aged women — the population is narrower than the
+                    # label, which is how a confounded claim gets published.
+                    holds = {k: val for k, val in (cfg.get("hold_at") or {}).items()
+                             if k != dim and k not in f.cut}
+                    # meta, never cut: the reliability gate inspects cut for
+                    # aggregate members, and the holds are aggregates by design
+                    # ("Canada", "Total - Gender"), so putting them there drops
+                    # every fact. Provenance renders meta["held_at"] instead.
+                    f.meta["held_at"] = holds
                     if mdim and measure is not None:
                         f.cut = {**f.cut, mdim: measure}
                     describe(f, measure, mdim, cfg)

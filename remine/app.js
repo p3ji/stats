@@ -60,8 +60,15 @@ async function renderArticle() {
   el.innerHTML = `
     <div class="eyebrow">${esc(a.date)}</div>
     <h1 class="header-title" style="font-size:1.6rem;margin:6px 0 18px">${esc(a.headline)}</h1>
-    <p class="daily-story"><strong>What the Daily reported:</strong> ${esc(a.daily_story)}
+    <h2 class="section-label">What the release reported</h2>
+    <p class="daily-story"> ${esc(a.daily_story)}
       <br><a href="${esc(safeUrl(a.source.url))}">${esc(a.source.title)}</a></p>
+    <div class="divider">
+      <span class="divider-label">Re-mined analysis</span>
+    </div>
+    <p class="divider-note">Everything below was computed from the same Statistics Canada table
+      the release cites. It did not appear in the release. Each finding lists the series and
+      reference periods it was computed from.</p>
     ${a.stories.map(renderStory).join('')}`;
 }
 
@@ -76,7 +83,7 @@ function renderStory(s) {
         <strong>Where these numbers come from.</strong>
         The Daily: ${esc(s.differs_from_daily)}.
         ${s.provenance.map((p) => `
-          <div>${esc(Object.values(p.cut).join(', '))} —
+          <div>${esc(Object.values(p.cut).join(', '))}${p.held_at && Object.keys(p.held_at).length ? esc(' · holding ' + Object.entries(p.held_at).map(([k, v]) => `${k}=${v}`).join(', ')) : ''} —
             <code>${esc(p.vectors.join(', '))}</code>,
             ${esc(p.periods.join(' to '))},
             <a href="${esc(safeUrl(p.table_url))}">source table</a></div>`).join('')}
