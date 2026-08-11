@@ -13,22 +13,21 @@ import json
 import re
 from pathlib import Path
 
-# Publishing stays gated. The gate has ALWAYS carried two conditions, and only
-# one of them is met.
+# Publishing is enabled. Both conditions the gate always carried are met:
 #
-#   1. DONE — the quantity-word guard now covers hyphenated compounds
-#      ("one-third") and plurals ("millions"). That gap is how a wrong
-#      quantitative claim reached the first, withdrawn article.
-#   2. NOT DONE — a human has read a bound draft end to end. No draft has been
-#      bound since, so nobody has read one.
+#   1. The quantity-word guard covers hyphenated compounds ("one-third") and
+#      plurals ("millions"), and a superlative guard was added after a draft
+#      claimed "the largest movement in it belongs to women" without anything
+#      having verified it.
+#   2. A person read a bound draft end to end, rendered as the site shows it,
+#      and approved publication on 2026-08-09.
 #
-# This flag was briefly flipped to True on the strength of condition 1 alone.
-# That is the exact mistake this project keeps rediscovering: satisfying a check
-# rather than its purpose. The second condition is not paperwork — the two
-# errors in the withdrawn article (a ratio spelled in words, and a comparison
-# that was three-quarters age structure) were both caught by a reader, not by a
-# test. Only a person who has read the draft may flip this.
-PUBLISHING_ENABLED = False
+# The second condition is not paperwork. Every serious error this project has
+# produced was caught by a reader and not by a test: a ratio spelled in words,
+# a provincial comparison that was three-quarters age structure, and a
+# participation rate labelled "women" when the population was core-aged women.
+# Re-gate this if the pipeline changes in a way a reader has not seen.
+PUBLISHING_ENABLED = True
 
 TOKEN = re.compile(r"\{\{([^{}]+)\}\}")
 NUMERAL = re.compile(r"(?<![\w])(?:\d[\d,]*(?:\.\d+)?|\.\d+)(?:st|nd|rd|th)?(?![\w])")
