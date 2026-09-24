@@ -1,0 +1,91 @@
+# query: self rated mental health canada
+# id: HEA-024
+# wave: 2
+# run: 3
+# date: 2026-08-31
+# url: https://www.bing.com/search?q=self+rated+mental+health+canada&setlang=en-ca&cc=CA&cb=1788486520
+# ai_module: empty
+# relevance: 1.00
+
+=== FULL SERP TEXT ===
+Health Infobase
+https://health-infobase.canada.ca › mental-health › indicators
+Index - Mental health in Canada dashboard – Canada.ca
+
+Jun 20, 2024 · This dashboard explores the mental health of people in Canada through 29 interactive indicators. You can find links to …
+
+Self-rated mental health acro…
+
+Self-rated mental health across occupational groups - …
+
+Self-rated mental health, com…
+
+Self-rated mental health, community belonging, life …
+
+Self-rated mental health, com…
+
+The current study found that life satisfaction and …
+
+Coping and positive mental h…
+
+Coping and positive mental health in Canada among …
+
+See results only from health-infobase.canada.ca
+ 
+Health Infobase
+https://health-infobase.canada.ca › mental-health › occupational-groups
+Self-rated mental health across occupational groups - Canada
+
+Self-rated mental health, community belonging, life satisfaction and perceived change in mental health among adults during the …
+
+Canada.ca
+https://www.canada.ca › en › public-health › services › reports-publications...
+Self-rated mental health, community belonging, life ... - Canada
+Introduction
+Methods
+Results
+Discussion
+Authors’ Contributions and Statement
+High SRMH, high community belonging and average life satisfaction results are reported in Table 1. Overall, 51.5% of adults in Canada reported high SRMH in winter/spring 2021, which is significantly lower than the 59.9% who reported high SRMH in fall 2020. High SRMH was significantly less common in winter/spring 2021 than in fall 2020 in every soci...
+See more on canada.ca
+Statistique Canada
+https://www.statcan.gc.ca › ... › mental-health-sante-mentale-eng.htm
+Quality of life indicator: Perceived mental health - Statistique Canada
+
+Perceived mental health refers to the perception of a person's mental health in general, either by the person themselves, or, in the …
+
+Statistics Canada
+https://www150.statcan.gc.ca › daily-quotidien
+The Daily — Self-rated mental health decreases after another year of ...
+
+In fall 2021, there were two surges in COVID -1 9 cases and hospitalizations that resulted in increased public health restrictions …
+
+canada.ca
+https://open-science.canada.ca › handle
+Self-rated mental health, community belonging, life satisfaction and ...
+
+2 days ago · Self-rated mental health, community belonging, life satisfaction and perceived change in mental health among adults …
+
+Open Ottawa
+https://open.ottawa.ca › datasets › self-rated-mental-health
+Self-rated mental health
+
+Respondents were asked to rate their mental health. This data was made available through a custom data request to Statistics Canada.
+
+Canadian Institute for Health Information
+https://www.cihi.ca › en › indicators › perceived-health
+Perceived Health | CIHI
+
+Canadian Community Health Survey, 2-year pooled estimates 2023–2024, Statistics Canada. This indicator measures the percentage …
+
+Canada.ca
+https://www.canada.ca › en › public-health › services › reports-publications...
+Coping and positive mental health in Canada among youth and adults ...
+
+Self-rated mental health, community belonging, life satisfaction and perceived change in mental health among adults during the …
+
+Statistics Canada
+https://www150.statcan.gc.ca › daily-quotidien
+Like
+Dislike
+ 

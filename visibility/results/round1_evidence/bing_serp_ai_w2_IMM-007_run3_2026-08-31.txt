@@ -1,0 +1,81 @@
+# query: visible minorities in canada percentage
+# id: IMM-007
+# wave: 2
+# run: 3
+# date: 2026-08-31
+# url: https://www.bing.com/search?q=visible+minorities+in+canada+percentage&setlang=en-ca&cc=CA&cb=1788486582
+# ai_module: absent
+# relevance: 1.00
+
+=== FULL SERP TEXT ===
+26.53%
+Some 9,639,200 Canadians identified as a member of a "visible minority group " in the 2021 Canadian Census, for 26.53% of the total population. This was an increase from the 2016 Census, when members of visible minorities accounted for 22.2% of the total population; from the 2011 Census, when the proportion was 19.1%; from the 2006 Census, when the proportion was 16.2%; from 2001, when the proportion was 13.4%; from 1996 (11.2%); from 1991 (9.4%) and from 1981 (4.7%). 
+Wikipedia
+Wikipedia
+Visible minority - Wikipedia
+Some 9,639,200 Canadians identified as a member of a "visible minority group " in the 2021 Canadian Census, for 26.53% of the total population. [2][3] This was an increase from the…
+ 
+Statistique Canada
+https://www12.statcan.gc.ca › census-recensement › ref
+Visible Minority and Population Group Reference ... - Statistics Canada
+
+Mar 30, 2022 · Data on Canada’s visible minority population are used by governments, businesses, community groups, health care …
+
+ 
+Statistique Canada
+https://www12.statcan.gc.ca › census-recensement › dp-pd › hlt-fst › ...
+Ethnocultural and religious diversity, 2021 Census of Population
+
+Jun 21, 2023 · These tables provide 2021 Census highlights on ethnic or cultural origin, visible minorities and religious diversity.
+
+Wikipedia
+https://en.wikipedia.org › wiki › Visible_minority
+Visible minority - Wikipedia
+OverviewBackgroundGeographical distributionLegislative versus operational definitionsControversySee alsoExternal links
+
+In Canada, a visible minority (French: minorité visible) is a demographic category of people, defined by the Government of Canada as "persons, other than aboriginal peoples, who are non-Caucasian in race or non-white in colour". The term is used primarily as a demographic category by Statistics Canada, in connection with Canada's employment equity, human rights, and other laws and policies. The term as defined, an…
+
+Wikipedia · Text under CC-BY-SA license
+Videos of visible minorities in Canada Percentage
+2:02
+StatsCan reviewing how people with mixed visible minority backgrounds are tallied
+YouTubeCBC News: The National
+3.2K viewsJul 17, 2021
+2:03
+Census reveals growing Canadian diversity
+YouTubeCTV News
+56.4K viewsOct 26, 2017
+2:01
+Canada has more immigrants than ever, Census data shows
+YouTubeCBC News: The National
+79.3K viewsOct 27, 2022
+Statistics Canada
+https://www150.statcan.gc.ca › en › tv.action
+Visible minority and population group by generation ... - Statistics …
+
+Oct 26, 2022 · Data on visible minority and population group by generation status for the population in private households in Canada, …
+
+Stephen Taylor
+https://www.stephentaylor.ca › data › census › minorities
+Visible Minorities — 2021 Canadian Census
+
+Visible minority population groups as percentage of total population. Interactive choropleth map of 2021 Census data across Canada.
+
+statcan.gc.ca
+https://www23.statcan.gc.ca › imdb
+Visible minority of person - Statistics Canada
+
+Statistics on this population can either be collected through a direct question asking respondents to indicate whether they are a …
+
+Canada.ca
+https://www.canada.ca › ... › diversity-inclusion-statistics.html
+Diversity and inclusion statistics - Canada.ca
+
+These tables provide the representation of each employment equity group (women, Indigenous Peoples, members of visible …
+
+Wikipedia
+https://en.wikipedia.org › wiki › Demographics_of_Canada
+thedatainsider.com
+https://thedatainsider.com › canada-population-demographics-by-ethnicity
+theworlddata.com
+https://theworlddata.com › canada-demographic-by-race

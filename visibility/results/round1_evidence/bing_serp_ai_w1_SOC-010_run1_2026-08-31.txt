@@ -1,0 +1,76 @@
+# query: do canadians trust the government
+# id: SOC-010
+# wave: 1
+# run: 1
+# date: 2026-08-31
+# url: https://www.bing.com/search?q=do+canadians+trust+the+government&setlang=en-ca&cc=CA&cb=1788486216
+# ai_module: absent
+# relevance: 1.00
+
+=== FULL SERP TEXT ===
+Policy Options
+https://policyoptions.irpp.org › trust-government-public
+Why Canada needs a trust ecosystem in government
+
+Oct 15, 2025 · Overall, Canadians’ trust in government institutions tends to be around or slightly above the OECD average. However, …
+
+ 
+frontiercentre.org
+https://frontiercentre.org › canadians-no-longer-trust-their-government-and...
+Canadians No Longer Trust Their Government. And For Good Reason
+
+Mar 4, 2025 · In a recent Ekos Research survey, 51 per cent of respondents said they distrust government decision-making, with that …
+
+Canada.ca
+https://www.canada.ca › en › government › system › government-wide-reporti…
+Government of Canada Trust and Transparency Strategy
+
+While Canadians have a high level of trust in our democratic system, we must take additional action to ensure the Government of …
+
+University of Waterloo
+https://uwaterloo.ca › cybersecurity-privacy-institute › sites › def…
+ · PDF file
+Trust in Canadian government: what is it, (how) has it changed, can it ...
+
+Criticisms of efforts toward Reconciliation with Indigenous Peoples for historical injustices, high levels of inequity in the population, …
+
+Policy Magazine
+https://www.policymagazine.ca › canadas-growing-problem-with-trust-in...
+Canada’s Growing Problem with Trust in Government
+
+Nov 30, 2022 · If the police lack the leadership, capacity and will to uphold the rule of law, it’s no wonder that public trust in …
+
+Public Sector Network
+https://publicsectornetwork.com › insight › public-trust-in-digital...
+Public Trust in Digital Government Canada
+
+Dec 2, 2024 · Where do Canadians stand when it comes to their trust levels in their government? According to the 2024 Edelman …
+
+plos.org
+https://journals.plos.org › plosone › article
+Canadians’ trust in government in a time of crisis: Does it matter?
+
+Sep 8, 2023 · Indeed, Canadians’ trust in government has been challenged by the COVID-19 pandemic, economic turmoil, and a …
+
+Canada.ca
+https://www.canada.ca › en › government › system › government-wide-reporti…
+Annual Report on the Government of Canada’s Trust and Transparency ...
+
+The Trust and Transparency Strategy identifies three strategic objectives and supporting commitments intended to guide federal …
+
+CBC
+https://www.cbc.ca › news › politics
+What can new polling tell us about the health of Canadian democracy ...
+
+Jan 17, 2026 · New polling suggests Canadians' faith in democracy is strong overall, but there are also some potentially concerning …
+
+publications.gc.ca
+https://publications.gc.ca › collections › sct-tbs
+ · PDF file
+Annual Report on the Government of Canada s Trust and Transparency …
+
+The Trust and Transparency Strategy identifies three strategic objectives and supporting commitments intended to guide federal …
+
+1
+2
+3

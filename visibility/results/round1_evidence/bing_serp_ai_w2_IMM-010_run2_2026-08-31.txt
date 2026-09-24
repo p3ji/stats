@@ -1,0 +1,76 @@
+# query: ethnic groups in canada percentages
+# id: IMM-010
+# wave: 2
+# run: 2
+# date: 2026-08-31
+# url: https://www.bing.com/search?q=ethnic+groups+in+canada+percentages&setlang=en-ca&cc=CA&cb=1788486450
+# ai_module: absent
+# relevance: 0.75
+
+=== FULL SERP TEXT ===
+theworlddata.com
+https://theworlddata.com › canada-demographic-by-race
+Canada Demographic by Race 2026 | Statistics & Facts
+
+Jul 10, 2026 · The three largest racialized groups—South Asian, Chinese, and Black—collectively represent 16.1% of Canada’s total …
+
+ 
+Wikipedia
+https://en.wikipedia.org › wiki › Ethnic_origins_of_people_in_Canada
+Ethnic origins of people in Canada - Wikipedia
+OverviewStatistics Canada report on race and ethnicity in Canada in 2022Data collection methodEvolution from 1871 to 1921See alsoFurther reading
+
+According to the 2021 Canadian census, over 450 "ethnic or cultural origins" were self-reported by Canadians. The country's ten largest self-reported specific ethnic or cultural origins in 2021 were Canadian (accounting for 15.6 percent of the population), followed by English (14.7 percent), Irish (12.1 percent), Scottish (12.1 percent), French (11.0 percent), German (8.1 percent), Chinese (4.7 percent), Italian (4.3 percent), Indian (…
+
+Wikipedia · Text under CC-BY-SA license
+Statistique Canada
+https://www12.statcan.gc.ca › census-recensement › dp-pd › hlt-fst › ...
+Ethnocultural and religious diversity, 2021 Census of Population
+
+Jun 21, 2023 · These tables provide 2021 Census highlights on ethnic or cultural origin, visible minorities and religious diversity.
+
+thedatainsider.com
+https://thedatainsider.com › canada-population-demographics-by-ethnicity
+Canada’s Population Demographics by Ethnicity - TheDataInsider
+
+Jul 22, 2025 · White Canadians remain the largest ethnic group, accounting for 67% of the population. South Asians represent the …
+
+Wikipedia
+https://en.wikipedia.org › wiki › Demographics_of_Canada
+Demographics of Canada - Wikipedia
+
+The country's ten largest self-reported specific ethnic or cultural origins in 2021 were Canadian [c] (accounting for 15.6 percent of the …
+
+Statistics Canada
+https://www150.statcan.gc.ca › pub
+Canada at a Glance, 2023 Immigration and ethnocultural - Statistics …
+
+In 2021, three racialized groups alone accounted for more than 16.1% of Canada's total population. These groups are South Asians …
+
+Statistique Canada
+https://www12.statcan.gc.ca › census-recensement › ref
+Ethnic or Cultural Origin Reference Guide, Census of Population, 2021
+
+Mar 30, 2022 · This reference guide provides information to help users effectively use and interpret ethnic or cultural origin data from …
+
+EBSCO
+https://www.ebsco.com › ... › racial-and-ethnic-demographics-canada
+Racial and ethnic demographics in Canada - EBSCO
+
+In the 2021 census, 14.7 percent of the population identified themselves as being of English descent, 12 percent as Scottish, and 12 …
+
+Statistics Canada
+https://www150.statcan.gc.ca › daily-quotidien
+The Daily — The Canadian census: A rich portrait of the country's ...
+
+Oct 26, 2022 · Racialized groups in Canada are all experiencing growth. In 2021, South Asian (7.1%), Chinese (4.7%) and Black (4.3%) …
+
+Statistique Canada
+https://www.statcan.gc.ca › en › subjects-start › immigration_and_ethno...
+Immigration ethnocultural diversity and Statistics - Statistique Canada
+
+Bringing together data, tools and reports to provide you with the latest information on immigration and ethnocultural diversity in …
+
+1
+2
+3

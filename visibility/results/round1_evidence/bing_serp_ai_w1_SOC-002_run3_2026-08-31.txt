@@ -1,0 +1,98 @@
+# query: what percentage of canadians volunteer
+# id: SOC-002
+# wave: 1
+# run: 3
+# date: 2026-08-31
+# url: https://www.bing.com/search?q=what+percentage+of+canadians+volunteer&setlang=en-ca&cc=CA&cb=1788486482
+# ai_module: populated
+# relevance: 1.00
+
+=== AI MODULE EXTRACTED TEXT ===
+People also ask
+Does Canada have a volunteer sector?
+How many people volunteer in Canada?
+What does Statistics Canada study about volunteering?
+Are Canadians volunteering less hours?
+Like
+Dislike
+
+=== FULL SERP TEXT ===
+Imagine Canada
+https://imaginecanada.ca › en › new-results-statistics-canadas-survey-giving...
+New Results from Statistics Canada’s Survey of Giving, Volunteering …
+
+Jun 23, 2025 · The percentage of Canadians volunteering for nonprofits and charities dropped significantly, from 41% in 2018 to 32% …
+
+ 
+Made in CA
+https://madeinca.ca › volunteer-work-statistics-canada
+Volunteer Work Statistics in Canada - Made in CA
+
+Jan 25, 2026 · In 2023, around 73% of Canadians aged 15 years or older were taking part in some type of volunteer work, either …
+
+How many people volunteer in Canada?
+Almost four in five Canadians volunteered in some capacity in 2018. While 79% overall engaged in either informal or formal volunteer work, the rate...
+Who is most likely to volunteer in Canada?
+Canadian volunteers come from all age groups and economic backgrounds. The portion of volunteers is the greatest among the iGen Canadians at 52%. H...
+Has the COVID-19 pandemic changed volunteering in Canada?
+The COVID-19 pandemic had a disruptive effect on volunteer work in Canada, making it harder for organisations that rely on support from their volun...
+Statistics Canada
+https://www150.statcan.gc.ca › daily-quotidien
+Volunteering and charitable giving in Canada, 2018 to 2023
+
+Jun 23, 2025 · Close to three in four people (73%) volunteered in 2023, compared with just under four in five people (79%) in 2018. …
+
+Canada.ca
+https://www.canada.ca › ... › reports › research › volunteers-canada.html
+Research summary: Volunteers in Canada - Canada.ca
+
+Using the 2018 and 2023 General Social Survey, this research looks at individuals who are volunteering in Canada, how often people …
+
+Statistics Canada
+https://www150.statcan.gc.ca › en › tv.action
+Volunteer rate and average annual volunteer hours, by definition of ...
+
+Nov 21, 2025 · Volunteer rate and distribution of volunteer hours, for the population aged 15 and over, by definition of volunteering …
+
+Statistique Canada
+https://www.statcan.gc.ca › en › survey › household
+Survey on Giving, Volunteering and Participating (SGVP)
+
+In 2018, over 24 million Canadians gave approximately 5 billion hours to their formal and informal volunteer activities — equivalent to …
+
+Volunteer Toronto
+https://www.volunteertoronto.ca › news
+Volunteering Rate in Canada Declines 8% Over Five Years
+
+Jul 28, 2025 · On June 23rd, 2025, Statistics Canada released preliminary findings from the 2023 Survey of Giving, Volunteering, and …
+
+Volunteer Canada
+https://volunteer.ca › data-on-giving-volunteering-and-participating-in-canada
+Data on Giving, Volunteering and Participating in Canada
+
+Collected every five years, this survey captures how Canadians support their communities through time, money, and civic action. The …
+
+givingandvolunteering.ca
+https://givingandvolunteering.ca › statscan-report-volunteering-and...
+StatsCan Report: Volunteering and Charitable Giving in Canada, 2018 …
+
+Jul 2, 2026 · The overall volunteer rate fell from 79 per cent in 2018 to 73 per cent in 2023, and total volunteer hours dropped 18 per …
+
+Made in CA
+https://madeinca.ca › not-for-profit-sector-statistics-canada
+Not-for-Profit Sector Statistics in Canada - Made in CA
+
+Jan 25, 2026 · According to Imagine Canada, around 41% of Canadians volunteer at charities and not-for-profit organisations. This …
+
+People also ask
+Does Canada have a volunteer sector?
+How many people volunteer in Canada?
+What does Statistics Canada study about volunteering?
+Are Canadians volunteering less hours?
+Like
+Dislike
+ 
+Deep dive into what percentage of canadians volunteer
+donations in Canada statistics
+number of volunteers in canada
+canadian volunteering statistics

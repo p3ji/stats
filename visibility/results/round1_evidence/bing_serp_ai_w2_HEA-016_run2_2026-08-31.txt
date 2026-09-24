@@ -1,0 +1,77 @@
+# query: how many canadians have a family doctor
+# id: HEA-016
+# wave: 2
+# run: 2
+# date: 2026-08-31
+# url: https://www.bing.com/search?q=how+many+canadians+have+a+family+doctor&setlang=en-ca&cc=CA&cb=1788486387
+# ai_module: absent
+# relevance: 1.00
+
+=== FULL SERP TEXT ===
+CBC
+https://www.cbc.ca › news › health
+More Canadians have a family doctor, but 'concerning gaps' found
+
+Dec 8, 2025 · An estimated 5.9 million Canadians don't have regular access to a primary care provider, down from 6.5 million in 2022, …
+
+ 
+Videos of How Many Canadians have a family doctor
+2:05
+More Canadians have family doctors, but accessing care remains a challenge
+YouTubeCBC News: The National
+6.2K views8 months ago
+0:35
+Report on family doctors in Canada
+YouTubeCTV News
+11.4K views8 months ago
+2:45
+Millions of Canadians don't have a family doctor #canada #canadianhealthcare #familydoctor
+YouTubeCanadian On Paper Society for Immigrant Physicians
+2.3K views4 months ago
+Canadian Medical Association
+https://www.cma.ca › healthcare-for-real › why-it-so-hard-find-family-doctor
+Why is it so hard to find a family doctor? | CMA
+
+Jul 2, 2026 · Over 6.5 million Canadians lack a family doctor. Learn why the shortage is growing, what’s driving it, and the …
+
+Canadian Medical Association
+https://www.cma.ca › ...
+National survey: 5.9 million in Canada still without regular doctor
+
+Dec 8, 2025 · 5.9 million Canadians do not have a family doctor, nurse practitioner or primary care team they see regularly, according …
+
+CTV News
+https://www.ctvnews.ca › health › article › more-canadians-are-gaining...
+Family doctor Canada: Survey finds about 6 million don't have one
+
+Dec 8, 2025 · Data from the OurCare Survey found that an estimated 5.9 million Canadians don’t have a primary care professional like …
+
+Angus Reid Institute
+https://angusreid.org › wp-content › uploads
+ · PDF file
+Health Care Access: Half of Canadians either don’t have a family …
+
+From 2015 to 2025, the percentage of Canadians who have difficult or no access to a family doctor has increased by 25 per cent (40% …
+
+Canadian Institute for Health Information
+https://www.cihi.ca › ... › most-canadians-have-a-regular-health-care-provider
+Most Canadians have a regular health care provider | CIHI
+
+Oct 23, 2025 · In 2024, 4 out of 5 Canadian adults age 18 and older (83%) reported having access to a regular health care provideri — …
+
+CBC
+https://www.cbc.ca › news › politics
+Meet some of the 6 million Canadians who don't have a family doctor
+
+Feb 18, 2024 · More than six million Canadians say they do not have regular access to primary care physicians. It's a crisis the experts …
+
+advancestudy.org
+https://advancestudy.org › how-many-canadians-dont-have-a-family-doctor
+How Many Canadians Don’t Have a Family Doctor? - Advance Study
+Angus Reid Institute
+https://angusreid.org
+advancestudy.org
+https://advancestudy.org › how-many-family-doctors-are-there-in-canada
+Like
+Dislike
+ 

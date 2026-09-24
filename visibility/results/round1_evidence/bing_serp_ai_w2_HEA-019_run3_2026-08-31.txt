@@ -1,0 +1,90 @@
+# query: unmet health care needs canada
+# id: HEA-019
+# wave: 2
+# run: 3
+# date: 2026-08-31
+# url: https://www.bing.com/search?q=unmet+health+care+needs+canada&setlang=en-ca&cc=CA&cb=1788486572
+# ai_module: populated
+# relevance: 1.00
+
+=== AI MODULE EXTRACTED TEXT ===
+People also ask
+Are there unmet health needs in Canada?
+What is the rate of unmet healthcare needs in Canada?
+What is the prevalence of unmet primary healthcare needs in Canada?
+How many Canadians have unmet home care needs?
+Like
+Dislike
+
+=== FULL SERP TEXT ===
+Statistics Canada
+https://www150.statcan.gc.ca › en › tv.action
+Unmet health care needs by gender and age group - Statistics Canada
+
+Apr 29, 2026 · Number and percentage of persons aged 15 years and over with unmet health care needs by gender (Canada and …
+
+ 
+Statistique Canada
+https://www.statcan.gc.ca › ... › health-sante › health-care-soins-sante-eng.htm
+Quality of life indicator: Unmet needs for health care - Statistique Canada
+
+This indicator is measured through multiple Statistics Canada surveys. Estimates can vary between data sources due to differences …
+
+Springer
+https://link.springer.com › article
+Social determinants of unmet need for primary care: a ... - Springer
+
+Oct 2, 2024 · Despite primary care being largely free at the point of delivery, many Canadians experience challenges in accessing the …
+
+Statistics Canada
+https://www150.statcan.gc.ca › pub › article
+Health Reports Difficulties accessing specialist care and the ...
+
+Jul 15, 2026 · Canada’s population is aging rapidly, with implications for the health care system, including increasing demand for …
+
+CBC
+https://www.cbc.ca › news › health
+Millions of Canadians struggle to get specialist health care: StatsCan ...
+
+Jul 21, 2026 · Experts say wait times for specialized care continue to get worse across the country, as the health-care system …
+
+ScienceDirect
+https://www.sciencedirect.com › science › article › pii
+Disability and unmet need for health care in Canada: Findings from the ...
+
+Oct 1, 2025 · Objective This study investigated the level of unmet health needs in the Canadian population, with and without …
+
+statcan.gc.ca
+https://www160.statcan.gc.ca › health-sante › health-care-soins-sante-eng.htm
+Quality of life indicator: Unmet needs for health care - Statistics Canada
+
+Sep 27, 2022 · This indicator is measured through multiple Statistics Canada surveys. Estimates can vary between data sources due …
+
+Canadian Institute for Health Information
+https://www.cihi.ca › en › indicators › canadians-with-a-mental-health...
+Canadians With a Mental Health Disorder Who Have an Unmet Need …
+
+The percentage of Canadians with a diagnosed mental health disorder lasting 6 months or more who report having an unmet mental …
+
+publications.gc.ca
+https://publications.gc.ca › collections › statcan
+ · PDF file
+Health and care-receiving profiles and unmet home care needs among ...
+
+Unmet home care needs are associated with negative health consequences and can challenge the ability of those 85 and older to age …
+
+publications.gc.ca
+https://publications.gc.ca › collections › statcan
+ · PDF file
+Changes in the health of Canadians and access to health care
+
+Data on perceived health and regular health care providers come from the Canadian Community Health Survey (CCHS) and data on …
+
+People also ask
+Are there unmet health needs in Canada?
+What is the rate of unmet healthcare needs in Canada?
+What is the prevalence of unmet primary healthcare needs in Canada?
+How many Canadians have unmet home care needs?
+Like
+Dislike
+ 

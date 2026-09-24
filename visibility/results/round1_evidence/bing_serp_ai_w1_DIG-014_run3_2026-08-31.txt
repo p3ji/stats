@@ -1,0 +1,87 @@
+# query: how many businesses in canada use artificial intelligence
+# id: DIG-014
+# wave: 1
+# run: 3
+# date: 2026-08-31
+# url: https://www.bing.com/search?q=how+many+businesses+in+canada+use+artificial+intelligence&setlang=en-ca&cc=CA&cb=1788486493
+# ai_module: absent
+# relevance: 1.00
+
+=== FULL SERP TEXT ===
+Statistics Canada
+https://www150.statcan.gc.ca › pub
+Analysis on artificial intelligence use by businesses in Canada, second ...
+
+Jun 16, 2025 · Artificial intelligence (AI) is increasingly shaping how work is performed and how businesses operate in Canada. …
+
+ 
+Statistics Canada
+https://www150.statcan.gc.ca › pub
+Analysis on artificial intelligence use by businesses in Canada, second ...
+
+Jun 11, 2026 · Over the last 12 months, businesses in information and cultural industries (42.3%), finance and insurance (40.4%), and …
+
+Bank of Canada
+https://www.bankofcanada.ca
+Canadian businesses’ use of AI: What the evidence shows
+
+Aug 24, 2026 · As businesses worldwide are adopting artificial intelligence to boost productivity, little has been known about how …
+
+LinkedIn
+https://www.linkedin.com › pulse › analysis-artificial-intelligence-use...
+Analysis on artificial intelligence use by businesses in Canada, second ...
+
+Jun 16, 2025 · In the second quarter of 2025, 8.3% of businesses in Canada reported that investment in AI was very important to their …
+
+Made in CA
+https://madeinca.ca › artificial-intelligence-canada-statistics
+Artificial Intelligence Statistics in Canada - Made in CA
+
+Jan 24, 2026 · Over 1,500 AI companies are operating in Canada, and their sizes range from small companies with only a few …
+
+publications.gc.ca
+https://publications.gc.ca › collections › statcan
+ · PDF file
+Analysis on artificial intelligence use by businesses in Canada, second ...
+
+In the second quarter of 2025, 12.2% of businesses reported having used AI to produce goods or deliver services over the 12 months …
+
+publications.gc.ca
+https://publications.gc.ca › collections › statcan
+ · PDF file
+Analysis on artificial intelligence use by businesses in Canada, second ...
+
+Of the businesses who reported using AI (6.1%), 6.3% of those businesses in Canada reported their total employment decreased after …
+
+cloudforces.ca
+https://www.cloudforces.ca › blog
+Canada's AI Adoption Gap in 2026: What the Latest Statistics Canada ...
+
+Jul 18, 2026 · Canada's business AI adoption rate tripled to 19.2% in two years — yet global peers sit at 88%. Here is what the Q2 2026 …
+
+Statistique Canada
+https://www.statcan.gc.ca › en › plus
+Which Canadian businesses are using generative artificial intelligence ...
+
+In the first quarter of 2024, approximately one in seven Canadian businesses were already using (9.3%) or had plans to use (4.6%) …
+
+Wikipedia
+https://en.wikipedia.org › wiki › Artificial_intelligence_industry_in_Canada
+Artificial intelligence industry in Canada - Wikipedia
+
+As of September 2025, Statistics Canada indicated that while about one-third of Canadian businesses had no plans to adopt artificial …
+
+Videos of How Many businesses in Canada Use Artificial Intelligence
+9:15
+Why Is Canada Spending $2 Billion on AI Infrastructure?
+YouTubeTheGlobalshift
+2.2K views3 months ago
+51:45
+Carney unveils Canada's AI strategy focused on "large-scale" data centres
+YouTubeGlobal News
+2.9K views3 months ago
+3:22
+How Canadian businesses are using AI to increase productivity
+YouTubeGlobal News
+8.6K viewsOct 26, 2024
+ 

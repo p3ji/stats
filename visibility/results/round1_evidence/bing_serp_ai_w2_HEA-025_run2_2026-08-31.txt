@@ -1,0 +1,104 @@
+# query: does income affect health in canada
+# id: HEA-025
+# wave: 2
+# run: 2
+# date: 2026-08-31
+# url: https://www.bing.com/search?q=does+income+affect+health+in+canada&setlang=en-ca&cc=CA&cb=1788486397
+# ai_module: absent
+# relevance: 1.00
+
+=== FULL SERP TEXT ===
+Yes
+Does Income Affect Health in Canada?
+Yes, income does affect health in Canada. Research indicates that higher income levels are associated with better health outcomes. Canadians in higher income brackets experience a 5-10 year life expectancy advantage compared to those in lower income groups. Factors such as income and social status, education, and social support networks significantly influence health. For instance, the health status improves at each step up the income and social hierarchy, with the healthiest populations being those in societies that are prosperous and have an equitable distribution of wealth. Additionally, the relationship between income inequality and health status has been reexamined, showing a negative relationship in many studies. However, the impact of income dynamics over time on health outcomes is still less understood. 
+www.cihi.ca
++5
+Read more
+www.cihi.ca
+Trends in Income-Related Health Inequalities in Canada
+The Trends in Income-Related Health Inequalities in Canada project examines whether the health gaps between lower- and higher-income individuals have changed over the past decade. …
+www.canada.ca
+What Makes Canadians Healthy or Unhealthy?
+The evidence indicates that the key factors which influence population health are: income and social status; social support networks; education; employment/ working conditions; soc…
+View all
+ 
+Canadian Institute for Health Information
+https://www.cihi.ca › en › trends-in-income-related-health-inequalities-in...
+Trends in Income-Related Health Inequalities in Canada
+
+The Trends in Income-Related Health Inequalities in Canada project examines whether the health gaps between lower- and higher …
+
+ 
+Springer
+https://link.springer.com › article
+Family income and health in Canada: a longitudinal study of stability ...
+
+Feb 10, 2021 · In this study we investigated how stability, volatility and trajectory in incomes over a decade predicted two health …
+
+Canada.ca
+https://www.canada.ca › en › public-health › services › health-promotion › ...
+What Makes Canadians Healthy or Unhealthy? - Canada.ca
+Overview
+Underlying Premises and Evidence Table
+This deceptively simple story speaks to the complex set of factors or conditions that determine the lev…
+- from
+There is a growing body of evidence about what makes people healthy. The Lalonde Report set the sta…
+The evidence indicates that the key factors which influence population health are: income and social status; social support networks; education; employment/ working conditions; social environments; physical environments; personal health practices and coping skills; healthy child development; biology …
+See more on canada.ca
+nih.gov
+https://pmc.ncbi.nlm.nih.gov › articles
+Income Inequality, Household Income, and Health Status in Canada: A ...
+
+This study extended previous research by examining whether income inequality at the metropolitan level, household income, or the …
+
+Canada.ca
+https://www.canada.ca › ... › mental-health-inequalities-income-canada.html
+Mental health inequalities by income in Canada - Canada.ca
+
+Jul 7, 2022 · There is a clear relationship between income and perceived mental health that is influenced by various factors.
+
+Springer
+https://link.springer.com › article
+Income inequality and life expectancy in Canada: New ... - Springer
+
+May 21, 2025 · We found a robust, negative and statistically significant association where higher population-level after-tax income …
+
+National Center for Biotechnology Information
+https://www.ncbi.nlm.nih.gov › pmc › articles
+Family income and health in Canada: a longitudinal study of stability ...
+
+Feb 10, 2021 · In this study we investigated how stability, volatility and trajectory in incomes over a decade predicted two health …
+
+healthcouncilcanada.ca
+https://www.healthcouncilcanada.ca › how-social-connections-shape-your...
+How Social Connections Shape Your Health (According to Canadian ...
+
+Oct 4, 2025 · Research consistently shows that Canadians in higher income brackets experience better health outcomes, with a 5-10 …
+
+Health Infobase
+https://health-infobase.canada.ca › health-of-people-in-canada-dashboard
+Explore the dashboard: Health of people in Canada dashboard – …
+
+Jun 26, 2026 · People in Canada generally live long and healthy lives, but not everyone has the same opportunity for good health. This …
+
+uO Research
+https://ruor.uottawa.ca › bitstreams › download
+ · PDF file
+Income Inequality and Health in Canada - University of Ottawa
+
+The conclusion is that income is a critical social determinant of health outcomes, and income inequality is not conducive to …
+
+Videos of Does Income Affect Health in Canada
+2:25
+Canada's healthcare costs are set to surge to nearly $400 billion in 2025
+YouTubeCTV News
+4.3K views9 months ago
+1:00:01
+More Than Money: Canada’s Billion Dollar Health Budget
+YouTubeCIHICanada
+590 views8 months ago
+1:15
+More Than Money: Canada’s Billion Dollar Health Budget
+YouTubeCIHICanada
+162 views10 months ago
+ 
